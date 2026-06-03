@@ -50,7 +50,7 @@ mongoose.connect(MONGODB_URI, {
 })
 .catch(err => {
   console.error('❌ MongoDB connection error:', err.message);
-  process.exit(1);
+  console.log("⚠️ سيبقى السيرفر يعمل بدون اتصال قاعدة البيانات حالياً...");
 });
 
 // ===== Health Check Endpoint =====
