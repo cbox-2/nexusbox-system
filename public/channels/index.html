@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Channels · NexusBox</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/shared/toolbar.css">
+</head>
+<body id="mainbody" style="background-color: #17102e !important;">
+<div id="bodywrap">
+  <div id="header">
+    <div class="wrap">
+      <a id="logo" href="/signup/signup.html">NexusBox</a>
+      <div id="headerExtras">
+        <span id="userWelcome">admin</span>
+        <a href="/dashboard/index.html">My Cboxes</a>
+        <a href="#">My Account</a>
+        <a href="#">Support</a>
+        <a href="#" onclick="globalLogout()">Log out</a>
+      </div>
+    </div>
+  </div>
+  <div id="subbar">
+    <div class="wrap">
+      <a href="/dashboard/index.html" class="submenuitem">MSASDWEC2015HKARNO</a>
+      <a href="/publish/publish.html" class="submenuitem">Publish</a>
+      <a href="/Theme-editor/Theme-editor.html" class="submenuitem" id="hovmenu1" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+      <a href="/posting-options/index.html" class="submenuitem" id="hovmenu2" onmousedown="return hovmenu(this, 2)">Options</a>
+      <a href="/registered-users/registered-users.html" class="submenuitem" id="hovmenu3" onmousedown="return hovmenu(this, 3)">Users</a>
+      <a href="/messages/messages.html" class="submenuitem active" id="hovmenu4" onmousedown="return hovmenu(this, 4)">Messages</a>
+    </div>
+  </div>
+  <div id="main" class="wrap">
+    <div id="content">
+      <h1>Channels</h1>
+      <p>Channels allow you to maintain separate NexusBox chat threads, to keep conversations organized by topic. Each channel has its own unique embed code and message history, but users and other NexusBox settings are shared. Create new channels below or search existing channels and view their messages.</p>
+
+      <div class="notice">
+        Channels are available with <a href="#">NexusBox Pro</a>. <a href="#">Unlock now</a>.
+      </div>
+
+      <form name="fthreadadd" onsubmit="return chk_fthreadadd();">
+        <fieldset>
+          <legend>Create new channel</legend>
+          <label>Name:</label>
+          <input type="text" name="nme" maxlength="25" size="35" class="txtbox" placeholder="Enter channel name">
+          <input type="submit" name="sub" value=" Add ">
+          <div id="m_fthreadadd" class="frmmsg1"></div>
+          <div id="em_fthreadadd" class="frmmsg2"></div>
+        </fieldset>
+      </form>
+
+      <fieldset>
+        <legend>Channels</legend>
+        <table class="dHead">
+          <tr>
+            <td>
+              <a href="#" onclick="selectAll();return false">Select All</a> | 
+              <a href="#" onclick="toggleSearch();return false">Search</a> | 
+              <a href="#" onclick="refreshChannels();return false">Refresh</a>
+            </td>
+            <td>
+              With selected: 
+              <a href="#" onclick="toggleDirectLink();return false">Toggle direct link</a> | 
+              <a href="#" onclick="deleteSelected();return false">Delete</a>
+            </td>
+          </tr>
+        </table>
+
+        <div id="searchBox">
+          Search for: <input type="text" class="txtbox" placeholder="Search...">
+          in <select class="txtbox">
+            <option value="nme" selected>Name</option>
+            <option value="id">Channel ID</option>
+            <option value="tme">Date created</option>
+          </select>
+          <input type="button" value=" Find " class="cbox-btn">
+        </div>
+
+        <div class="channel-frame">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>Channel Name</th>
+                <th>Created</th>
+                <th>Direct Link</th>
+              </tr>
+            </thead>
+            <tbody id="channelsBody">
+              <tr>
+                <td><input type="checkbox" class="channel-check"></td>
+                <td><strong>General</strong></td>
+                <td>Jun 1, 2026</td>
+                <td><a href="#" class="channel-link">Direct link</a></td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="channel-check"></td>
+                <td><strong>Support</strong></td>
+                <td>Jun 2, 2026</td>
+                <td><a href="#" class="channel-link">Direct link</a></td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
+
+      <h2>Channel API</h2>
+      <p>NexusBox has an API allowing you to generate channels programmatically. <a href="#">Find out more</a> about how to use the API. Your secret API URL is as follows. (NB: do not make this address publicly-accessible.)</p>
+      
+      <div class="code" id="apiUrl">
+        https://nexusbox.app/apis/channels.php?id=4-2015HKARNO-52gxr7&key=1e0b0701f04e0206e9c3dd98e9a738c5&act=mkchannel
+      </div>
+      
+      <p>
+        <input type="button" value=" Copy API URL " onclick="copyApiUrl()" class="cbox-btn">
+      </p>
+
+    </div>
+  </div>
+</div>
+<div id="footer">
+  <a href="#">About</a><a href="#">Plans & pricing</a><a href="#">Terms & conditions</a><a href="#">Privacy policy</a><a href="#">Contact us</a>
+  <div class="verybottom">© 2004–2026 NexusBox System, all rights reserved.</div>
+</div>
+<div id="hovmenu"></div>
+<script src="code.js"></script>
+<script src="/shared/toolbar.js"></script>
+</body>
+</html>

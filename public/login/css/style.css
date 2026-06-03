@@ -1,0 +1,57 @@
+@charset "utf-8";
+
+/* === خطوط محلية === */
+@font-face{font-family:'Open Sans';font-weight:400;src:local('Open Sans'),local('Tahoma')}
+@font-face{font-family:'Numans';src:local('Century Gothic'),local('Tahoma'),sans-serif}
+
+/* === إعدادات عامة === */
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{font:14px 'Open Sans',Tahoma,Arial,sans-serif;color:#454545;text-align:center;line-height:1.5;min-width:780px;background:#E8E8E8}
+a:link,a:visited{color:#059ad0;text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* === الهيدر === */
+#header{background:#323232;color:#ddd;font-size:85%;position:relative;text-align:right;line-height:30px;padding:8px 0}
+#header .wrap{max-width:1000px;margin:0 auto;padding:0 12px;display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:10px}
+#header #logo img{height:86px;width:200px}
+#headerExtras{display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+#headerExtras label{color:#aaa;font-size:11px}
+.txtbox{font-family:inherit;font-size:12px;border:#059ad0 2px solid;background:#fff;padding:4px 6px;height:24px;color:#000}
+input[type=submit]{font-family:inherit;font-size:12px;border:#059ad0 2px solid;background:#059ad0;color:#fff;padding:4px 10px;cursor:pointer;border-radius:2px}
+input[type=submit]:hover{background:#0379a3}
+
+/* === شريط التنقل === */
+#topbar{background:#e0e0e0;border-bottom:1px solid #ccc;padding:6px 0}
+#topbar .wrap{max-width:1000px;margin:0 auto;display:flex;flex-wrap:wrap;gap:4px;justify-content:center}
+a.button{background:#fff;border:1px solid #bbb;padding:4px 8px;color:#333;border-radius:2px;font-size:11px;text-decoration:none}
+a.button:hover,a.button.active{background:#d9e4f2;border-color:#7a9cc6}
+
+/* === المحتوى === */
+#main{background:#fff;border:1px solid #ccc;border-radius:2px;margin:15px auto;max-width:1000px;text-align:left;padding:15px}
+.grid{display:flex;flex-wrap:wrap;gap:12px}
+.box{flex:1;min-width:280px;background:#f9f9f9;border:1px solid #ddd;border-radius:2px}
+.box-h{background:#d9e4f2;border-bottom:1px solid #b0c4de;padding:6px 10px;font-weight:bold;color:#0055aa;font-size:12px}
+.box-c{padding:10px}
+.box-c p{margin-bottom:8px;font-size:12px}
+label{display:inline-block;width:30%;text-align:right;padding:2px 0;font-size:12px}
+.form{width:70%;padding:4px 6px;margin:2px 0 6px;border:1px solid #aaa;font-size:12px}
+.btn{background:#f0f0f0;border:1px solid #aaa;padding:4px 10px;cursor:pointer;font-size:12px;border-radius:2px;margin-top:4px}
+.btn.Danger{background:#ffe0e0;border-color:#cc9999;color:#c00}
+.stats-table{width:100%;border-collapse:collapse;font-size:11px}
+.stats-table td{padding:4px 6px;border-bottom:1px solid #eee}
+.stats-table td:first-child{color:#666;width:45%}
+.quick-url{background:#fff;border:1px solid #ccc;padding:4px 6px;width:100%;font-family:monospace;font-size:10px;color:#555;border-radius:2px}
+.notice_er{background:#fc735a;color:#fff;padding:6px 12px;margin:8px 12px;font-size:11px;border-radius:2px}
+
+/* === الفوتر === */
+#footer{background:#f0f0f0;border-top:1px solid #ccc;padding:8px 12px;text-align:center;font-size:10px;color:#666;margin-top:0}
+#footer a{color:#555;text-decoration:none;margin:0 4px}
+.verybottom{margin-top:4px;color:#888}
+
+/* === تجاوب === */
+@media(max-width:800px){
+  body{min-width:300px}
+  #header .wrap,#topbar .wrap{flex-direction:column;align-items:flex-start}
+  .col1_2,.col2_2{width:100%;flex:1 1 100%}
+  label,.form{width:100%;text-align:right}
+}

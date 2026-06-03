@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Messages · NexusBox</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/shared/toolbar.css">
+</head>
+<body id="mainbody" style="background-color: #052e2b !important;">
+<div id="bodywrap">
+  <div id="header">
+    <div class="wrap">
+      <a id="logo" href="/signup/signup.html">NexusBox</a>
+      <div id="headerExtras">
+        <span id="userWelcome">admin</span>
+        <a href="/dashboard/index.html">My Cboxes</a>
+        <a href="#">My Account</a>
+        <a href="#">Support</a>
+        <a href="#" onclick="globalLogout()">Log out</a>
+      </div>
+    </div>
+  </div>
+  <div id="subbar">
+    <div class="wrap">
+      <a href="/dashboard/index.html" class="submenuitem">MSASDWEC2015HKARNO</a>
+      <a href="/publish/publish.html" class="submenuitem">Publish</a>
+      <a href="/Theme-editor/Theme-editor.html" class="submenuitem" id="hovmenu1" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+      <a href="/posting-options/index.html" class="submenuitem" id="hovmenu2" onmousedown="return hovmenu(this, 2)">Options</a>
+      <a href="/registered-users/registered-users.html" class="submenuitem" id="hovmenu3" onmousedown="return hovmenu(this, 3)">Users</a>
+      <a href="/messages/index.html" class="submenuitem active" id="hovmenu4" onmousedown="return hovmenu(this, 4)">Messages</a>
+    </div>
+  </div>
+  <div id="main" class="wrap">
+    <div id="content">
+      <h1>Messages</h1>
+      <p>View and delete messages and ban users using this form.</p>
+
+      <form name="fpostopt" onsubmit="return chk_fpostopt();">
+        <fieldset class="Short">
+          <legend>Message options</legend>
+          <label for="i_emlnotify" title="Sends you an email each day with your new messages">Email daily digest of new messages:</label>
+          <div class="slideThree"><input type="checkbox" name="emlnotify" value="1" id="i_emlnotify"><label></label></div>
+          <input type="submit" name="sub" value=" Save ">
+          <div id="m_fpostopt" class="frmmsg1"></div>
+          <div id="em_fpostopt" class="frmmsg2"></div>
+        </fieldset>
+      </form>
+
+      <form name="fquickdel" onsubmit="return chk_bulkdel();">
+        <fieldset>
+          <legend>Bulk Delete</legend>
+          <label>Choose range:</label>
+          <div class="bulk-delete-row">
+            <select name="prunetype" class="txtbox">
+              <option value="0" selected>Keep the</option>
+              <option value="1">Delete the</option>
+            </select>
+            <input type="text" size="4" name="prunenum" maxlength="4" class="txtbox" value="150">
+            <select name="prunewhich" class="txtbox">
+              <option value="0">oldest messages</option>
+              <option value="1" selected>most recent messages</option>
+            </select>
+            <input type="submit" name="sub" value="Delete" class="Danger">
+          </div>
+          <div id="m_fquickdel" class="frmmsg1"></div>
+          <div id="em_fquickdel" class="frmmsg2"></div>
+        </fieldset>
+      </form>
+
+      <fieldset>
+        <legend>Messages</legend>
+        <table class="dHead">
+          <tr>
+            <td>
+              <a href="#" onclick="selectAllMessages();return false">Select All</a> | 
+              <a href="#" onclick="toggleSearch();return false">Search</a> | 
+              <a href="#" onclick="refreshMessages();return false">Refresh</a>
+            </td>
+            <td>
+              With selected: 
+              <a href="#" onclick="deleteSelected();return false">Delete</a> | 
+              <a href="#" onclick="deleteAsSpam();return false">Delete as spam</a>
+            </td>
+          </tr>
+          <tr id="srchposts">
+            <td colspan="2" align="center">
+              Search for: <input type="text" maxlength="100" size="30" class="txtbox" placeholder="Search..."> 
+              in <select class="txtbox">
+                <option value="nme" selected>Name</option>
+                <option value="eml">Link</option>
+                <option value="msg">Message</option>
+                <option value="tme">Date</option>
+                <option value="ip">IP</option>
+              </select>
+              <input type="button" value=" Find " class="cbox-btn">
+            </td>
+          </tr>
+        </table>
+
+        <div class="messages-frame">
+          <table>
+            <thead>
+              <tr>
+                <th></th>
+                <th>User</th>
+                <th>Message</th>
+                <th>Date</th>
+                <th>IP</th>
+              </tr>
+            </thead>
+            <tbody>
+              <tr>
+                <td><input type="checkbox" class="msg-check"></td>
+                <td><strong>Ahmed</strong></td>
+                <td>Hello everyone! 👋</td>
+                <td>Jun 3, 2026 10:15</td>
+                <td>192.168.1.10</td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="msg-check"></td>
+                <td><strong>Sara</strong></td>
+                <td>Welcome to NexusBox!</td>
+                <td>Jun 3, 2026 10:16</td>
+                <td>192.168.1.20</td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="msg-check"></td>
+                <td><strong>Mohammed</strong></td>
+                <td>Nice to meet you all 😊</td>
+                <td>Jun 3, 2026 10:18</td>
+                <td>192.168.1.30</td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="msg-check"></td>
+                <td><strong>Fatima</strong></td>
+                <td>Great chat room!</td>
+                <td>Jun 3, 2026 10:20</td>
+                <td>192.168.1.40</td>
+              </tr>
+              <tr>
+                <td><input type="checkbox" class="msg-check"></td>
+                <td><strong>Ali</strong></td>
+                <td>How's everyone doing today?</td>
+                <td>Jun 3, 2026 10:22</td>
+                <td>192.168.1.50</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </fieldset>
+
+    </div>
+  </div>
+</div>
+<div id="footer">
+  <a href="#">About</a><a href="#">Plans & pricing</a><a href="#">Terms & conditions</a><a href="#">Privacy policy</a><a href="#">Contact us</a>
+  <div class="verybottom">© 2004–2026 NexusBox System, all rights reserved.</div>
+</div>
+<div id="hovmenu"></div>
+<script src="code.js"></script>
+<script src="/shared/toolbar.js"></script>
+</body>
+</html>

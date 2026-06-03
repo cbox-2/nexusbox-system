@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Date Options · NexusBox</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/shared/toolbar.css">
+</head>
+<body id="mainbody">
+<div id="bodywrap">
+  <div id="header">
+    <div class="wrap">
+      <a id="logo" href="/signup/signup.html">NexusBox</a>
+      <div id="headerExtras">
+        <span id="userWelcome">admin</span>
+        <a href="/dashboard/index.html">My Cboxes</a>
+        <a href="#">My Account</a>
+        <a href="#">Support</a>
+        <a href="#" onclick="globalLogout()">Log out</a>
+      </div>
+    </div>
+  </div>
+  <div id="subbar">
+    <div class="wrap">
+      <a href="/dashboard/index.html" class="submenuitem" style="font-weight:600">MSASDWEC2015HKARNO</a>
+      <a href="/publish/publish.html" class="submenuitem">Publish</a>
+      <a href="/Theme-editor/Theme-editor.html" class="submenuitem" id="hovmenu1" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+      <a href="/posting-options/index.html" class="submenuitem active" id="hovmenu2" onmousedown="return hovmenu(this, 2)">Options</a>
+      <a href="/registered-users/registered-users.html" class="submenuitem" id="hovmenu3" onmousedown="return hovmenu(this, 3)">Users</a>
+      <a href="/messages/messages.html" class="submenuitem" id="hovmenu4" onmousedown="return hovmenu(this, 4)">Messages</a>
+    </div>
+  </div>
+  <div id="main" class="wrap">
+    <div id="content">
+      <h1>Date Options</h1>
+      <p>Change the way the date is displayed on messages in your NexusBox.</p>
+      <p>With the current settings, the date is: <b><span id="ddemo">Loading...</span></b></p>
+
+      <form name="dateopt" onsubmit="return chk_dateopt();">
+
+        <fieldset>
+          <legend>Date &amp; formatting</legend>
+          <label>Format:</label>
+          <select name="dformat" class="txtbox" onchange="calcdate()">
+            <option value="0" selected>dd mmm yy</option>
+            <option value="2">dd/mm/yyyy</option>
+            <option value="4">mm/dd/yyyy</option>
+            <option value="6">yyyy-mm-dd</option>
+            <option value="8">dd'th mmm yyyy</option>
+            <option value="10">ddd, mmm dd'th yyyy</option>
+          </select>
+
+          <label>Time:</label>
+          <select name="tformat" class="txtbox" onchange="calcdate()">
+            <option value="0">24 hr</option>
+            <option value="1" selected>12 hr</option>
+          </select>
+
+          <label>Zone <a href="javascript:gettz();" style="font-size:12px">[reset]</a>:</label>
+          <input type="text" name="tzone" id="tzone" size="6" maxlength="6" class="txtbox" value="3.00" onchange="calcdate();">
+        </fieldset>
+
+        <fieldset>
+          <legend>Date display</legend>
+          <label>Display date:</label>
+          <select name="showdate" class="txtbox">
+            <option value="0">Hide</option>
+            <option value="1">As tooltip</option>
+            <option value="2">Above messages</option>
+            <option value="3" selected>Above messages &amp; relative</option>
+          </select>
+        </fieldset>
+
+        <fieldset>
+          <input type="submit" name="sub" value=" Save ">
+          <div id="m_dateopt" class="frmmsg1"></div>
+          <div id="em_dateopt" class="frmmsg2"></div>
+        </fieldset>
+
+      </form>
+    </div>
+  </div>
+</div>
+<div id="footer">
+  <a href="#">About</a><a href="#">Plans & pricing</a><a href="#">Terms & conditions</a><a href="#">Privacy policy</a><a href="#">Contact us</a>
+  <div class="verybottom">© 2004–2026 NexusBox System, all rights reserved.</div>
+</div>
+<div id="hovmenu"></div>
+<script src="code.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded',function(){
+  if(typeof calcdate==='function') calcdate();
+});
+</script>
+<script src="/shared/toolbar.js"></script>
+</body>
+</html>

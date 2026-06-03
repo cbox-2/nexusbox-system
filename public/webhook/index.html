@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Message Webhook · NexusBox</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/shared/toolbar.css">
+</head>
+<body id="mainbody" style="background-color: #164e63 !important;">
+<div id="bodywrap">
+  <div id="header">
+    <div class="wrap">
+      <a id="logo" href="/signup/signup.html">NexusBox</a>
+      <div id="headerExtras">
+        <span id="userWelcome">admin</span>
+        <a href="/dashboard/index.html">My Cboxes</a>
+        <a href="#">My Account</a>
+        <a href="#">Support</a>
+        <a href="#" onclick="globalLogout()">Log out</a>
+      </div>
+    </div>
+  </div>
+  <div id="subbar">
+    <div class="wrap">
+      <a href="/dashboard/index.html" class="submenuitem">MSASDWEC2015HKARNO</a>
+      <a href="/publish/publish.html" class="submenuitem">Publish</a>
+      <a href="/Theme-editor/Theme-editor.html" class="submenuitem" id="hovmenu1" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+      <a href="/posting-options/index.html" class="submenuitem" id="hovmenu2" onmousedown="return hovmenu(this, 2)">Options</a>
+      <a href="/registered-users/registered-users.html" class="submenuitem" id="hovmenu3" onmousedown="return hovmenu(this, 3)">Users</a>
+      <a href="/messages/messages.html" class="submenuitem active" id="hovmenu4" onmousedown="return hovmenu(this, 4)">Messages</a>
+    </div>
+  </div>
+  <div id="main" class="wrap">
+    <div id="content">
+      <h1>Message webhook</h1>
+      <p>Configure and enable the NexusBox webhook here. This allows you to receive a copy of every message published to your NexusBox at your own HTTP endpoint. This allows you to keep logs, trigger your own notifications, implement bots, and more.</p>
+      <p>This feature requires some development experience. <a href="#">See webhook help</a>.</p>
+
+      <div class="notice">
+        Webhook is a <a href="#">NexusBox Pro</a> feature. Find out more about webhooks <a href="#">here</a>.
+      </div>
+
+      <form name="fpostopt" onsubmit="return chk_webhook();">
+        <fieldset>
+          <legend>Callback settings</legend>
+          <label>Callback URL:</label>
+          <input type="text" name="url" value="" placeholder="http://yoursite.example.com/nexusbox" maxlength="200" class="txtbox">
+
+          <label for="i_enabled">Callback enabled:</label>
+          <div class="slideThree"><input type="checkbox" name="enabled" value="1" disabled id="i_enabled"><label></label></div>
+          
+          <input type="submit" name="sub" value=" Save ">
+          <div id="m_webhook" class="frmmsg1"></div>
+        </fieldset>
+      </form>
+
+      <fieldset>
+        <legend>Current status</legend>
+        <label>Endpoint state:</label>
+        <div class="notInput status-not-configured">NOT CONFIGURED</div>
+        <div>
+          <input type="button" value=" Refresh " onclick="refreshStatus()">
+        </div>
+      </fieldset>
+
+      <div class="webhook-info">
+        <strong>💡 Tip:</strong> When enabled, NexusBox will send a POST request to your callback URL every time a new message is posted. The request body will contain the message data in JSON format.
+      </div>
+    </div>
+  </div>
+</div>
+<div id="footer">
+  <a href="#">About</a><a href="#">Plans & pricing</a><a href="#">Terms & conditions</a><a href="#">Privacy policy</a><a href="#">Contact us</a>
+  <div class="verybottom">© 2004–2026 NexusBox System, all rights reserved.</div>
+</div>
+<div id="hovmenu"></div>
+<script src="code.js"></script>
+<script src="/shared/toolbar.js"></script>
+</body>
+</html>

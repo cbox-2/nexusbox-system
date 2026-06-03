@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Archives · NexusBox</title>
+<link rel="stylesheet" href="style.css">
+<link rel="stylesheet" href="/shared/toolbar.css">
+</head>
+<body id="mainbody" style="background-color: #18181b !important;">
+<div id="bodywrap">
+  <div id="header">
+    <div class="wrap">
+      <a id="logo" href="/signup/signup.html">NexusBox</a>
+      <div id="headerExtras">
+        <span id="userWelcome">admin</span>
+        <a href="/dashboard/index.html">My Cboxes</a>
+        <a href="#">My Account</a>
+        <a href="#">Support</a>
+        <a href="#" onclick="globalLogout()">Log out</a>
+      </div>
+    </div>
+  </div>
+  <div id="subbar">
+    <div class="wrap">
+      <a href="/dashboard/index.html" class="submenuitem">MSASDWEC2015HKARNO</a>
+      <a href="/publish/publish.html" class="submenuitem">Publish</a>
+      <a href="/Theme-editor/Theme-editor.html" class="submenuitem" id="hovmenu1" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+      <a href="/posting-options/index.html" class="submenuitem" id="hovmenu2" onmousedown="return hovmenu(this, 2)">Options</a>
+      <a href="/registered-users/registered-users.html" class="submenuitem" id="hovmenu3" onmousedown="return hovmenu(this, 3)">Users</a>
+      <a href="/messages/messages.html" class="submenuitem active" id="hovmenu4" onmousedown="return hovmenu(this, 4)">Messages</a>
+    </div>
+  </div>
+  <div id="main" class="wrap">
+    <div id="content">
+      <h1>Archived messages</h1>
+      <p>View and download your message archives. All messages are archived, including messages that are later deleted via your NexusBox or the control panel, and archives are stored for three months. Your archives will be generated in tab-separated CSV format, which can be imported into various applications, including spreadsheets, for processing and exporting.</p>
+      <p><span class="highlightGood">TIP</span> You can receive copies of messages directly to your own server using our <a href="/webhook/index.html">webhook</a> feature.</p>
+
+      <form name="fpostsarc" onsubmit="return chk_fpostsarc();">
+        <fieldset>
+          <legend>Generate archive download</legend>
+          <table class="date-table">
+            <tr>
+              <td></td>
+              <td align="center"><strong>Year</strong></td>
+              <td align="center"><strong>Month</strong></td>
+              <td align="center"><strong>Day</strong></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td align="right">From</td>
+              <td><input type="text" name="yy1" size="5" maxlength="5" class="txtbox" value="2026"></td>
+              <td><input type="text" name="mm1" size="3" maxlength="3" class="txtbox" value="06"></td>
+              <td><input type="text" name="dd1" size="3" maxlength="3" class="txtbox" value="01"></td>
+              <td></td>
+            </tr>
+            <tr>
+              <td align="right">To</td>
+              <td><input type="text" name="yy2" size="5" maxlength="5" class="txtbox" value="2026"></td>
+              <td><input type="text" name="mm2" size="3" maxlength="3" class="txtbox" value="06"></td>
+              <td><input type="text" name="dd2" size="3" maxlength="3" class="txtbox" value="03"></td>
+              <td></td>
+            </tr>
+          </table>
+          <input type="submit" name="sub" value=" Go ">
+          <div id="m_fpostsarc" class="frmmsg1"></div>
+          <div id="em_fpostsarc" class="frmmsg2"></div>
+        </fieldset>
+      </form>
+
+      <h2>Recently generated archives</h2>
+      <div class="block_grey">
+        <i>Right-click and select Save Target As or Save Link As...</i>
+        <ul>
+          <li><a href="#" onclick="downloadArchive('nexusbox_2026-05-28_2026-06-01.zip');return false">2026-05-28 – 2026-06-01</a> <small>(127 KB)</small></li>
+          <li><a href="#" onclick="downloadArchive('nexusbox_2026-04-15_2026-05-15.zip');return false">2026-04-15 – 2026-05-15</a> <small>(256 KB)</small></li>
+          <li><a href="#" onclick="downloadArchive('nexusbox_2026-03-01_2026-04-01.zip');return false">2026-03-01 – 2026-04-01</a> <small>(189 KB)</small></li>
+        </ul>
+      </div>
+
+    </div>
+  </div>
+</div>
+<div id="footer">
+  <a href="#">About</a><a href="#">Plans & pricing</a><a href="#">Terms & conditions</a><a href="#">Privacy policy</a><a href="#">Contact us</a>
+  <div class="verybottom">© 2004–2026 NexusBox System, all rights reserved.</div>
+</div>
+<div id="hovmenu"></div>
+<script src="code.js"></script>
+<script src="/shared/toolbar.js"></script>
+</body>
+</html>

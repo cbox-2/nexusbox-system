@@ -1,0 +1,347 @@
+/* ===== NexusBox Toolbar - معالجة شاملة لكل الصناديق ===== */
+
+:root {
+  --primary-color: #6366f1;
+  --primary-gradient: linear-gradient(135deg, #6366f1, #8b5cf6);
+  --primary-glow: rgba(99, 102, 241, 0.4);
+  --gold-color: #fbbf24;
+  --gold-gradient: linear-gradient(135deg, #fbbf24, #f59e0b);
+  --gold-glow: rgba(251, 191, 36, 0.4);
+}
+
+body {
+  background: transparent !important;
+  padding-top: 120px !important;
+  color: #e2e8f0 !important;
+}
+
+#header, #header *, #subbar, #subbar * {
+  direction: ltr !important;
+  text-align: left !important;
+}
+
+#header {
+  position: fixed !important;
+  top: 10px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 96% !important;
+  max-width: 1400px !important;
+  z-index: 99999 !important;
+  background: linear-gradient(135deg, rgba(30, 41, 59, 0.95), rgba(15, 23, 42, 0.9)) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.15) !important;
+  border-radius: 14px !important;
+  padding: 4px 12px !important;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.4), 0 0 25px var(--gold-glow) !important;
+  display: grid !important;
+  grid-template-columns: 80px 1fr !important;
+  align-items: center !important;
+  min-height: 36px !important;
+  height: 36px !important;
+  overflow: hidden !important;
+}
+
+#header .wrap { display: contents !important; }
+
+#header::before {
+  content: '' !important;
+  position: absolute !important;
+  top: -2px !important;
+  left: 20% !important;
+  right: 20% !important;
+  height: 2px !important;
+  background: linear-gradient(90deg, transparent, var(--gold-color), #f59e0b, var(--gold-color), transparent) !important;
+  border-radius: 2px !important;
+  box-shadow: 0 0 10px var(--gold-color) !important;
+  display: block !important;
+}
+
+#logo {
+  position: relative !important;
+  display: block !important;
+  width: 80px !important;
+  height: 28px !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  text-decoration: none !important;
+  grid-column: 1 !important;
+  grid-row: 1 !important;
+  overflow: hidden !important;
+}
+
+#logo::before {
+  content: 'N' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 18% !important;
+  transform: translateY(-50%) !important;
+  font-size: 18px !important;
+  font-weight: 900 !important;
+  font-family: 'Arial Black', sans-serif !important;
+  background: var(--gold-gradient) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  filter: drop-shadow(0 0 8px var(--gold-glow)) !important;
+  animation: flipN 4s infinite !important;
+}
+
+#logo::after {
+  content: 'NexusBox' !important;
+  position: absolute !important;
+  top: 50% !important;
+  left: 42% !important;
+  transform: translateY(-50%) !important;
+  font-size: 10px !important;
+  font-weight: 800 !important;
+  background: var(--gold-gradient) !important;
+  -webkit-background-clip: text !important;
+  -webkit-text-fill-color: transparent !important;
+  background-clip: text !important;
+  filter: drop-shadow(0 0 5px var(--gold-glow)) !important;
+  animation: flipFull 4s infinite !important;
+}
+
+@keyframes flipN {
+  0%, 40% { opacity: 1; transform: translateY(-50%) rotateY(0deg) scale(1.1); }
+  45%, 55% { opacity: 0; transform: translateY(-50%) rotateY(90deg); }
+  60%, 100% { opacity: 0; transform: translateY(-50%) rotateY(180deg); }
+}
+
+@keyframes flipFull {
+  0%, 40% { opacity: 0; transform: translateY(-50%) rotateY(-180deg); }
+  45%, 55% { opacity: 0; transform: translateY(-50%) rotateY(-90deg); }
+  60%, 100% { opacity: 1; transform: translateY(-50%) rotateY(0deg); }
+}
+
+#headerExtras {
+  display: flex !important;
+  gap: 3px !important;
+  flex-wrap: wrap !important;
+  align-items: center !important;
+  justify-content: flex-end !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  grid-column: 2 !important;
+  grid-row: 1 !important;
+  overflow: hidden !important;
+}
+
+#headerExtras a,
+#headerExtras span {
+  color: #f1f5f9 !important;
+  padding: 2px 6px !important;
+  border-radius: 4px !important;
+  background: rgba(255, 255, 255, 0.08) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  font-size: 9px !important;
+  white-space: nowrap !important;
+  transition: all 0.3s ease !important;
+  text-decoration: none !important;
+  display: inline-block !important;
+  max-height: 20px !important;
+  line-height: 1 !important;
+}
+
+#headerExtras a:hover {
+  background: var(--gold-gradient) !important;
+  color: #1e293b !important;
+}
+
+#headerExtras span {
+  background: rgba(16, 185, 129, 0.2) !important;
+  color: #10b981 !important;
+  font-weight: 600 !important;
+}
+
+#subbar {
+  position: fixed !important;
+  top: 54px !important;
+  left: 50% !important;
+  transform: translateX(-50%) !important;
+  width: 96% !important;
+  max-width: 1400px !important;
+  z-index: 99998 !important;
+  background: linear-gradient(135deg, rgba(99, 102, 241, 0.92), rgba(139, 92, 246, 0.88)) !important;
+  backdrop-filter: blur(20px) saturate(180%) !important;
+  -webkit-backdrop-filter: blur(20px) saturate(180%) !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  border-radius: 14px !important;
+  padding: 4px 12px !important;
+  box-shadow: 0 10px 30px var(--primary-glow) !important;
+  display: block !important;
+  overflow: visible !important;
+  line-height: 1.2 !important;
+  height: 36px !important;
+  min-height: 36px !important;
+}
+
+#subbar .wrap {
+  display: flex !important;
+  justify-content: center !important;
+  align-items: center !important;
+  flex-wrap: wrap !important;
+  gap: 3px !important;
+  overflow: visible !important;
+  width: 100% !important;
+  height: 28px !important;
+}
+
+.submenuitem {
+  display: inline-flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  visibility: visible !important;
+  opacity: 1 !important;
+  background: rgba(255, 255, 255, 0.15) !important;
+  color: white !important;
+  border-radius: 6px !important;
+  padding: 3px 7px !important;
+  margin: 0 !important;
+  font-size: 9px !important;
+  font-weight: 700 !important;
+  white-space: nowrap !important;
+  border: 1px solid rgba(255, 255, 255, 0.25) !important;
+  transition: all 0.3s ease !important;
+  flex-shrink: 0 !important;
+  text-decoration: none !important;
+  line-height: 1 !important;
+  height: 20px !important;
+  max-height: 20px !important;
+  overflow: visible !important;
+}
+
+.submenuitem:hover {
+  background: rgba(255, 255, 255, 0.3) !important;
+  transform: translateY(-2px) scale(1.05) !important;
+}
+
+.submenuitem.active,
+.submenuitem b {
+  background: var(--gold-gradient) !important;
+  color: #1e293b !important;
+  box-shadow: 0 3px 10px var(--gold-glow) !important;
+}
+
+#hovmenu { display: none !important; visibility: hidden !important; }
+
+/* ===== معالجة شاملة لكل الصناديق البيضاء في الصفحات ===== */
+fieldset, .cbox-section, .panel, .card, div[class*="panel"], div[class*="card"],
+div[id*="panel"], div[id*="section"], .form-container, .settings-box,
+.main-content, .content-area, .wrap-content, table, tbody, tr, td,
+div[class*="box"], div[class*="container"], section, article {
+  background: rgba(0, 0, 0, 0.3) !important;
+  backdrop-filter: blur(10px) !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+  color: #e2e8f0 !important;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3) !important;
+}
+
+/* النصوص والعناوين */
+fieldset legend, .cbox-section h2, .panel h2, .card h2, h1, h2, h3, h4, h5, h6,
+fieldset label, .cbox-section label, .panel label {
+  color: #f1f5f9 !important;
+}
+
+/* حقول الإدخال */
+input[type="text"], input[type="password"], input[type="email"],
+input[type="url"], input[type="number"], textarea, select {
+  background: rgba(15, 23, 42, 0.8) !important;
+  border: 1px solid rgba(255, 255, 255, 0.2) !important;
+  color: white !important;
+  padding: 8px 12px !important;
+  border-radius: 6px !important;
+}
+
+input[type="text"]:focus, input[type="password"]:focus,
+input[type="email"]:focus, input[type="url"]:focus,
+textarea:focus, select:focus {
+  outline: none !important;
+  border-color: var(--primary-color) !important;
+  box-shadow: 0 0 10px var(--primary-glow) !important;
+}
+
+/* الأزرار */
+input[type="submit"], button[type="submit"], .btn, .cbox-btn,
+button[class*="btn"], button[class*="button"] {
+  background: linear-gradient(135deg, #0ea5e9, #0284c7) !important;
+  color: white !important;
+  border: none !important;
+  padding: 8px 16px !important;
+  border-radius: 6px !important;
+  font-weight: 600 !important;
+  cursor: pointer !important;
+  transition: all 0.3s !important;
+}
+
+input[type="submit"]:hover, button[type="submit"]:hover,
+.btn:hover, .cbox-btn:hover {
+  transform: translateY(-2px) !important;
+  box-shadow: 0 5px 15px rgba(14, 165, 233, 0.4) !important;
+}
+
+/* الصناديق الملونة (تنبيهات) */
+div[class*="alert"], div[class*="notice"], div[class*="warning"],
+div[class*="error"], div[class*="success"], div[class*="info"] {
+  background: rgba(251, 191, 36, 0.2) !important;
+  border: 1px solid rgba(251, 191, 36, 0.4) !important;
+  color: #fbbf24 !important;
+}
+
+div[class*="alert"] a, div[class*="notice"] a,
+div[class*="warning"] a, div[class*="error"] a {
+  color: #60a5fa !important;
+}
+
+/* النصوص العادية */
+p, span, div:not(#header):not(#subbar):not(.submenuitem) {
+  color: #cbd5e1 !important;
+}
+
+/* الروابط */
+a {
+  color: #60a5fa !important;
+}
+
+a:hover {
+  color: #93c5fd !important;
+}
+
+/* الجداول */
+table {
+  border-collapse: collapse !important;
+  width: 100% !important;
+}
+
+table td, table th {
+  padding: 10px !important;
+  border: 1px solid rgba(255, 255, 255, 0.1) !important;
+}
+
+table th {
+  background: rgba(99, 102, 241, 0.3) !important;
+  color: #f1f5f9 !important;
+  font-weight: 600 !important;
+}
+
+table tr:nth-child(even) {
+  background: rgba(255, 255, 255, 0.05) !important;
+}
+
+table tr:hover {
+  background: rgba(99, 102, 241, 0.2) !important;
+}
+
+@media (max-width: 768px) {
+  #header, #subbar { height: 34px !important; min-height: 34px !important; padding: 3px 8px !important; }
+  #subbar { top: 50px !important; }
+  #header { grid-template-columns: 70px 1fr !important; }
+  #logo { width: 70px !important; height: 24px !important; }
+  #logo::before { font-size: 16px !important; left: 15% !important; }
+  #logo::after { font-size: 9px !important; left: 40% !important; }
+  #headerExtras a, #headerExtras span { padding: 2px 4px !important; font-size: 8px !important; max-height: 18px !important; }
+  .submenuitem { padding: 2px 5px !important; font-size: 8px !important; height: 18px !important; max-height: 18px !important; }
+  body { padding-top: 110px !important; }
+}
