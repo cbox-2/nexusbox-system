@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>NexusBox - الواجهة الموحدة</title>
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #0f0c29; color: #fff; height: 100vh; overflow: hidden; }
+    
+    .app-container { display: flex; height: 100vh; }
+    
+    /* القائمة الجانبية */
+    .sidebar {
+      width: 260px;
+      background: linear-gradient(180deg, #1a1a2e, #16213e);
+      border-left: 1px solid rgba(255,255,255,0.1);
+      overflow-y: auto;
+      padding: 20px 0;
+      flex-shrink: 0;
+    }
+    .sidebar h2 {
+      text-align: center;
+      padding: 0 20px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+      color: #00dbde;
+      font-size: 1.4em;
+    }
+    .nav-btn {
+      display: block;
+      width: 100%;
+      padding: 14px 20px;
+      background: transparent;
+      color: #ccc;
+      border: none;
+      text-align: right;
+      cursor: pointer;
+      font-size: 1em;
+      transition: all 0.3s;
+      border-right: 3px solid transparent;
+    }
+    .nav-btn:hover {
+      background: rgba(0,219,222,0.1);
+      color: #fff;
+      border-right-color: #00dbde;
+    }
+    .nav-btn.active {
+      background: rgba(0,219,222,0.2);
+      color: #00dbde;
+      border-right-color: #00dbde;
+    }
+    .nav-icon { margin-left: 10px; }
+
+    /* منطقة العرض */
+    .main-content {
+      flex: 1;
+      background: #24243e;
+      position: relative;
+    }
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      background: #fff;
+    }
+  </style>
+</head>
+<body>
+  <div class="app-container">
+    <!-- القائمة الجانبية -->
+    <div class="sidebar">
+      <h2>🚀 NexusBox</h2>
+      <button class="nav-btn active" onclick="loadPage('dashboard/index.html', this)"><span class="nav-icon">📊</span> لوحة التحكم</button>
+      <button class="nav-btn" onclick="loadPage('login/index.html', this)"><span class="nav-icon">🔐</span> تسجيل الدخول</button>
+      <button class="nav-btn" onclick="loadPage('signup/signup.html', this)"><span class="nav-icon"></span> إنشاء حساب</button>
+      <button class="nav-btn" onclick="loadPage('chat/chat.html', this)"><span class="nav-icon">💬</span> الدردشة</button>
+      <button class="nav-btn" onclick="loadPage('channels/index.html', this)"><span class="nav-icon">📡</span> القنوات</button>
+      <button class="nav-btn" onclick="loadPage('messages/index.html', this)"><span class="nav-icon">✉️</span> الرسائل</button>
+      <button class="nav-btn" onclick="loadPage('registered-users/registered-users.html', this)"><span class="nav-icon">👥</span> المستخدمين</button>
+      <button class="nav-btn" onclick="loadPage('bans/index.html', this)"><span class="nav-icon"></span> الحظر</button>
+      <button class="nav-btn" onclick="loadPage('archives/index.html', this)"><span class="nav-icon">📁</span> الأرشيف</button>
+      <button class="nav-btn" onclick="loadPage('emoticons/index.html', this)"><span class="nav-icon">😊</span> الرموز التعبيرية</button>
+      <button class="nav-btn" onclick="loadPage('filtering/index.html', this)"><span class="nav-icon">🔍</span> الفلترة</button>
+      <button class="nav-btn" onclick="loadPage('sticky-message/index.html', this)"><span class="nav-icon">📌</span> الرسائل المثبتة</button>
+      <button class="nav-btn" onclick="loadPage('posting-options/index.html', this)"><span class="nav-icon">️</span> خيارات النشر</button>
+      <button class="nav-btn" onclick="loadPage('date-options/index.html', this)"><span class="nav-icon">📅</span> خيارات التاريخ</button>
+      <button class="nav-btn" onclick="loadPage('layout-options/layout-options.html', this)"><span class="nav-icon">🎨</span> خيارات التصميم</button>
+      <button class="nav-btn" onclick="loadPage('Theme-editor/Theme-editor.html', this)"><span class="nav-icon">🎭</span> محرر الثيمات</button>
+      <button class="nav-btn" onclick="loadPage('user-integration/user-integration.html', this)"><span class="nav-icon"></span> تكامل المستخدمين</button>
+      <button class="nav-btn" onclick="loadPage('publish/publish.html', this)"><span class="nav-icon">📢</span> النشر</button>
+      <button class="nav-btn" onclick="loadPage('webhook/index.html', this)"><span class="nav-icon">🪝</span> Webhook</button>
+    </div>
+
+    <!-- منطقة العرض -->
+    <div class="main-content">
+      <iframe id="content-frame" src="dashboard/index.html"></iframe>
+    </div>
+  </div>
+
+  <script>
+    function loadPage(url, btn) {
+      document.getElementById('content-frame').src = url;
+      
+      // تحديث الزر النشط
+      document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+    }
+  </script>
+</body>
+</html>
