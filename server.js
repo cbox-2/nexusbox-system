@@ -5,131 +5,109 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
-const path = require('path');
-const { router: authRouter, authMiddleware, adminMiddleware } = require("./routes/auth");
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 
 const app = express();
 
 // ===== Trust Proxy (مهم لـ Railway) =====
-app.set("trust proxy", true);
+app.set("trust proxy", 1);
 
-// ===== حفظ معلومات الاتصال للتشخيص =====
-let connectionInfo = {
-  status: 'connecting',
-  error: null,
-  uri: null,
-  attempts: 0,
-  lastAttempt: null
-};
-
-// ===== Security Middleware =====
-app.use(helmet({
-  contentSecurityPolicy: false,
-  crossOriginEmbedderPolicy: false
-}));
-
-app.use(cors({
-  origin: '*',
-  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-  allowedHeaders: ['Content-Type', 'Authorization']
-}));
+// ===== Security & Performance =====
+app.use(helmet({ contentSecurityPolicy: false }));
+app.use(cors());
+app.use(compression());
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true }));
 
 // ===== Rate Limiting =====
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
-  max: 100,
-  message: { error: 'Too many requests' }
+  max: 1000,
+  validate: { xForwardedForHeader: false }
 });
-app.use('/api/', limiter);
+app.use(limiter);
 
-// ===== Body Parser =====
-app.use(express.json({ limit: '10mb' }));
-app.use(express.urlencoded({ extended: true, limit: '10mb' }));
-app.use(compression());
+// ===== User Model (مدمج في نفس الملف) =====
+const userSchema = new mongoose.Schema({
+  username: { type: String, required: true, unique: true, trim: true, minlength: 3 },
+  email: { type: String, required: true, unique: true, lowercase: true },
+  password: { type: String, required: true, minlength: 6 },
+  role: { type: String, default: 'user', enum: ['user', 'admin', 'moderator'] },
+  status: { type: String, default: 'active', enum: ['active', 'banned', 'suspended'] },
+  createdAt: { type: Date, default: Date.now },
+  lastLogin: { type: Date }
+});
 
-// ===== Static Files =====
-app.use(express.static('public'));
+userSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
 
-// ===== تشخيص المتغيرات =====
-console.log('');
-console.log('═══════════════════════════════════════');
-console.log('🔍 تشخيص المتغيرات:');
-console.log('═══════════════════════════════════════');
-console.log(`PORT: ${process.env.PORT || 'NOT SET'}`);
-console.log(`NODE_ENV: ${process.env.NODE_ENV || 'NOT SET'}`);
-console.log(`JWT_SECRET: ${process.env.JWT_SECRET ? 'SET ✓' : 'NOT SET ✗'}`);
-console.log(`MONGODB_URI: ${process.env.MONGODB_URI ? 'SET ✓' : 'NOT SET ✗'}`);
+userSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
 
-if (process.env.MONGODB_URI) {
-  // إخفاء كلمة المرور للتشخيص
-  const maskedUri = process.env.MONGODB_URI.replace(/:\/\/([^:]+):([^@]+)@/, '://$1:***@');
-  console.log(`URI Preview: ${maskedUri}`);
-  connectionInfo.uri = maskedUri;
-} else {
-  console.log('❌ MONGODB_URI غير موجود!');
-  connectionInfo.error = 'MONGODB_URI environment variable is not set';
-}
-console.log('═══════════════════════════════════════');
-console.log('');
+userSchema.methods.toJSON = function() {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
 
-// ===== MongoDB Connection مع إعادة المحاولة =====
-const MONGODB_URI = process.env.MONGODB_URI;
+const User = mongoose.model('User', userSchema);
 
-function connectToMongo() {
-  if (!MONGODB_URI) {
-    connectionInfo.status = 'failed';
-    connectionInfo.error = 'MONGODB_URI not set';
-    console.log('❌ لا يمكن الاتصال: MONGODB_URI غير موجود');
-    return;
+// ===== Auth Middleware =====
+const authMiddleware = async (req, res, next) => {
+  try {
+    const token = req.headers.authorization?.split(' ')[1];
+    if (!token) return res.status(401).json({ success: false, error: 'No token provided' });
+    
+    const decoded = jwt.verify(token, process.env.JWT_SECRET);
+    const user = await User.findById(decoded.userId);
+    if (!user) return res.status(401).json({ success: false, error: 'User not found' });
+    if (user.status !== 'active') return res.status(403).json({ success: false, error: 'Account not active' });
+    
+    req.user = user;
+    req.userId = user._id;
+    next();
+  } catch (error) {
+    return res.status(401).json({ success: false, error: 'Invalid token' });
   }
+};
 
+const adminMiddleware = (req, res, next) => {
+  if (req.user.role !== 'admin') {
+    return res.status(403).json({ success: false, error: 'Admin access required' });
+  }
+  next();
+};
+
+// ===== Database Connection =====
+let connectionInfo = { status: 'connecting', attempts: 0, lastError: null };
+
+async function connectToMongo() {
   connectionInfo.attempts++;
-  connectionInfo.lastAttempt = new Date().toISOString();
-  console.log(`🔄 محاولة الاتصال #${connectionInfo.attempts}...`);
-
-  mongoose.connect(MONGODB_URI)
-    .then(() => {
-      connectionInfo.status = 'connected';
-      connectionInfo.error = null;
-      console.log('✅ Connected to MongoDB Atlas');
-      console.log('📦 Database: nexusbox');
-    })
-    .catch(err => {
-      connectionInfo.status = 'disconnected';
-      connectionInfo.error = err.message;
-      console.error('❌ MongoDB connection error:', err.message);
-      console.error('🔍 Error details:', err);
-      
-      // إعادة المحاولة بعد 5 ثواني
-      setTimeout(connectToMongo, 5000);
+  try {
+    await mongoose.connect(process.env.MONGODB_URI, {
+      serverSelectionTimeoutMS: 10000,
+      socketTimeoutMS: 45000
     });
+    connectionInfo.status = 'connected';
+    connectionInfo.lastError = null;
+    console.log('✅ Connected to MongoDB Atlas');
+  } catch (error) {
+    connectionInfo.status = 'disconnected';
+    connectionInfo.lastError = error.message;
+    console.log('❌ MongoDB connection error:', error.message);
+    setTimeout(connectToMongo, 5000);
+  }
 }
 
-// بدء الاتصال
-connectToMongo();
+// ===== Routes =====
 
-// ===== Authentication Routes =====
-app.use("/api/auth", authRouter);
-
-// ===== Protected Route Example =====
-app.get("/api/profile", authMiddleware, (req, res) => {
-  res.json({
-    success: true,
-    message: "Welcome to your profile",
-    user: req.user.toJSON()
-  });
-});
-
-// ===== Admin Route Example =====
-app.get("/api/admin/dashboard", authMiddleware, adminMiddleware, (req, res) => {
-  res.json({
-    success: true,
-    message: "Welcome Admin!",
-    user: req.user.toJSON()
-  });
-});
-
-// ===== Health Check Endpoint =====
+// Health Check
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
@@ -140,35 +118,114 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ===== Debug Endpoint (للتشخيص) =====
-app.get('/api/debug', (req, res) => {
-  res.json({
-    success: true,
-    debug: {
-      connection: connectionInfo,
-      mongooseState: mongoose.connection.readyState,
-      mongooseStates: {
-        0: 'disconnected',
-        1: 'connected',
-        2: 'connecting',
-        3: 'disconnecting'
-      },
-      environment: {
-        NODE_ENV: process.env.NODE_ENV,
-        PORT: process.env.PORT,
-        MONGODB_URI_SET: !!process.env.MONGODB_URI,
-        JWT_SECRET_SET: !!process.env.JWT_SECRET
-      },
-      server: {
-        uptime: process.uptime(),
-        memory: process.memoryUsage(),
-        nodeVersion: process.version
-      }
+// ===== AUTH ROUTES =====
+
+// Signup
+app.post('/api/auth/signup', async (req, res) => {
+  try {
+    const { username, email, password } = req.body;
+    
+    if (!username || !email || !password) {
+      return res.status(400).json({ success: false, error: 'All fields are required' });
     }
-  });
+    
+    if (password.length < 6) {
+      return res.status(400).json({ success: false, error: 'Password must be at least 6 characters' });
+    }
+    
+    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
+    if (existingUser) {
+      return res.status(400).json({ success: false, error: 'Username or email already exists' });
+    }
+    
+    const user = new User({ username, email, password });
+    await user.save();
+    
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    
+    res.status(201).json({
+      success: true,
+      message: 'User created successfully',
+      user: user.toJSON(),
+      token
+    });
+  } catch (error) {
+    console.error('Signup error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
 });
 
-// ===== Root Endpoint =====
+// Login
+app.post('/api/auth/login', async (req, res) => {
+  try {
+    const { username, password } = req.body;
+    
+    if (!username || !password) {
+      return res.status(400).json({ success: false, error: 'Username and password are required' });
+    }
+    
+    const user = await User.findOne({ $or: [{ username }, { email: username }] });
+    if (!user) {
+      return res.status(401).json({ success: false, error: 'Invalid credentials' });
+    }
+    
+    const isMatch = await user.comparePassword(password);
+    if (!isMatch) {
+      return res.status(401).json({ success: false, error: 'Invalid credentials' });
+    }
+    
+    if (user.status !== 'active') {
+      return res.status(403).json({ success: false, error: 'Account is not active' });
+    }
+    
+    user.lastLogin = new Date();
+    await user.save();
+    
+    const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
+    
+    res.json({
+      success: true,
+      message: 'Login successful',
+      user: user.toJSON(),
+      token
+    });
+  } catch (error) {
+    console.error('Login error:', error);
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Logout
+app.get('/api/auth/logout', authMiddleware, (req, res) => {
+  res.json({ success: true, message: 'Logged out successfully' });
+});
+
+// Get current user
+app.get('/api/auth/me', authMiddleware, async (req, res) => {
+  res.json({ success: true, user: req.user.toJSON() });
+});
+
+// Get all users (Admin only)
+app.get('/api/auth/users', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const users = await User.find().sort({ createdAt: -1 });
+    res.json({ success: true, count: users.length, users });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// Profile (protected)
+app.get('/api/profile', authMiddleware, (req, res) => {
+  res.json({ success: true, message: 'Welcome to your profile', user: req.user.toJSON() });
+});
+
+// Admin Dashboard
+app.get('/api/admin/dashboard', authMiddleware, adminMiddleware, (req, res) => {
+  res.json({ success: true, message: 'Welcome Admin!', user: req.user.toJSON() });
+});
+
+// ===== Root Route =====
 app.get('/', (req, res) => {
   res.json({
     name: 'NexusBox API',
@@ -176,53 +233,32 @@ app.get('/', (req, res) => {
     status: 'online',
     endpoints: {
       health: '/api/health',
-      debug: '/api/debug',
       auth: '/api/auth',
-      users: '/api/users',
-      messages: '/api/messages',
-      bans: '/api/bans'
+      profile: '/api/profile'
     }
   });
 });
 
 // ===== Error Handler =====
 app.use((err, req, res, next) => {
-  console.error('Error:', err.stack);
-  res.status(500).json({
-    success: false,
-    error: process.env.NODE_ENV === 'production' ? 'Internal server error' : err.message
-  });
+  console.error('Server error:', err);
+  res.status(500).json({ success: false, error: 'Internal server error' });
 });
 
-// ===== 404 Handler =====
+// 404 Handler
 app.use((req, res) => {
-  res.status(404).json({
-    success: false,
-    error: 'Endpoint not found'
-  });
+  res.status(404).json({ success: false, error: 'Endpoint not found' });
 });
 
 // ===== Start Server =====
 const PORT = process.env.PORT || 3000;
+
+connectToMongo();
+
 app.listen(PORT, '0.0.0.0', () => {
-  console.log('');
   console.log('═══════════════════════════════════════');
   console.log('🚀 NexusBox Backend Started!');
-  console.log('═══════════════════════════════════════');
-  console.log(`📍 Port: ${PORT}`);
+  console.log(`📡 Port: ${PORT}`);
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
-  console.log(`🔗 URL: http://localhost:${PORT}`);
-  console.log(`🏥 Health: http://localhost:${PORT}/api/health`);
-  console.log(`🔍 Debug: http://localhost:${PORT}/api/debug`);
   console.log('═══════════════════════════════════════');
-  console.log('');
-});
-
-// ===== Graceful Shutdown =====
-process.on('SIGTERM', () => {
-  console.log('SIGTERM received, shutting down gracefully...');
-  mongoose.connection.close(() => {
-    console.log('MongoDB connection closed');
-    process.exit(0);
-  });
 });
