@@ -10,6 +10,9 @@ const { router: authRouter, authMiddleware, adminMiddleware } = require("./route
 
 const app = express();
 
+// ===== Trust Proxy (مهم لـ Railway) =====
+app.set("trust proxy", true);
+
 // ===== حفظ معلومات الاتصال للتشخيص =====
 let connectionInfo = {
   status: 'connecting',
