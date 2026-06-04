@@ -9,6 +9,15 @@ const path = require('path');
 
 const app = express();
 
+// ===== حفظ معلومات الاتصال للتشخيص =====
+let connectionInfo = {
+  status: 'connecting',
+  error: null,
+  uri: null,
+  attempts: 0,
+  lastAttempt: null
+};
+
 // ===== Security Middleware =====
 app.use(helmet({
   contentSecurityPolicy: false,
@@ -23,9 +32,9 @@ app.use(cors({
 
 // ===== Rate Limiting =====
 const limiter = rateLimit({
-  windowMs: 15 * 60 * 1000, // 15 minutes
-  max: 100, // limit each IP to 100 requests per windowMs
-  message: { error: 'Too many requests, please try again later.' }
+  windowMs: 15 * 60 * 1000,
+  max: 100,
+  message: { error: 'Too many requests' }
 });
 app.use('/api/', limiter);
 
@@ -37,21 +46,63 @@ app.use(compression());
 // ===== Static Files =====
 app.use(express.static('public'));
 
-// ===== MongoDB Connection =====
+// ===== تشخيص المتغيرات =====
+console.log('');
+console.log('═══════════════════════════════════════');
+console.log('🔍 تشخيص المتغيرات:');
+console.log('═══════════════════════════════════════');
+console.log(`PORT: ${process.env.PORT || 'NOT SET'}`);
+console.log(`NODE_ENV: ${process.env.NODE_ENV || 'NOT SET'}`);
+console.log(`JWT_SECRET: ${process.env.JWT_SECRET ? 'SET ✓' : 'NOT SET ✗'}`);
+console.log(`MONGODB_URI: ${process.env.MONGODB_URI ? 'SET ✓' : 'NOT SET ✗'}`);
+
+if (process.env.MONGODB_URI) {
+  // إخفاء كلمة المرور للتشخيص
+  const maskedUri = process.env.MONGODB_URI.replace(/:\/\/([^:]+):([^@]+)@/, '://$1:***@');
+  console.log(`URI Preview: ${maskedUri}`);
+  connectionInfo.uri = maskedUri;
+} else {
+  console.log('❌ MONGODB_URI غير موجود!');
+  connectionInfo.error = 'MONGODB_URI environment variable is not set';
+}
+console.log('═══════════════════════════════════════');
+console.log('');
+
+// ===== MongoDB Connection مع إعادة المحاولة =====
 const MONGODB_URI = process.env.MONGODB_URI;
 
-mongoose.connect(MONGODB_URI, {
-  useNewUrlParser: true,
-  useUnifiedTopology: true,
-})
-.then(() => {
-  console.log('✅ Connected to MongoDB Atlas');
-  console.log('📦 Database: nexusbox');
-})
-.catch(err => {
-  console.error('❌ MongoDB connection error:', err.message);
-  console.log("⚠️ سيبقى السيرفر يعمل بدون اتصال قاعدة البيانات حالياً...");
-});
+function connectToMongo() {
+  if (!MONGODB_URI) {
+    connectionInfo.status = 'failed';
+    connectionInfo.error = 'MONGODB_URI not set';
+    console.log('❌ لا يمكن الاتصال: MONGODB_URI غير موجود');
+    return;
+  }
+
+  connectionInfo.attempts++;
+  connectionInfo.lastAttempt = new Date().toISOString();
+  console.log(`🔄 محاولة الاتصال #${connectionInfo.attempts}...`);
+
+  mongoose.connect(MONGODB_URI)
+    .then(() => {
+      connectionInfo.status = 'connected';
+      connectionInfo.error = null;
+      console.log('✅ Connected to MongoDB Atlas');
+      console.log('📦 Database: nexusbox');
+    })
+    .catch(err => {
+      connectionInfo.status = 'disconnected';
+      connectionInfo.error = err.message;
+      console.error('❌ MongoDB connection error:', err.message);
+      console.error('🔍 Error details:', err);
+      
+      // إعادة المحاولة بعد 5 ثواني
+      setTimeout(connectToMongo, 5000);
+    });
+}
+
+// بدء الاتصال
+connectToMongo();
 
 // ===== Health Check Endpoint =====
 app.get('/api/health', (req, res) => {
@@ -64,6 +115,34 @@ app.get('/api/health', (req, res) => {
   });
 });
 
+// ===== Debug Endpoint (للتشخيص) =====
+app.get('/api/debug', (req, res) => {
+  res.json({
+    success: true,
+    debug: {
+      connection: connectionInfo,
+      mongooseState: mongoose.connection.readyState,
+      mongooseStates: {
+        0: 'disconnected',
+        1: 'connected',
+        2: 'connecting',
+        3: 'disconnecting'
+      },
+      environment: {
+        NODE_ENV: process.env.NODE_ENV,
+        PORT: process.env.PORT,
+        MONGODB_URI_SET: !!process.env.MONGODB_URI,
+        JWT_SECRET_SET: !!process.env.JWT_SECRET
+      },
+      server: {
+        uptime: process.uptime(),
+        memory: process.memoryUsage(),
+        nodeVersion: process.version
+      }
+    }
+  });
+});
+
 // ===== Root Endpoint =====
 app.get('/', (req, res) => {
   res.json({
@@ -72,25 +151,13 @@ app.get('/', (req, res) => {
     status: 'online',
     endpoints: {
       health: '/api/health',
+      debug: '/api/debug',
       auth: '/api/auth',
       users: '/api/users',
       messages: '/api/messages',
       bans: '/api/bans'
     }
   });
-});
-
-// ===== Serve Frontend Pages =====
-app.get('/dashboard', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'dashboard', 'index.html'));
-});
-
-app.get('/bans', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'bans', 'index.html'));
-});
-
-app.get('/messages', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'messages', 'index.html'));
 });
 
 // ===== Error Handler =====
@@ -121,6 +188,7 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log(`🔗 URL: http://localhost:${PORT}`);
   console.log(`🏥 Health: http://localhost:${PORT}/api/health`);
+  console.log(`🔍 Debug: http://localhost:${PORT}/api/debug`);
   console.log('═══════════════════════════════════════');
   console.log('');
 });
