@@ -18,6 +18,7 @@ app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
+app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
 // ===== Rate Limiting =====
