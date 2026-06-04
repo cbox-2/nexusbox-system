@@ -6,6 +6,7 @@ const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
 const path = require('path');
+const { router: authRouter, authMiddleware, adminMiddleware } = require("./routes/auth");
 
 const app = express();
 
@@ -103,6 +104,27 @@ function connectToMongo() {
 
 // بدء الاتصال
 connectToMongo();
+
+// ===== Authentication Routes =====
+app.use("/api/auth", authRouter);
+
+// ===== Protected Route Example =====
+app.get("/api/profile", authMiddleware, (req, res) => {
+  res.json({
+    success: true,
+    message: "Welcome to your profile",
+    user: req.user.toJSON()
+  });
+});
+
+// ===== Admin Route Example =====
+app.get("/api/admin/dashboard", authMiddleware, adminMiddleware, (req, res) => {
+  res.json({
+    success: true,
+    message: "Welcome Admin!",
+    user: req.user.toJSON()
+  });
+});
 
 // ===== Health Check Endpoint =====
 app.get('/api/health', (req, res) => {
