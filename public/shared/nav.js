@@ -1,8 +1,7 @@
-// ===== NexusBox Navigation System v3 - Event Delegation =====
+// ===== NexusBox Navigation System v4 - Fixed =====
 (function() {
   'use strict';
   
-  // Menu definitions
   var menus = {
     1: [
       {text:'Layout', href:'/layout-options/layout-options.html'},
@@ -29,7 +28,6 @@
     ]
   };
 
-  // Show menu
   function showMenu(menuId) {
     var container = document.getElementById('hovmenu');
     if (!container) return false;
@@ -45,13 +43,18 @@
       link.href = item.href;
       link.className = 'submenuitem';
       link.textContent = item.text;
+      // Prevent default and navigate
+      link.onclick = function(e) {
+        e.preventDefault();
+        window.location.href = item.href;
+        return false;
+      };
       container.appendChild(link);
     });
     
     return false;
   }
 
-  // Hide menu
   function hideMenu() {
     var container = document.getElementById('hovmenu');
     if (container) {
@@ -60,9 +63,8 @@
     }
   }
 
-  // Initialize navigation
   function init() {
-    console.log('🚀 Navigation system initializing...');
+    console.log('🚀 Navigation system v4 initializing...');
     
     var subbar = document.getElementById('subbar');
     if (!subbar) {
@@ -70,21 +72,47 @@
       return;
     }
 
-    // Event delegation on subbar
+    // Get current page path
+    var currentPath = window.location.pathname;
+    console.log('Current path:', currentPath);
+
+    // Handle all clicks in subbar
     subbar.addEventListener('click', function(e) {
-      var target = e.target.closest('.submenuitem');
-      if (!target) return;
+      var target = e.target;
       
-      var id = target.id;
-      if (id && id.startsWith('hovmenu')) {
-        var menuId = parseInt(id.replace('hovmenu', ''));
+      // Find closest submenuitem
+      while (target && target !== subbar) {
+        if (target.classList && target.classList.contains('submenuitem')) {
+          break;
+        }
+        target = target.parentElement;
+      }
+      
+      if (!target || target === subbar) return;
+      
+      // Check if it's a dropdown button (hovmenu1-4)
+      var btnId = target.id;
+      if (btnId && btnId.startsWith('hovmenu')) {
+        var menuId = parseInt(btnId.replace('hovmenu', ''));
         if (menuId >= 1 && menuId <= 4) {
           e.preventDefault();
           e.stopPropagation();
+          console.log('Opening menu', menuId);
           showMenu(menuId);
           return false;
         }
       }
+      
+      // For regular links (Publish, Dashboard, etc), let them navigate
+      var href = target.getAttribute('href');
+      if (href && href !== '#' && !href.startsWith('javascript')) {
+        console.log('Navigating to:', href);
+        // Don't prevent default - let the link work normally
+        return true;
+      }
+      
+      e.preventDefault();
+      return false;
     });
 
     // Close menu when clicking outside
@@ -96,37 +124,35 @@
       }
     });
 
-    // Set active state for current page
-    var currentPath = window.location.pathname;
+    // Set active state
     var allLinks = subbar.querySelectorAll('.submenuitem');
     allLinks.forEach(function(link) {
-      if (link.href && link.href.endsWith(currentPath)) {
+      link.classList.remove('active');
+      var href = link.getAttribute('href');
+      if (href && currentPath.includes(href)) {
         link.classList.add('active');
+        console.log('Active:', href);
       }
     });
 
-    console.log('✅ Navigation system ready');
+    console.log('✅ Navigation system v4 ready');
   }
 
-  // Run when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
   
-  // Global function
   window.hovmenu = showMenu;
 })();
 
-// Global logout
 function globalLogout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   window.location.href = '/login/index.html';
 }
 
-// Load user info
 async function loadUserInfo() {
   var token = localStorage.getItem('token');
   if (!token) {
