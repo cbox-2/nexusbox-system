@@ -555,3 +555,67 @@ app.put('/api/layout', authMiddleware, async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// ===== USER INTEGRATION API =====
+const integrationSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  privateKey: { type: String, required: true },
+  enabled: { type: Boolean, default: false },
+  autoRegister: { type: Boolean, default: false },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const IntegrationSettings = mongoose.model('IntegrationSettings', integrationSchema);
+
+app.get('/api/integration', authMiddleware, async (req, res) => {
+  try {
+    let settings = await IntegrationSettings.findOne({ user: req.userId });
+    if (!settings) {
+      // Generate a random private key
+      const privateKey = Math.random().toString(36).substring(2, 18).replace(/[^a-z0-9]/g, '').substring(0, 16);
+      settings = new IntegrationSettings({
+        user: req.userId,
+        privateKey: privateKey
+      });
+      await settings.save();
+    }
+    res.json({ success: true, settings });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/integration', authMiddleware, async (req, res) => {
+  try {
+    const { enabled, autoRegister } = req.body;
+    let settings = await IntegrationSettings.findOne({ user: req.userId });
+    if (!settings) {
+      const privateKey = Math.random().toString(36).substring(2, 18).replace(/[^a-z0-9]/g, '').substring(0, 16);
+      settings = new IntegrationSettings({ user: req.userId, privateKey });
+    }
+    if (enabled !== undefined) settings.enabled = enabled;
+    if (autoRegister !== undefined) settings.autoRegister = autoRegister;
+    settings.updatedAt = new Date();
+    await settings.save();
+    res.json({ success: true, settings });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/integration/regenerate-key', authMiddleware, async (req, res) => {
+  try {
+    const newKey = Math.random().toString(36).substring(2, 18).replace(/[^a-z0-9]/g, '').substring(0, 16);
+    let settings = await IntegrationSettings.findOne({ user: req.userId });
+    if (!settings) {
+      settings = new IntegrationSettings({ user: req.userId, privateKey: newKey });
+    } else {
+      settings.privateKey = newKey;
+    }
+    settings.updatedAt = new Date();
+    await settings.save();
+    res.json({ success: true, privateKey: newKey });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
