@@ -5,7 +5,6 @@
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta content="width=device-width, initial-scale=1" name="viewport">
 <meta name="description" content="NexusBox Theme Editor - Customize your chat appearance">
-<link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
 <link rel="stylesheet" href="/shared/toolbar.css">
 </head>
 <body id="mainbody">
@@ -43,7 +42,7 @@ var rcvdformresponse = function () {};
 <div id="header">
 <div class="wrap">
 <a id="logo" href="/dashboard/index.html">
-<img src="/shared/logo400.png" alt="NexusBox" width="200" height="86" border="0" onerror="this.outerHTML='<span style=\'color:#fff;font-size:24px;font-weight:bold\'>NexusBox</span>'">
+<span style="color:#fff;font-size:24px;font-weight:bold">NexusBox</span>
 </a>
 <div id="headerExtras">
 <span id="userWelcome">جاري التحميل...</span>
@@ -71,75 +70,6 @@ var rcvdformresponse = function () {};
 
 <div id="main" class="wrap">
 <div id="content">
-
-<script type="text/javascript">
-var noticetogorig = "";
-function noticetoggle(xo, v) {
-  var xo = document.getElementById(xo);
-  z = document.getElementById('notice-more');
-  if (z.style.display == 'none') {
-    z.style.display = '';
-    noticetogorig = xo.innerHTML;
-    xo.innerHTML = v;
-  }
-  else {
-    z.style.display = 'none';
-    xo.innerHTML = noticetogorig;
-  }
-}
-
-function noticeclose(x) {
-  z = document.getElementById('notice');
-  z.style.display = "none";
-  document.cookie = "rnot="+x+";";
-}
-
-function highlighthelp(sec, para, on) {
-var ico = document.getElementById("hlpico-"+sec+"-"+para);
-  if (!ico) return;
-  if (!on) {
-  ico.style.filter = "alpha(opacity=60)";
-  ico.style.opacity = 0.6;
-  }
-  else {
-  ico.style.filter = "";
-  ico.style.opacity = 1;
-  }
-}
-
-var createBar = function ($elem, isLog, showLimit) {
-var $bar = document.createElement("div");
-$bar.className = "barFill";
-var $text = document.createElement("div");
-$text.className = "barText";
-$elem.appendChild($bar);
-$elem.appendChild($text);
-var minWidth = 5;
-var format = function (n) {
-return (n+'').split('').reverse().join('').replace(/([0-9]{3})(?=[0-9])/g, "$1,").split('').reverse().join('');
-}
-$bar.style.width = "0%";
-return {
-setBarSize: function (val, max) {
-var over = false;
-if (val > max) over = true;
-var val = Math.min(max, Math.max(0, val));
-var prop = val / max;
-$text.innerHTML = format(val) + (over ? "+" : "") + (showLimit ? "/" + max : "");
-var w = (isLog ? (Math.log((prop*1.718 + 1))) : prop) * 100;
-var r = prop/0.7 * 255 + 50;
-var g = 255 - prop*0.6*255;
-var b = 80;
-var comp = (255 / (r*0.9 + g * 1.1)) * 1.4;
-r = r / comp; g = g / comp; b = b / comp;
-window.setTimeout(function () {
-$bar.style.width = Math.max(w, minWidth) + "%";
-$bar.style.backgroundColor = "rgb("+(r|0)+", "+(g|0)+", "+(b|0)+")";
-}, 100);
-}
-}
-};
-</script>
 
 <h1>Theme Editor</h1>
 
@@ -184,8 +114,8 @@ return true;
 <fieldset>
 <legend>Live preview</legend>
 <div id="preview-container" style="background: #fff; border: 1px solid #ccc; padding: 10px;">
-<iframe id="cboxmain" width="100%" height="305" frameborder="0" style="border: 0; padding: 0; margin: 0 auto;"></iframe>
-<iframe id="cboxform" width="100%" height="107" frameborder="0" style="border: 0; padding: 0; margin: 0 auto;"></iframe>
+<iframe id="cboxmain" src="/chat/chat.html?preview=true" width="100%" height="305" frameborder="0" style="border: 0; padding: 0; margin: 0 auto; background: transparent;"></iframe>
+<iframe id="cboxform" src="/chat/chat.html?preview=form" width="100%" height="107" frameborder="0" style="border: 0; padding: 0; margin: 0 auto; background: transparent;"></iframe>
 </div>
 </fieldset>
 </div>
@@ -374,12 +304,10 @@ float: right;
 <script src="/shared/toolbar.js"></script>
 <script src="/shared/auth.js"></script>
 <script>
-// ===== Global Variables =====
 var currentUser = null;
 var currentTheme = null;
 var themePresets = {};
 
-// ===== Hovmenu System =====
 var hovmenu = function(btn, menuId) {
 var menus = {
 1: [
@@ -428,7 +356,6 @@ document.getElementById('hovmenu').innerHTML = '';
 }
 });
 
-// ===== Load User Info =====
 async function loadUserInfo() {
 const token = localStorage.getItem('token');
 if (!token) {
@@ -459,7 +386,6 @@ console.error('Error loading user:', error);
 }
 }
 
-// ===== Load Theme Presets =====
 async function loadThemePresets() {
 const token = localStorage.getItem('token');
 
@@ -479,7 +405,6 @@ console.error('Error loading presets:', error);
 }
 }
 
-// ===== Load User Theme =====
 async function loadUserTheme() {
 const token = localStorage.getItem('token');
 
@@ -504,7 +429,6 @@ console.error('Error loading theme:', error);
 }
 }
 
-// ===== Load Theme Preset =====
 function loadThemePreset(presetId) {
 if (!doWarnThen()) {
 return false;
@@ -525,45 +449,39 @@ updatePreview();
 return true;
 }
 
-// ===== Mark Changes =====
 function markChanged() {
 changesMade = true;
 }
 
-// ===== Update Preview =====
 function updatePreview() {
 var css = document.getElementById('advancedcss').value;
 
-var previewHTML = '<!DOCTYPE html><html><head><style>' + css + '</style></head><body>';
-previewHTML += '<div style="padding: 20px;">';
-previewHTML += '<h2>NexusBox Preview</h2>';
-previewHTML += '<div class="mnbdy" style="padding: 10px;">';
-previewHTML += '<div class="stxt">Sample message 1</div>';
-previewHTML += '<div class="stxt2">Sample message 2</div>';
-previewHTML += '<div class="dtxt">12:00 PM</div>';
-previewHTML += '</div>';
-previewHTML += '<div class="cfrm" style="margin-top: 10px;">';
-previewHTML += '<input type="text" class="frmtb" placeholder="Name">';
-previewHTML += '<input type="text" class="frmtb" placeholder="Message">';
-previewHTML += '<input type="button" class="frmbtn" value="»">';
-previewHTML += '</div>';
-previewHTML += '</div></body></html>';
-
 var mainFrame = document.getElementById('cboxmain');
-mainFrame.srcdoc = previewHTML;
-
-var formHTML = '<!DOCTYPE html><html><head><style>' + css + '</style></head><body>';
-formHTML += '<div class="cfrm" style="padding: 10px;">';
-formHTML += '<input type="text" class="frmtb" placeholder="Name">';
-formHTML += '<input type="text" class="frmtb" placeholder="Message">';
-formHTML += '<input type="button" class="frmbtn" value="»">';
-formHTML += '</div></body></html>';
-
 var formFrame = document.getElementById('cboxform');
-formFrame.srcdoc = formHTML;
+
+if (mainFrame && mainFrame.contentWindow) {
+var mainDoc = mainFrame.contentWindow.document;
+var styleTag = mainDoc.getElementById('theme-style');
+if (!styleTag) {
+styleTag = mainDoc.createElement('style');
+styleTag.id = 'theme-style';
+mainDoc.head.appendChild(styleTag);
+}
+styleTag.textContent = css;
 }
 
-// ===== Save Theme =====
+if (formFrame && formFrame.contentWindow) {
+var formDoc = formFrame.contentWindow.document;
+var styleTag = formDoc.getElementById('theme-style');
+if (!styleTag) {
+styleTag = formDoc.createElement('style');
+styleTag.id = 'theme-style';
+formDoc.head.appendChild(styleTag);
+}
+styleTag.textContent = css;
+}
+}
+
 async function saveTheme(event) {
 if (event) event.preventDefault();
 
@@ -609,7 +527,6 @@ errDiv.className = 'frmmsg2 Error';
 return false;
 }
 
-// ===== Quick Login =====
 async function quickLogin(e) {
 e.preventDefault();
 var uname = document.getElementById('ql-uname').value;
@@ -640,23 +557,19 @@ document.getElementById('em_qlpop').innerHTML = '<ul><li>Connection error</li></
 return false;
 }
 
-// ===== Logout =====
 function logout() {
 globalLogout();
 return false;
 }
 
-// ===== Initialize =====
 document.addEventListener('DOMContentLoaded', function() {
 loadUserInfo();
 });
 
-// Modal / naked mode
 if (window.isPopup) {
 document.body.className = "Popped";
 }
 
-// Breadcrumbs
 var dropCrumb = function () {
 if (!localStorage) return;
 var bc = getCrumbs();
