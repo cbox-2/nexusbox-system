@@ -159,3 +159,21 @@ async function loadUserInfo() {
     return null;
   }
 }
+
+// Ensure globalLogout is available
+if (typeof window.globalLogout !== 'function') {
+  window.globalLogout = function() {
+    console.log('[Logout] Clearing session...');
+    try {
+      localStorage.removeItem('token');
+      localStorage.removeItem('user');
+      sessionStorage.clear();
+      console.log('[Logout] Session cleared');
+      window.location.href = '/login/index.html';
+    } catch(e) {
+      console.error('[Logout] Error:', e);
+      window.location.href = '/login/index.html';
+    }
+    return false;
+  };
+}
