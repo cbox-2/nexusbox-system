@@ -36,6 +36,15 @@ const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 1000, validate: { xFo
 app.use(limiter);
 app.use(detectSuspicious);
 app.use(securityHeaders);
+app.use((req, res, next) => {
+  res.setHeader('X-Frame-Options', 'SAMEORIGIN');
+  res.setHeader('X-Content-Type-Options', 'nosniff');
+  res.setHeader('X-XSS-Protection', '1; mode=block');
+  if (process.env.NODE_ENV === 'production') {
+    res.setHeader('Strict-Transport-Security', 'max-age=31536000; includeSubDomains');
+  }
+  next();
+});
 app.use(express.static('public'));
 // Models
 const userSchema = new mongoose.Schema({ username: { type: String, required: true, unique: true, trim: true }, email: { type: String, required: true, unique: true, lowercase: true }, password: { type: String, required: true }, role: { type: String, default: 'user', enum: ['user', 'moderator', 'admin'] }, status: { type: String, default: 'active', enum: ['active', 'banned', 'suspended'] }, createdAt: { type: Date, default: Date.now }, lastLogin: { type: Date } });
