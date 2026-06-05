@@ -571,6 +571,8 @@ app.post('/api/publish/generate-tag', authMiddleware, async (req, res) => {
 });
 
 // ===== PUBLISH API =====
+
+// ===== PUBLISH API =====
 const publishSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
   siteUrl: { type: String, default: '' },
