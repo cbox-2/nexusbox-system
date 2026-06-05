@@ -40,6 +40,7 @@ app.use(helmet({
       mediaSrc: ["'self'"],
       frameSrc: ["'self'"],
       scriptSrcAttr: ["'self'", "'unsafe-inline'"],
+      scriptSrcAttr: ["'self'", "'unsafe-inline'"],
       baseUri: ["'self'"],
       formAction: ["'self'"]
     }
