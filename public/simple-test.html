@@ -1,0 +1,31 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval'; style-src 'self' 'unsafe-inline';">
+<title>Test</title>
+<style>
+body { font-family: Arial; padding: 20px; background: #1a1a2e; color: #fff; }
+button { background: #667eea; color: white; border: none; padding: 15px 30px; margin: 10px; border-radius: 8px; font-size: 16px; cursor: pointer; }
+.result { background: #0a0a1a; padding: 15px; margin: 10px 0; border-radius: 5px; font-family: monospace; min-height: 50px; color: #4ade80; }
+</style>
+</head>
+<body>
+<h1>🧪 NexusBox Test</h1>
+
+<button onclick="testHealth()">Test Health</button>
+<div id="result" class="result">Click button...</div>
+
+<script>
+async function testHealth() {
+  try {
+    const res = await fetch('/api/health');
+    const data = await res.json();
+    document.getElementById('result').textContent = JSON.stringify(data, null, 2);
+  } catch(e) {
+    document.getElementById('result').textContent = 'Error: ' + e.message;
+  }
+}
+</script>
+</body>
+</html>
