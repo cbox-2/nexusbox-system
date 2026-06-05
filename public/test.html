@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="UTF-8">
+<title>NexusBox API Test</title>
+<style>
+body { font-family: Arial; max-width: 800px; margin: 50px auto; padding: 20px; background: #1a1a2e; color: #fff; }
+h1 { color: #667eea; }
+.card { background: #16213e; padding: 20px; margin: 20px 0; border-radius: 10px; border: 1px solid #0f3460; }
+input { width: 100%; padding: 10px; margin: 5px 0; border-radius: 5px; border: 1px solid #0f3460; background: #0f3460; color: #fff; }
+button { background: #667eea; color: white; border: none; padding: 12px 24px; border-radius: 5px; cursor: pointer; margin: 5px; font-size: 16px; }
+button:hover { background: #764ba2; }
+.result { background: #0a0a1a; padding: 15px; border-radius: 5px; margin-top: 10px; font-family: monospace; white-space: pre-wrap; word-break: break-all; min-height: 50px; color: #4ade80; }
+.error { color: #f87171; }
+.token { background: #064e3b; padding: 10px; border-radius: 5px; margin: 10px 0; font-family: monospace; font-size: 12px; word-break: break-all; }
+</style>
+</head>
+<body>
+
+<h1>🧪 NexusBox API Test</h1>
+
+<div class="card">
+  <h2>1. Health Check</h2>
+  <button onclick="testHealth()">Test Health</button>
+  <div id="health-result" class="result">Click button to test...</div>
+</div>
+
+<div class="card">
+  <h2>2. Create Account</h2>
+  <input type="text" id="username" placeholder="Username" value="testuser123">
+  <input type="email" id="email" placeholder="Email" value="test123@example.com">
+  <input type="password" id="password" placeholder="Password" value="password123">
+  <button onclick="createAccount()">Create Account</button>
+  <div id="signup-result" class="result">Click button to test...</div>
+</div>
+
+<div class="card">
+  <h2>3. Login</h2>
+  <input type="text" id="login-user" placeholder="Username" value="testuser123">
+  <input type="password" id="login-pass" placeholder="Password" value="password123">
+  <button onclick="login()">Login</button>
+  <div id="login-result" class="result">Click button to test...</div>
+  <div id="token-box" class="token" style="display:none"></div>
+</div>
+
+<div class="card">
+  <h2>4. Create Box</h2>
+  <input type="text" id="box-name" placeholder="Box Name" value="My Test Box">
+  <button onclick="createBox()">Create Box</button>
+  <div id="box-result" class="result">Click button to test...</div>
+</div>
+
+<div class="card">
+  <h2>5. List Boxes</h2>
+  <button onclick="listBoxes()">List My Boxes</button>
+  <div id="list-result" class="result">Click button to test...</div>
+</div>
+
+<script>
+let TOKEN = '';
+const API = window.location.origin;
+
+console.log('API Base:', API);
+
+function show(id, data, isError) {
+  const el = document.getElementById(id);
+  el.textContent = JSON.stringify(data, null, 2);
+  el.className = 'result' + (isError ? ' error' : '');
+}
+
+async function testHealth() {
+  try {
+    console.log('Testing health...');
+    const res = await fetch(API + '/api/health');
+    const data = await res.json();
+    console.log('Health response:', data);
+    show('health-result', data);
+  } catch(e) {
+    console.error('Health error:', e);
+    show('health-result', {error: e.message}, true);
+  }
+}
+
+async function createAccount() {
+  try {
+    const username = document.getElementById('username').value;
+    const email = document.getElementById('email').value;
+    const password = document.getElementById('password').value;
+    
+    console.log('Creating account:', {username, email});
+    
+    const res = await fetch(API + '/api/auth/signup', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username, email, password})
+    });
+    
+    const data = await res.json();
+    console.log('Signup response:', data);
+    show('signup-result', data, !data.success);
+    
+    if (data.token) {
+      TOKEN = data.token;
+      document.getElementById('token-box').style.display = 'block';
+      document.getElementById('token-box').textContent = 'Token: ' + TOKEN;
+    }
+  } catch(e) {
+    console.error('Signup error:', e);
+    show('signup-result', {error: e.message}, true);
+  }
+}
+
+async function login() {
+  try {
+    const username = document.getElementById('login-user').value;
+    const password = document.getElementById('login-pass').value;
+    
+    console.log('Logging in...');
+    
+    const res = await fetch(API + '/api/auth/login', {
+      method: 'POST',
+      headers: {'Content-Type': 'application/json'},
+      body: JSON.stringify({username, password})
+    });
+    
+    const data = await res.json();
+    console.log('Login response:', data);
+    show('login-result', data, !data.success);
+    
+    if (data.token) {
+      TOKEN = data.token;
+      document.getElementById('token-box').style.display = 'block';
+      document.getElementById('token-box').textContent = 'Token: ' + TOKEN;
+    }
+  } catch(e) {
+    console.error('Login error:', e);
+    show('login-result', {error: e.message}, true);
+  }
+}
+
+async function createBox() {
+  if (!TOKEN) {
+    alert('Please login first!');
+    return;
+  }
+  
+  try {
+    const name = document.getElementById('box-name').value;
+    
+    console.log('Creating box:', name);
+    
+    const res = await fetch(API + '/api/boxes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + TOKEN
+      },
+      body: JSON.stringify({name})
+    });
+    
+    const data = await res.json();
+    console.log('Box response:', data);
+    show('box-result', data, !data.success);
+  } catch(e) {
+    console.error('Box error:', e);
+    show('box-result', {error: e.message}, true);
+  }
+}
+
+async function listBoxes() {
+  if (!TOKEN) {
+    alert('Please login first!');
+    return;
+  }
+  
+  try {
+    console.log('Listing boxes...');
+    
+    const res = await fetch(API + '/api/boxes', {
+      headers: {'Authorization': 'Bearer ' + TOKEN}
+    });
+    
+    const data = await res.json();
+    console.log('Boxes response:', data);
+    show('list-result', data, !data.success);
+  } catch(e) {
+    console.error('List error:', e);
+    show('list-result', {error: e.message}, true);
+  }
+}
+</script>
+
+</body>
+</html>
