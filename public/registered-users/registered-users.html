@@ -35,5 +35,10 @@
   <p>Manage your registered users here</p>
 </div>
 <script src="/shared/toolbar.js"></script>
+<script>
+if (window.self !== window.top) {
+  document.body.classList.add('in-iframe');
+}
+</script>
 </body>
 </html>

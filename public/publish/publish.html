@@ -314,5 +314,10 @@ document.addEventListener('mousedown', function(e) {
   }
 });
 </script>
+<script>
+if (window.self !== window.top) {
+  document.body.classList.add('in-iframe');
+}
+</script>
 </body>
 </html>

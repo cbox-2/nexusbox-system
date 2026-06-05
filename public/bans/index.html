@@ -1,86 +1,62 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Blocked Users · NexusBox</title>
+<title>المستخدمون المحظورون · NexusBox</title>
 <link rel="stylesheet" href="style.css">
-<link rel="stylesheet" href="/shared/toolbar.css">
+<style>
+/* إخفاء الـ Header إذا كانت الصفحة داخل iframe */
+body.in-iframe #header,
+body.in-iframe #subbar {
+  display: none !important;
+}
+body.in-iframe {
+  padding-top: 0 !important;
+}
+</style>
 </head>
-<body id="mainbody" style="background-color: #0f172a !important;">
-<div id="bodywrap">
-  <div id="header">
-    <div class="wrap">
-      <a id="logo" href="/dashboard/index.html">NexusBox</a>
-      <div id="headerExtras">
-        <span id="userWelcome">admin</span>
-        <a href="/dashboard/index.html">My Cboxes</a>
-        <a href="#">My Account</a>
-        <a href="#">Support</a>
-        <a href="#" onclick="globalLogout()">Log out</a>
-      </div>
-    </div>
-  </div>
-  <div id="subbar">
-    <div class="wrap">
-      <a href="/dashboard/index.html" class="submenuitem"><b>MSASDWEC2015HKARNO</b></a>
-      <a href="/publish/publish.html" class="submenuitem">Publish</a>
-      <a href="/Theme-editor/Theme-editor.html" class="submenuitem" id="hovmenu1" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
-      <a href="/posting-options/index.html" class="submenuitem" id="hovmenu2" onmousedown="return hovmenu(this, 2)">Options</a>
-      <a href="/registered-users/registered-users.html" class="submenuitem" id="hovmenu3" onmousedown="return hovmenu(this, 3)">Users</a>
-      <a href="/messages/index.html" class="submenuitem" id="hovmenu4" onmousedown="return hovmenu(this, 4)">Messages</a>
-    </div>
-  </div>
+<body dir="rtl">
 
-  <div id="main" class="wrap">
-    <div id="content">
-      <h1>Blocked Users</h1>
-      <p>Maintain your ban list here. You can ban users via the Messages page or by entering their IP addresses manually on this page.</p>
-
-      <h2>Country Restriction</h2>
-      <form>
-        <fieldset>
-          <legend>Country Restriction</legend>
-          <label>Policy:</label>
-          <select name="policy" class="txtbox">
-            <option value="allow">Allow any</option>
-            <option value="block">Block any</option>
-          </select>
-          <label>Country:</label>
-          <select name="country" class="txtbox">
-            <option value="eg">Egypt</option>
-            <option value="sa">Saudi Arabia</option>
-            <option value="ae">UAE</option>
-          </select>
-          <input type="submit" value="Add/Update">
-        </fieldset>
-      </form>
-
-      <h2>Add IP Ban</h2>
-      <form>
-        <fieldset>
-          <legend>IP Ban</legend>
-          <label>IP Address:</label>
-          <input type="text" name="ip" class="txtbox" placeholder="123.45.67.89">
-          <label>Duration:</label>
-          <select name="duration" class="txtbox">
-            <option value="1">1 day</option>
-            <option value="7">7 days</option>
-            <option value="30">30 days</option>
-            <option value="0">Permanent</option>
-          </select>
-          <input type="submit" value="Ban IP">
-        </fieldset>
-      </form>
+<div id="header" dir="rtl">
+  <div class="wrap">
+    <a id="logo" href="/dashboard/index.html">NexusBox</a>
+    <div id="headerExtras">
+      <span id="userWelcome">مدير</span>
+      <a href="#">صناديق بريدي</a>
+      <a href="#">حسابي</a>
+      <a href="#">الدعم</a>
+      <a href="#">تسجيل الخروج</a>
     </div>
   </div>
 </div>
 
-<div id="footer">
-  <a href="#">About</a><a href="#">Plans &amp; pricing</a><a href="#">Terms &amp; conditions</a><a href="#">Privacy policy</a><a href="#">Contact us</a>
-  <div class="verybottom">© 2004–2026 NexusBox System, all rights reserved.</div>
+<div id="subbar" dir="rtl">
+  <div class="wrap">
+    <a href="#" class="submenuitem active">المستخدمون المحظورون</a>
+  </div>
 </div>
+
+<div id="main" style="padding: 20px; color: white;">
+  <h1>المستخدمون المحظورون</h1>
+  <p>يمكنك الاحتفاظ بقائمة الحظر هنا. يمكنك حظر المستخدمين عبر صفحة الرسائل أو بإدخال عناوين IP الخاصة بهم يدويًا في هذه الصفحة.</p>
+  
+  <h2 style="margin-top: 30px;">قيود على البلد</h2>
+  <div style="background: #2a2a4a; padding: 20px; border-radius: 8px; margin-top: 15px;">
+    <label style="display: block; margin-bottom: 10px;">سياسة:</label>
+    <select style="width: 100%; padding: 10px; background: #1e1b4b; color: white; border: 1px solid #444; border-radius: 4px;">
+      <option>السماح بأي</option>
+      <option>حظر الكل</option>
+    </select>
+  </div>
+</div>
+
 <script src="code.js"></script>
-<script src="/shared/toolbar.js"></script>
+<script>
+// كشف إذا كانت الصفحة داخل iframe
+if (window.self !== window.top) {
+  document.body.classList.add('in-iframe');
+}
+</script>
 </body>
 </html>

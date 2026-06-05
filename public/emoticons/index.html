@@ -148,5 +148,10 @@ function togglePreview() {
 }
 </script>
 <script src="/shared/toolbar.js"></script>
+<script>
+if (window.self !== window.top) {
+  document.body.classList.add('in-iframe');
+}
+</script>
 </body>
 </html>

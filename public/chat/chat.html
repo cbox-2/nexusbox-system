@@ -82,5 +82,10 @@ document.getElementById('sendBtn').addEventListener('click', sendMessage);
 document.getElementById('chatInput').addEventListener('keypress', e => { if(e.key==='Enter') sendMessage(); });
 function escapeHtml(t){ const d=document.createElement('div'); d.textContent=t; return d.innerHTML; }
 </script>
+<script>
+if (window.self !== window.top) {
+  document.body.classList.add('in-iframe');
+}
+</script>
 </body>
 </html>
