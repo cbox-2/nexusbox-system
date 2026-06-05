@@ -1,0 +1,341 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Admin Panel - NexusBox</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; }
+.topbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; }
+.topbar h1 { font-size: 24px; }
+.topbar a { color: white; text-decoration: none; margin-right: 20px; }
+.container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+.section { background: white; border-radius: 10px; padding: 30px; margin-bottom: 25px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.section h2 { color: #333; margin-bottom: 20px; font-size: 22px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; }
+.form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; }
+.form-group input:focus, .form-group select:focus { border-color: #667eea; outline: none; }
+.toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 12px; }
+.toggle-row label { font-weight: bold; }
+.toggle-row small { color: #666; display: block; margin-top: 3px; }
+.toggle { position: relative; display: inline-block; width: 60px; height: 34px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: #667eea; }
+input:checked + .slider:before { transform: translateX(26px); }
+.btn { padding: 12px 30px; border: none; border-radius: 5px; cursor: pointer; font-size: 16px; font-weight: bold; }
+.btn-primary { background: #667eea; color: white; }
+.btn-success { background: #48bb78; color: white; }
+.btn:hover { opacity: 0.9; }
+.code-box { background: #f4f4f4; border: 2px solid #ddd; border-radius: 5px; padding: 20px; font-family: 'Courier New', monospace; overflow-x: auto; white-space: pre-wrap; word-break: break-all; direction: ltr; text-align: left; margin: 15px 0; }
+.instructions { background: #e7f3ff; border-right: 4px solid #2196F3; padding: 20px; border-radius: 5px; margin: 15px 0; }
+.instructions h3 { color: #1976D2; margin-bottom: 15px; }
+.instructions ol { padding-right: 20px; }
+.instructions li { margin: 10px 0; line-height: 1.6; }
+.success-msg { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 5px; margin: 15px 0; display: none; }
+.help-box { background: #fff3cd; border: 1px solid #ffc107; padding: 15px; border-radius: 5px; margin: 15px 0; }
+.help-box h4 { color: #856404; margin-bottom: 10px; }
+.box-select { background: #f8f9fa; padding: 20px; border-radius: 8px; margin-bottom: 20px; }
+</style>
+</head>
+<body>
+
+<div class="topbar">
+  <h1>🔧 NexusBox Admin Panel</h1>
+  <div>
+    <a href="/dashboard/index.html">Dashboard</a>
+    <a href="#" onclick="logout()">Logout</a>
+  </div>
+</div>
+
+<div class="container">
+
+  <!-- Box Selection -->
+  <div class="section">
+    <h2>📦 اختر الصندوق (Box)</h2>
+    <div class="box-select">
+      <label>اختر Box من القائمة:</label>
+      <select id="boxSelect" onchange="loadBoxSettings()">
+        <option value="">جاري التحميل...</option>
+      </select>
+    </div>
+  </div>
+
+  <!-- Embed Options -->
+  <div class="section">
+    <h2>⚙️ خيارات التضمين (Embed Options)</h2>
+    
+    <div class="form-group">
+      <label>رابط موقعك الإلكتروني:</label>
+      <input type="url" id="siteUrl" placeholder="https://www.yourwebsite.com">
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <label>تفعيل القائمة البيضاء للمواقع (Whitelist)</label><br>
+        <small>السماح فقط للمواقع المحددة بتضمين الـ Box</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="whitelistToggle" onchange="toggleWhitelist()">
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="form-group" id="whitelistInput" style="display:none;">
+      <label>المواقع المسموحة (افصل بينها بفاصلة):</label>
+      <input type="text" id="allowedSites" placeholder="example.com, another.com">
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <label>استخدام بروتوكول HTTP الآمن (SSL/TLS)</label><br>
+        <small>تفعيل HTTPS للاتصال الآمن</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="sslToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label>علامة الأمان (Security Tag):</label>
+      <input type="text" id="securityTag" placeholder="do3gdi" readonly>
+      <small style="color:#666; display:block; margin-top:5px;">يتم إنشاؤه تلقائياً لكل Box</small>
+    </div>
+
+    <div class="toggle-row">
+      <div>
+        <label>تفعيل Auto-Resize</label><br>
+        <small>تعديل الارتفاع تلقائياً حسب المحتوى</small>
+      </div>
+      <label class="toggle">
+        <input type="checkbox" id="autoResizeToggle" checked>
+        <span class="slider"></span>
+      </label>
+    </div>
+
+    <div class="form-group">
+      <label>العرض (Width):</label>
+      <input type="number" id="widthInput" value="400" min="200" max="800">
+    </div>
+
+    <div class="form-group">
+      <label>الارتفاع (Height):</label>
+      <input type="number" id="heightInput" value="500" min="300" max="1000">
+    </div>
+
+    <button class="btn btn-primary" onclick="generateCode()">💾 حفظ وتوليد الكود</button>
+  </div>
+
+  <!-- Generated Code -->
+  <div class="section">
+    <h2>📝 احصل على رمز التضمين الخاص بك</h2>
+    
+    <div class="form-group">
+      <label>تنسيق الكود:</label>
+      <select id="codeType" onchange="generateCode()">
+        <option value="iframe">Iframe (موصى به)</option>
+        <option value="script">Script Widget</option>
+      </select>
+    </div>
+
+    <div class="success-msg" id="successMsg">✅ تم نسخ الكود إلى الحافظة بنجاح!</div>
+
+    <label>الكود الجاهز للنسخ:</label>
+    <div class="code-box" id="codeOutput">اختر Box واضغط على "حفظ وتوليد الكود"...</div>
+
+    <button class="btn btn-success" onclick="copyCode()">📋 نسخ إلى الحافظة</button>
+  </div>
+
+  <!-- Instructions -->
+  <div class="section">
+    <h2>📖 تعليمات التضمين</h2>
+    
+    <div class="instructions">
+      <h3>كيفية التثبيت:</h3>
+      <ol>
+        <li>انسخ الكود الخاص بك بالنقر على الزر أعلاه</li>
+        <li>افتح محرر الصفحات أو القوالب لموقعك</li>
+        <li>قم بالتبديل إلى وضع التحرير HTML أو وضع التحرير الخام</li>
+        <li>ألصق الكود الخاص بك في المحرر</li>
+        <li>احفظ التغييرات وانشرها</li>
+        <li>افتح موقعك للتحقق من ظهور الـ Box</li>
+      </ol>
+    </div>
+
+    <div class="help-box">
+      <h4>⚠️ هل تواجه مشاكل في التثبيت؟</h4>
+      <p>إذا رأيت رمزاً على صفحتك بدلاً من NexusBox، فقد يقوم محرر النصوص الخاص بك بإزالة أو تنظيف HTML الخاص بـ NexusBox.</p>
+      <p>إذا كانت منصتك تدعم التطبيقات أو الأدوات المصغرة، فقد تجد تطبيقاً أو أداة مصغرة تتيح لك تضمين صندوق التحكم الخاص بك.</p>
+    </div>
+  </div>
+
+</div>
+
+<script>
+const API = window.location.origin;
+const TOKEN = localStorage.getItem('token');
+let currentBox = null;
+
+// Load boxes on page load
+window.onload = async function() {
+  if (!TOKEN) {
+    alert('الرجاء تسجيل الدخول أولاً');
+    window.location.href = '/test.html';
+    return;
+  }
+  await loadBoxes();
+};
+
+async function loadBoxes() {
+  try {
+    const res = await fetch(API + '/api/boxes', {
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      const select = document.getElementById('boxSelect');
+      select.innerHTML = '<option value="">-- اختر Box --</option>';
+      
+      data.boxes.forEach(box => {
+        select.innerHTML += `<option value="${box.embedKey}" data-id="${box._id}">${box.name} (${box.slug})</option>`;
+      });
+
+      // Check URL for key
+      const params = new URLSearchParams(window.location.search);
+      const key = params.get('key');
+      if (key) {
+        select.value = key;
+        loadBoxSettings();
+      }
+    }
+  } catch (error) {
+    console.error('Error loading boxes:', error);
+  }
+}
+
+async function loadBoxSettings() {
+  const select = document.getElementById('boxSelect');
+  const key = select.value;
+  
+  if (!key) {
+    currentBox = null;
+    return;
+  }
+
+  try {
+    const res = await fetch(API + '/api/embed/' + key);
+    const data = await res.json();
+    
+    if (data.success) {
+      currentBox = data.box;
+      document.getElementById('securityTag').value = currentBox.slug || 'auto-generated';
+      
+      // Load saved settings if any
+      if (currentBox.publish && currentBox.publish.siteUrl) {
+        document.getElementById('siteUrl').value = currentBox.publish.siteUrl;
+      }
+      if (currentBox.layout) {
+        document.getElementById('widthInput').value = currentBox.layout.width || 400;
+        document.getElementById('heightInput').value = currentBox.layout.height || 500;
+      }
+      
+      generateCode();
+    }
+  } catch (error) {
+    console.error('Error loading box:', error);
+  }
+}
+
+function toggleWhitelist() {
+  const enabled = document.getElementById('whitelistToggle').checked;
+  document.getElementById('whitelistInput').style.display = enabled ? 'block' : 'none';
+}
+
+function generateCode() {
+  if (!currentBox) {
+    document.getElementById('codeOutput').textContent = 'الرجاء اختيار Box أولاً';
+    return;
+  }
+
+  const width = document.getElementById('widthInput').value;
+  const height = document.getElementById('heightInput').value;
+  const useSSL = document.getElementById('sslToggle').checked;
+  const codeType = document.getElementById('codeType').value;
+  const autoResize = document.getElementById('autoResizeToggle').checked;
+  
+  const protocol = useSSL ? 'https' : 'http';
+  const domain = 'nexusbox-system-production-c290.up.railway.app';
+  const embedUrl = `${protocol}://${domain}/embed.html?key=${currentBox.embedKey}`;
+  
+  let code = '';
+  
+  if (codeType === 'iframe') {
+    code = `<!-- BEGIN NEXUSBOX - ${currentBox.name} -->
+<iframe 
+  src="${embedUrl}" 
+  width="${width}" 
+  height="${height}"
+  style="border: none; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden;"
+  allowfullscreen
+  loading="lazy"
+  ${autoResize ? 'id="nexusbox-iframe"' : ''}>
+</iframe>
+${autoResize ? `
+<script>
+  window.addEventListener('message', function(e) {
+    if (e.origin === '${protocol}://${domain}') {
+      var iframe = document.getElementById('nexusbox-iframe');
+      if (iframe && e.data.height) {
+        iframe.style.height = e.data.height + 'px';
+      }
+    }
+  });
+<\/script>` : ''}
+<!-- END NEXUSBOX -->`;
+  } else {
+    code = `<!-- BEGIN NEXUSBOX WIDGET -->
+<script 
+  src="${protocol}://${domain}/widget.js" 
+  data-box="${currentBox.embedKey}"
+  data-width="${width}"
+  data-height="${height}"
+  data-ssl="${useSSL}"
+  data-autoresize="${autoResize}">
+<\/script>
+<!-- END NEXUSBOX WIDGET -->`;
+  }
+  
+  document.getElementById('codeOutput').textContent = code;
+}
+
+function copyCode() {
+  const code = document.getElementById('codeOutput').textContent;
+  
+  if (!code || code === 'الرجاء اختيار Box أولاً') {
+    alert('الرجاء توليد الكود أولاً');
+    return;
+  }
+  
+  navigator.clipboard.writeText(code).then(() => {
+    const msg = document.getElementById('successMsg');
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+  }).catch(err => {
+    console.error('Copy error:', err);
+    alert('فشل نسخ الكود');
+  });
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/test.html';
+}
+</script>
+
+</body>
+</html>
