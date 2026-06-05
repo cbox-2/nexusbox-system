@@ -1,6 +1,10 @@
-// ===== NexusBox Navigation System - Production Ready =====
+// ===== NexusBox Navigation System - Final Clean =====
 (function() {
   'use strict';
+  
+  // Prevent multiple initializations
+  if (window.navInitialized) return;
+  window.navInitialized = true;
   
   var menus = {
     1: [
@@ -57,15 +61,15 @@
     }
   }
 
+  // Initialize ONCE
   function init() {
     var subbar = document.getElementById('subbar');
     if (!subbar) return;
 
-    // Event delegation - handle ALL clicks
+    // Single event listener
     subbar.addEventListener('click', function(e) {
       var target = e.target;
       
-      // Find closest submenuitem
       while (target && target !== subbar) {
         if (target.classList && target.classList.contains('submenuitem')) break;
         target = target.parentElement;
@@ -73,7 +77,6 @@
       
       if (!target || target === subbar) return;
       
-      // Check if it's a dropdown button
       var id = target.id || '';
       var match = id.match(/^hovmenu(\d)$/);
       
@@ -85,16 +88,14 @@
         return false;
       }
       
-      // Regular links - let them navigate naturally
       var href = target.getAttribute('href');
       if (href && href !== '#' && href.indexOf('javascript') !== 0) {
-        // Let browser handle navigation
         return true;
       }
       
       e.preventDefault();
       return false;
-    });
+    }, { once: false });
 
     // Close menu on outside click
     document.addEventListener('click', function(e) {
@@ -105,7 +106,7 @@
       }
     });
 
-    // Set active state
+    // Active state
     var currentPath = window.location.pathname;
     var allLinks = subbar.querySelectorAll('.submenuitem');
     for (var i = 0; i < allLinks.length; i++) {
@@ -118,7 +119,7 @@
   }
 
   if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', init);
+    document.addEventListener('DOMContentLoaded', init, { once: true });
   } else {
     init();
   }
