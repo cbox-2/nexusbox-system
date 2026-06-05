@@ -1,62 +1,183 @@
 <!DOCTYPE html>
-<html lang="ar">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>المستخدمون المحظورون · NexusBox</title>
 <link rel="stylesheet" href="style.css">
 <style>
-/* إخفاء الـ Header إذا كانت الصفحة داخل iframe */
-body.in-iframe #header,
-body.in-iframe #subbar {
-  display: none !important;
+body { background-color: #1e1b4b !important; padding-top: 20px !important; color: white; }
+.ban-list { margin-top: 20px; }
+.ban-item {
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  border-right: 4px solid #dc3545;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
-body.in-iframe {
-  padding-top: 0 !important;
+.ban-info { flex: 1; }
+.ban-actions { display: flex; gap: 10px; }
+.btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
 }
+.btn-remove { background: #28a745; color: white; }
+.btn:hover { opacity: 0.8; }
+.add-ban-form {
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; }
+.form-group input, .form-group textarea {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 5px;
+  color: white;
+}
+.form-group textarea { min-height: 80px; resize: vertical; }
 </style>
 </head>
-<body dir="rtl">
+<body>
 
-<div id="header" dir="rtl">
-  <div class="wrap">
-    <a id="logo" href="/dashboard/index.html">NexusBox</a>
-    <div id="headerExtras">
-      <span id="userWelcome">مدير</span>
-      <a href="#">صناديق بريدي</a>
-      <a href="#">حسابي</a>
-      <a href="#">الدعم</a>
-      <a href="#">تسجيل الخروج</a>
-    </div>
-  </div>
-</div>
-
-<div id="subbar" dir="rtl">
-  <div class="wrap">
-    <a href="#" class="submenuitem active">المستخدمون المحظورون</a>
-  </div>
-</div>
-
-<div id="main" style="padding: 20px; color: white;">
+<div id="main">
   <h1>المستخدمون المحظورون</h1>
-  <p>يمكنك الاحتفاظ بقائمة الحظر هنا. يمكنك حظر المستخدمين عبر صفحة الرسائل أو بإدخال عناوين IP الخاصة بهم يدويًا في هذه الصفحة.</p>
+  <p>إدارة قائمة الحظر في النظام</p>
   
-  <h2 style="margin-top: 30px;">قيود على البلد</h2>
-  <div style="background: #2a2a4a; padding: 20px; border-radius: 8px; margin-top: 15px;">
-    <label style="display: block; margin-bottom: 10px;">سياسة:</label>
-    <select style="width: 100%; padding: 10px; background: #1e1b4b; color: white; border: 1px solid #444; border-radius: 4px;">
-      <option>السماح بأي</option>
-      <option>حظر الكل</option>
-    </select>
+  <div class="add-ban-form">
+    <h3>إضافة حظر جديد</h3>
+    <form id="add-ban-form">
+      <div class="form-group">
+        <label>الهدف (IP أو اسم مستخدم)</label>
+        <input type="text" id="ban-target" required>
+      </div>
+      <div class="form-group">
+        <label>السبب</label>
+        <textarea id="ban-reason"></textarea>
+      </div>
+      <div class="form-group">
+        <label>ينتهي في (اختياري)</label>
+        <input type="datetime-local" id="ban-expires">
+      </div>
+      <button type="submit" class="btn btn-remove">إضافة حظر</button>
+    </form>
+  </div>
+  
+  <div class="ban-list" id="ban-list">
+    <p>جاري تحميل قائمة الحظر...</p>
   </div>
 </div>
 
 <script src="code.js"></script>
 <script>
-// كشف إذا كانت الصفحة داخل iframe
-if (window.self !== window.top) {
-  document.body.classList.add('in-iframe');
+const token = localStorage.getItem('token');
+
+// تحميل قائمة الحظر
+async function loadBans() {
+  try {
+    const res = await fetch('/api/bans', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      const banList = document.getElementById('ban-list');
+      banList.innerHTML = '';
+      
+      if (data.bans.length === 0) {
+        banList.innerHTML = '<p>لا يوجد حظر حالياً</p>';
+        return;
+      }
+      
+      data.bans.forEach(ban => {
+        const banItem = document.createElement('div');
+        banItem.className = 'ban-item';
+        banItem.innerHTML = `
+          <div class="ban-info">
+            <strong>${ban.target}</strong>
+            <br>
+            <small>السبب: ${ban.reason || 'غير محدد'}</small>
+            <br>
+            <small>بواسطة: ${ban.bannedBy?.username || 'Unknown'}</small>
+            <br>
+            <small>${new Date(ban.createdAt).toLocaleString('ar')}${ban.expiresAt ? ' | ينتهي: ' + new Date(ban.expiresAt).toLocaleString('ar') : ''}</small>
+          </div>
+          <div class="ban-actions">
+            <button class="btn btn-remove" onclick="removeBan('${ban._id}')">إزالة الحظر</button>
+          </div>
+        `;
+        banList.appendChild(banItem);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading bans:', error);
+  }
 }
+
+// إضافة حظر
+document.getElementById('add-ban-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const target = document.getElementById('ban-target').value;
+  const reason = document.getElementById('ban-reason').value;
+  const expiresAt = document.getElementById('ban-expires').value;
+  
+  try {
+    const res = await fetch('/api/bans', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ target, reason, expiresAt })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      alert('تم إضافة الحظر!');
+      loadBans();
+      this.reset();
+    } else {
+      alert('خطأ: ' + data.error);
+    }
+  } catch (error) {
+    alert('خطأ في الاتصال');
+  }
+});
+
+// إزالة حظر
+async function removeBan(banId) {
+  if (!confirm('هل أنت متأكد من إزالة هذا الحظر؟')) return;
+  
+  try {
+    const res = await fetch(`/api/bans/${banId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      loadBans();
+    }
+  } catch (error) {
+    alert('خطأ في الاتصال');
+  }
+}
+
+// تحميل قائمة الحظر عند فتح الصفحة
+loadBans();
 </script>
 </body>
 </html>

@@ -1,44 +1,207 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Registered Users · NexusBox</title>
-<link rel="stylesheet" href="/shared/toolbar.css">
-<style>body { background-color: #1e293b !important; padding-top: 120px !important; }</style>
-</head>
-<body dir="ltr">
-<div id="header" dir="ltr">
-  <div class="wrap">
-    <a id="logo" href="/dashboard/index.html">NexusBox</a>
-    <div id="headerExtras">
-      <span id="userWelcome">admin</span>
-      <a href="/dashboard/index.html">My Cboxes</a>
-      <a href="#">My Account</a>
-      <a href="#">Support</a>
-      <a href="#" onclick="globalLogout()">Log out</a>
-    </div>
-  </div>
-</div>
-<div id="subbar" dir="ltr">
-  <div class="wrap">
-    <a href="/dashboard/index.html" class="submenuitem"><b>MSASDWEC2015HKARNO</b></a>
-    <a href="/publish/publish.html" class="submenuitem">Publish</a>
-    <a href="/Theme-editor/Theme-editor.html" class="submenuitem">Look & feel</a>
-    <a href="/posting-options/index.html" class="submenuitem">Options</a>
-    <a href="/registered-users/registered-users.html" class="submenuitem active">Users</a>
-    <a href="/messages/index.html" class="submenuitem">Messages</a>
-  </div>
-</div>
-<div id="main" style="padding: 20px; color: white;">
-  <h1>Registered Users</h1>
-  <p>Manage your registered users here</p>
-</div>
-<script src="/shared/toolbar.js"></script>
-<script>
-if (window.self !== window.top) {
-  document.body.classList.add('in-iframe');
+<title>المستخدمون المسجلون · NexusBox</title>
+<link rel="stylesheet" href="style.css">
+<style>
+body { background-color: #1e1b4b !important; padding-top: 20px !important; color: white; }
+.user-list { margin-top: 20px; }
+.user-item {
+  background: rgba(255,255,255,0.1);
+  padding: 15px;
+  margin-bottom: 10px;
+  border-radius: 8px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
 }
+.user-info { flex: 1; }
+.user-actions { display: flex; gap: 10px; }
+.btn {
+  padding: 8px 15px;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  font-size: 13px;
+}
+.btn-edit { background: #4a7fb5; color: white; }
+.btn-delete { background: #dc3545; color: white; }
+.btn-ban { background: #ffc107; color: black; }
+.btn:hover { opacity: 0.8; }
+.add-user-form {
+  background: rgba(255,255,255,0.1);
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.form-group { margin-bottom: 15px; }
+.form-group label { display: block; margin-bottom: 5px; }
+.form-group input, .form-group select {
+  width: 100%;
+  padding: 10px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 5px;
+  color: white;
+}
+</style>
+</head>
+<body>
+
+<div id="main">
+  <h1>المستخدمون المسجلون</h1>
+  <p>إدارة المستخدمين المسجلين في النظام</p>
+  
+  <div class="add-user-form">
+    <h3>إضافة مستخدم جديد</h3>
+    <form id="add-user-form">
+      <div class="form-group">
+        <label>اسم المستخدم</label>
+        <input type="text" id="new-username" required>
+      </div>
+      <div class="form-group">
+        <label>البريد الإلكتروني</label>
+        <input type="email" id="new-email" required>
+      </div>
+      <div class="form-group">
+        <label>الصلاحية</label>
+        <select id="new-role">
+          <option value="user">مستخدم</option>
+          <option value="moderator">مشرف</option>
+          <option value="admin">مدير</option>
+        </select>
+      </div>
+      <button type="submit" class="btn btn-edit">إضافة مستخدم</button>
+    </form>
+  </div>
+  
+  <div class="user-list" id="user-list">
+    <p>جاري تحميل المستخدمين...</p>
+  </div>
+</div>
+
+<script src="code.js"></script>
+<script>
+const token = localStorage.getItem('token');
+
+// تحميل المستخدمين
+async function loadUsers() {
+  try {
+    const res = await fetch('/api/auth/users', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      const userList = document.getElementById('user-list');
+      userList.innerHTML = '';
+      
+      data.users.forEach(user => {
+        const userItem = document.createElement('div');
+        userItem.className = 'user-item';
+        userItem.innerHTML = `
+          <div class="user-info">
+            <strong>${user.username}</strong>
+            <br>
+            <small>${user.email} | ${user.role} | ${user.status}</small>
+          </div>
+          <div class="user-actions">
+            <button class="btn btn-ban" onclick="toggleBan('${user._id}', '${user.status}')">
+              ${user.status === 'active' ? 'حظر' : 'تفعيل'}
+            </button>
+            <button class="btn btn-delete" onclick="deleteUser('${user._id}')">حذف</button>
+          </div>
+        `;
+        userList.appendChild(userItem);
+      });
+    }
+  } catch (error) {
+    console.error('Error loading users:', error);
+  }
+}
+
+// إضافة مستخدم
+document.getElementById('add-user-form').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const username = document.getElementById('new-username').value;
+  const email = document.getElementById('new-email').value;
+  const role = document.getElementById('new-role').value;
+  
+  try {
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ username, email, password: 'TempPass123', role })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      alert('تم إضافة المستخدم بنجاح!');
+      loadUsers();
+      this.reset();
+    } else {
+      alert('خطأ: ' + data.error);
+    }
+  } catch (error) {
+    alert('خطأ في الاتصال');
+  }
+});
+
+// حظر/تفعيل مستخدم
+async function toggleBan(userId, currentStatus) {
+  const newStatus = currentStatus === 'active' ? 'banned' : 'active';
+  
+  try {
+    const res = await fetch(`/api/auth/users/${userId}/status`, {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify({ status: newStatus })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      alert(newStatus === 'banned' ? 'تم حظر المستخدم' : 'تم تفعيل المستخدم');
+      loadUsers();
+    }
+  } catch (error) {
+    alert('خطأ في الاتصال');
+  }
+}
+
+// حذف مستخدم
+async function deleteUser(userId) {
+  if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
+  
+  try {
+    const res = await fetch(`/api/auth/users/${userId}`, {
+      method: 'DELETE',
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      alert('تم حذف المستخدم');
+      loadUsers();
+    }
+  } catch (error) {
+    alert('خطأ في الاتصال');
+  }
+}
+
+// تحميل المستخدمين عند فتح الصفحة
+loadUsers();
 </script>
 </body>
 </html>
