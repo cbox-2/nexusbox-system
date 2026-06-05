@@ -5,7 +5,7 @@ const boxSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true, maxlength: 50 },
   slug: { type: String, unique: true, lowercase: true, match: /^[a-z0-9-]+$/ },
   ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-  embedKey: { type: String, unique: true, required: true },
+  embedKey: { type: String, unique: true, default: () => require('crypto').randomBytes(16).toString('hex') },
   status: { type: String, default: 'active', enum: ['active', 'disabled', 'archived'] },
   
   theme: {
@@ -59,14 +59,16 @@ boxSchema.index({ status: 1 });
 
 // Auto-generate slug and embedKey
 boxSchema.pre('save', function(next) {
-  if (this.isModified('name') && !this.slug) {
-    this.slug = this.name
-      .toLowerCase()
-      .replace(/[^a-z0-9]+/g, '-')
-      .replace(/(^-|-$)/g, '');
+  if (this.isNew || this.isModified('name')) {
+    if (!this.slug) {
+      this.slug = this.name
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-')
+        .replace(/(^-|-$)/g, '');
+    }
   }
   if (!this.embedKey) {
-    this.embedKey = crypto.randomBytes(16).toString('hex');
+    this.embedKey = require('crypto').randomBytes(16).toString('hex');
   }
   this.updatedAt = new Date();
   next();
