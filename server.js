@@ -5,6 +5,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
+const { sanitizeInput, securityLog, trackFailedLogin, isBlockedByFailedLogins, clearFailedLogins, detectSuspicious } = require('./middleware/security');
+const { securityHeaders, apiRateLimit, securityErrorHandler } = require('./middleware/security-routes');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const app = express();
@@ -32,6 +34,8 @@ app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true }));
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 1000, validate: { xForwardedForHeader: false } });
 app.use(limiter);
+app.use(detectSuspicious);
+app.use(securityHeaders);
 app.use(express.static('public'));
 // Models
 const userSchema = new mongoose.Schema({ username: { type: String, required: true, unique: true, trim: true }, email: { type: String, required: true, unique: true, lowercase: true }, password: { type: String, required: true }, role: { type: String, default: 'user', enum: ['user', 'moderator', 'admin'] }, status: { type: String, default: 'active', enum: ['active', 'banned', 'suspended'] }, createdAt: { type: Date, default: Date.now }, lastLogin: { type: Date } });
@@ -57,7 +61,12 @@ const adminMiddleware = (req, res, next) => { if (req.user.role !== 'admin') ret
 const moderatorMiddleware = (req, res, next) => { if (!['admin', 'moderator'].includes(req.user.role)) return res.status(403).json({ success: false, error: 'Moderator access required' }); next(); };
 // Auth APIs
 app.post('/api/auth/signup', async (req, res) => { try { const { username, email, password } = req.body; if (!username || !email || !password) return res.status(400).json({ success: false, error: 'All fields required' }); if (password.length < 6) return res.status(400).json({ success: false, error: 'Password min 6 chars' }); const existing = await User.findOne({ $or: [{ email }, { username }] }); if (existing) return res.status(400).json({ success: false, error: 'Username/email exists' }); const user = new User({ username, email, password }); await user.save(); const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' }); res.status(201).json({ success: true, user: user.toJSON(), token }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
-app.post('/api/auth/login', async (req, res) => { try { const { username, password } = req.body; if (!username || !password) return res.status(400).json({ success: false, error: 'Username and password required' }); const user = await User.findOne({ $or: [{ username }, { email: username }] }); if (!user) return res.status(401).json({ success: false, error: 'Invalid credentials' }); const isMatch = await user.comparePassword(password); if (!isMatch) return res.status(401).json({ success: false, error: 'Invalid credentials' }); if (user.status !== 'active') return res.status(403).json({ success: false, error: 'Account not active' }); user.lastLogin = new Date(); await user.save(); const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' }); res.json({ success: true, user: user.toJSON(), token }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
+app.post('/api/auth/login', async (req, res) => { try {
+    const loginIp = req.ip || 'unknown';
+    if (isBlockedByFailedLogins(req.body.username || '', loginIp)) {
+      securityLog('LOGIN_BLOCKED', { username: req.body.username }, req);
+      return res.status(429).json({ success: false, error: 'Too many failed attempts. Try again later.' });
+    } const { username, password } = req.body; if (!username || !password) return res.status(400).json({ success: false, error: 'Username and password required' }); const user = await User.findOne({ $or: [{ username }, { email: username }] }); if (!user) { trackFailedLogin(username, req.ip || 'unknown'); return res.status(401).json({ success: false, error: 'Invalid credentials' }); } const isMatch = await user.comparePassword(password); if (!isMatch) return res.status(401).json({ success: false, error: 'Invalid credentials' }); if (user.status !== 'active') return res.status(403).json({ success: false, error: 'Account not active' }); user.lastLogin = new Date(); await user.save(); const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' }); res.json({ success: true, user: user.toJSON(), token }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
 app.get('/api/auth/me', authMiddleware, (req, res) => { res.json({ success: true, user: req.user.toJSON() }); });
 app.get('/api/auth/users', authMiddleware, adminMiddleware, async (req, res) => { try { const users = await User.find().sort({ createdAt: -1 }); res.json({ success: true, count: users.length, users }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
 app.put('/api/auth/users/:id/role', authMiddleware, adminMiddleware, async (req, res) => { try { const { role } = req.body; if (!['user', 'moderator', 'admin'].includes(role)) return res.status(400).json({ success: false, error: 'Invalid role' }); const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true }); if (!user) return res.status(404).json({ success: false, error: 'User not found' }); res.json({ success: true, user: user.toJSON() }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
@@ -102,6 +111,7 @@ app.delete('/api/registered-users/:id', authMiddleware, async (req, res) => { tr
 app.get('/api/health', (req, res) => { res.json({ success: true, message: 'NexusBox Backend is running', timestamp: new Date().toISOString(), database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected', version: '1.0.0' }); });
 app.get('/', (req, res) => { res.json({ name: 'NexusBox API', version: '1.0.0', status: 'online' }); });
 // Error handlers
+app.use(securityErrorHandler);
 app.use((err, req, res, next) => { console.error('Server error:', err); res.status(500).json({ success: false, error: 'Internal server error' }); });
 app.use((req, res) => { res.status(404).json({ success: false, error: 'Endpoint not found' }); });
 // Database & Start

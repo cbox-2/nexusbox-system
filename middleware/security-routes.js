@@ -1,7 +1,5 @@
-// ===== NexusBox Security Routes Middleware =====
-const { securityLog, detectSuspicious, sanitizeInput } = require('./security');
+const { securityLog } = require('./security');
 
-// 1. Security Headers
 const securityHeaders = (req, res, next) => {
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'SAMEORIGIN');
@@ -16,48 +14,16 @@ const securityHeaders = (req, res, next) => {
   next();
 };
 
-// 2. CORS Security
-const corsSecurity = (req, res, next) => {
-  const allowedOrigins = [
-    'https://nexusbox-system-production-c290.up.railway.app',
-    'http://localhost:3000'
-  ];
-  
-  const origin = req.headers.origin;
-  if (allowedOrigins.includes(origin)) {
-    res.setHeader('Access-Control-Allow-Origin', origin);
-  }
-  
-  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, PUT, DELETE, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Access-Control-Max-Age', '86400');
-  
-  if (req.method === 'OPTIONS') {
-    return res.status(204).end();
-  }
-  
-  next();
-};
-
-// 3. Auth Protection
-const requireAuth = (req, res, next) => {
-  next();
-};
-
-// 4. API Rate Limiting (per-endpoint)
-const apiRateLimit = (windowMs = 60000, max = 100) => {
+const apiRateLimit = (windowMs, max) => {
+  windowMs = windowMs || 60000;
+  max = max || 100;
   const requests = new Map();
   
   return (req, res, next) => {
-    const key = req.ip + ':' + req.path;
+    const key = (req.ip || 'unknown') + ':' + req.path;
     const now = Date.now();
     
-    if (!requests.has(key)) {
-      requests.set(key, []);
-    }
-    
-    const reqs = requests.get(key).filter(t => now - t < windowMs);
+    const reqs = (requests.get(key) || []).filter(t => now - t < windowMs);
     reqs.push(now);
     requests.set(key, reqs);
     
@@ -73,16 +39,6 @@ const apiRateLimit = (windowMs = 60000, max = 100) => {
   };
 };
 
-// 5. Filter Sensitive Data
-const filterSensitiveData = (user) => {
-  if (!user) return null;
-  const filtered = { ...user };
-  delete filtered.password;
-  delete filtered.__v;
-  return filtered;
-};
-
-// 6. Error Handler
 const securityErrorHandler = (err, req, res, next) => {
   if (err.name === 'UnauthorizedError' || err.status === 401) {
     securityLog('UNAUTHORIZED_ACCESS', { path: req.path }, req);
@@ -92,10 +48,11 @@ const securityErrorHandler = (err, req, res, next) => {
     securityLog('INVALID_JWT', { path: req.path }, req);
   }
   
-  if (err.message && err.message.includes('ECONNREFUSED')) {
-    return res.status(503).json({
+  if (process.env.NODE_ENV === 'production') {
+    console.error('[ERROR]', err.message);
+    return res.status(err.status || 500).json({
       success: false,
-      error: 'Service temporarily unavailable'
+      error: 'Internal server error'
     });
   }
   
@@ -104,9 +61,6 @@ const securityErrorHandler = (err, req, res, next) => {
 
 module.exports = {
   securityHeaders,
-  corsSecurity,
-  requireAuth,
   apiRateLimit,
-  filterSensitiveData,
   securityErrorHandler
 };
