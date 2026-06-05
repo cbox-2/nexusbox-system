@@ -1,177 +1,152 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
+<html lang="en"><head>
+<title>Channels · NexusBox</title>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>القنوات · NexusBox</title>
-<link rel="stylesheet" href="style.css">
-<style>
-body { background-color: #1e1b4b !important; padding-top: 20px !important; color: white; }
-.channel-list { margin-top: 20px; }
-.channel-item {
-  background: rgba(255,255,255,0.1);
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  border-right: 4px solid #4a7fb5;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.channel-info { flex: 1; }
-.channel-actions { display: flex; gap: 10px; }
-.btn {
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 13px;
-}
-.btn-delete { background: #dc3545; color: white; }
-.btn:hover { opacity: 0.8; }
-.add-channel-form {
-  background: rgba(255,255,255,0.1);
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 5px; }
-.form-group input, .form-group textarea {
-  width: 100%;
-  padding: 10px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 5px;
-  color: white;
-}
-.form-group textarea { min-height: 80px; resize: vertical; }
-</style>
+<link rel="stylesheet" href="/shared/toolbar.css">
 </head>
-<body>
+<body id="mainbody">
 
-<div id="main">
-  <h1>القنوات</h1>
-  <p>إدارة قنوات الدردشة</p>
-  
-  <div class="add-channel-form">
-    <h3>إنشاء قناة جديدة</h3>
-    <form id="add-channel-form">
-      <div class="form-group">
-        <label>اسم القناة</label>
-        <input type="text" id="channel-name" required>
-      </div>
-      <div class="form-group">
-        <label>الوصف</label>
-        <textarea id="channel-description"></textarea>
-      </div>
-      <button type="submit" class="btn btn-edit">إنشاء قناة</button>
-    </form>
-  </div>
-  
-  <div class="channel-list" id="channel-list">
-    <p>جاري تحميل القنوات...</p>
-  </div>
+<div id="bodywrap">
+<div id="header">
+<div class="wrap">
+<a id="logo" href="/dashboard/index.html"><span style="color:#fff;font-size:24px;font-weight:bold">NexusBox</span></a>
+<div id="headerExtras">
+<span id="userWelcome">Loading...</span>
+<a href="/dashboard/index.html">My Cboxes</a>
+<a href="#" onclick="globalLogout(); return false;">Log out</a>
+</div>
+</div>
+</div>
+<div id="subbar">
+<div class="wrap">
+<a href="/dashboard/index.html" class="submenuitem"><b id="cbox-name">MSASDWEC2015HKARNO</b></a>
+<a href="/publish/publish.html" class="submenuitem">Publish</a>
+<a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this,1)">Look &amp; feel</a>
+<a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this,2)">Options</a>
+<a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this,3)">Users</a>
+<a href="#" id="hovmenu4" class="submenuitem active" onmousedown="return hovmenu(this,4)">Messages</a>
+</div>
+</div>
+<div id="bar3"><div id="hovmenu" class="wrap"><a></a></div></div>
+
+<div id="main"><div id="content">
+
+<h1>📺 Channels</h1>
+<p>Create and manage chat channels for your community.</p>
+
+<form id="add-channel-form" onsubmit="return addChannel(event)">
+<fieldset>
+<legend>Create New Channel</legend>
+<label>Channel Name:</label>
+<input type="text" id="ch-name" maxlength="50" size="30" class="txtbox" required>
+<label>Description:</label>
+<input type="text" id="ch-desc" maxlength="200" size="50" class="txtbox">
+<input type="submit" value=" Create Channel ">
+<div id="m_ch" class="frmmsg1"></div>
+<div id="em_ch" class="frmmsg2"></div>
+</fieldset>
+</form>
+
+<fieldset>
+<legend>Existing Channels</legend>
+<div id="channel-list" style="background:#fff; min-height:200px; padding:10px;">
+<div style="text-align:center; color:#999;">Loading channels...</div>
+</div>
+</fieldset>
+
+</div></div>
 </div>
 
-<script src="code.js"></script>
-<script>
-const token = localStorage.getItem('token');
+<div id="footer">
+<a href="#">About</a><a href="#">Contact us</a>
+<div class="verybottom">© 2004–2026 NexusBox Communications</div>
+</div>
 
-// تحميل القنوات
-async function loadChannels() {
-  try {
-    const res = await fetch('/api/channels', {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    const data = await res.json();
-    
-    if (data.success) {
-      const channelList = document.getElementById('channel-list');
-      channelList.innerHTML = '';
-      
-      if (data.channels.length === 0) {
-        channelList.innerHTML = '<p>لا توجد قنوات حالياً</p>';
-        return;
-      }
-      
-      data.channels.forEach(channel => {
-        const channelItem = document.createElement('div');
-        channelItem.className = 'channel-item';
-        channelItem.innerHTML = `
-          <div class="channel-info">
-            <strong>${channel.name}</strong>
-            <br>
-            <small>${channel.description || 'لا يوجد وصف'}</small>
-            <br>
-            <small>بواسطة: ${channel.createdBy?.username || 'Unknown'} | ${new Date(channel.createdAt).toLocaleString('ar')}</small>
-          </div>
-          <div class="channel-actions">
-            <button class="btn btn-delete" onclick="deleteChannel('${channel._id}')">حذف</button>
-          </div>
-        `;
-        channelList.appendChild(channelItem);
-      });
-    }
-  } catch (error) {
-    console.error('Error loading channels:', error);
-  }
-}
-
-// إنشاء قناة
-document.getElementById('add-channel-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  
-  const name = document.getElementById('channel-name').value;
-  const description = document.getElementById('channel-description').value;
-  
-  try {
-    const res = await fetch('/api/channels', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({ name, description })
-    });
-    
-    const data = await res.json();
-    
-    if (data.success) {
-      alert('تم إنشاء القناة!');
-      loadChannels();
-      this.reset();
-    } else {
-      alert('خطأ: ' + data.error);
-    }
-  } catch (error) {
-    alert('خطأ في الاتصال');
-  }
-});
-
-// حذف قناة
-async function deleteChannel(channelId) {
-  if (!confirm('هل أنت متأكد من حذف هذه القناة؟')) return;
-  
-  try {
-    const res = await fetch(`/api/channels/${channelId}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    
-    const data = await res.json();
-    
-    if (data.success) {
-      loadChannels();
-    }
-  } catch (error) {
-    alert('خطأ في الاتصال');
-  }
-}
-
-// تحميل القنوات عند فتح الصفحة
-loadChannels();
-</script>
+<script src="/shared/toolbar.js"></script>
+<script src="/shared/auth.js"></script>
 <script src="/shared/nav.js"></script>
-</body>
-</html>
+<script>
+async function init() {
+  await loadUserInfo();
+  loadChannels();
+}
+
+async function loadChannels() {
+  var token = localStorage.getItem('token');
+  var list = document.getElementById('channel-list');
+  try {
+    var res = await fetch('/api/channels', {headers:{'Authorization':'Bearer '+token}});
+    var data = await res.json();
+    if (data.success) renderChannels(data.channels);
+    else list.innerHTML = '<div style="color:#f66">Error loading</div>';
+  } catch(e) { list.innerHTML = '<div style="color:#f66">Connection error</div>'; }
+}
+
+function renderChannels(channels) {
+  var list = document.getElementById('channel-list');
+    list.innerHTML = '<div style="text-align:center; color:#999; padding:20px;">No channels yet. Create your first one!</div>';
+    return;
+  }
+  list.innerHTML = '';
+  channels.forEach(function(ch) {
+    var row = document.createElement('div');
+    row.style.cssText = 'padding:12px; border-bottom:1px solid #eee; display:flex; justify-content:space-between; align-items:center;';
+    row.innerHTML = '<div>' +
+      '<strong style="color:#059ad0;">#' + escapeHtml(ch.name) + '</strong>' +
+      '<div style="color:#666; font-size:11px;">' + escapeHtml(ch.description || 'No description') + '</div>' +
+      '<div style="color:#999; font-size:10px;">Created: ' + new Date(ch.createdAt).toLocaleDateString() + '</div>' +
+      '</div>' +
+      '<div>' +
+      '<a href="/chat/chat.html?channel=' + ch.name + '" style="background:#059ad0; color:#fff; padding:5px 10px; text-decoration:none; border-radius:3px; margin-right:5px;">Open</a>' +
+      '<button onclick="deleteChannel(''+ch._id+'')" style="background:#dc3545;">Delete</button>' +
+      '</div>';
+    list.appendChild(row);
+  });
+}
+
+function escapeHtml(t) { var d = document.createElement('div'); d.textContent = t; return d.innerHTML; }
+
+async function addChannel(e) {
+  e.preventDefault();
+  var token = localStorage.getItem('token');
+  var msg = document.getElementById('m_ch');
+  var err = document.getElementById('em_ch');
+  msg.textContent = ''; err.innerHTML = '';
+  var name = document.getElementById('ch-name').value.trim();
+  var desc = document.getElementById('ch-desc').value.trim();
+  try {
+    var res = await fetch('/api/channels', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+token},
+      body: JSON.stringify({name: name, description: desc})
+    });
+    var data = await res.json();
+    if (data.success) {
+      msg.textContent = 'Channel created!';
+      document.getElementById('ch-name').value = '';
+      document.getElementById('ch-desc').value = '';
+      loadChannels();
+    } else {
+      err.innerHTML = '<ul><li>' + data.error + '</li></ul>';
+    }
+  } catch(e) { err.innerHTML = '<ul><li>Connection error</li></ul>'; }
+  return false;
+}
+
+async function deleteChannel(id) {
+  var token = localStorage.getItem('token');
+  try {
+    var res = await fetch('/api/channels/' + id, {
+      method: 'DELETE',
+      headers: {'Authorization':'Bearer '+token}
+    });
+    var data = await res.json();
+    if (data.success) loadChannels();
+    else alert('Error: ' + data.error);
+  } catch(e) { alert('Connection error'); }
+}
+
+document.addEventListener('DOMContentLoaded', init);
+</script>
+
+</body></html>

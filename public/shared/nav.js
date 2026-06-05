@@ -1,4 +1,4 @@
-// Hovmenu System - Shared across all pages
+// ===== NexusBox Navigation System =====
 var hovmenu = function(btn, menuId) {
   var menus = {
     1: [
@@ -25,33 +25,41 @@ var hovmenu = function(btn, menuId) {
       {text:'Channels', href:'/channels/index.html'}
     ]
   };
-  
   var hovmenuDiv = document.getElementById('hovmenu');
-  
   var items = menus[menuId] || [];
   hovmenuDiv.innerHTML = '';
-  
+  hovmenuDiv.style.display = 'block';
   items.forEach(function(item) {
     var a = document.createElement('a');
     a.href = item.href;
-    a.className = 'submenuitem';
+    a.className = 'submenuitem' + (item.active ? ' active' : '');
     a.textContent = item.text;
     hovmenuDiv.appendChild(a);
   });
-  
   return false;
 };
 
-// Close menu when clicking outside
 document.addEventListener('click', function(e) {
   var hovmenuDiv = document.getElementById('hovmenu');
     hovmenuDiv.innerHTML = '';
   }
 });
 
-// Global logout function
 function globalLogout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   window.location.href = '/login/index.html';
+}
+
+async function loadUserInfo() {
+  var token = localStorage.getItem('token');
+  try {
+    var res = await fetch('/api/auth/me', {headers:{'Authorization':'Bearer '+token}});
+    var data = await res.json();
+    var uw = document.getElementById('userWelcome');
+    var cn = document.getElementById('cbox-name');
+    if (uw) uw.textContent = data.user.email || data.user.username;
+    if (cn) cn.textContent = data.user.username.toUpperCase();
+    return data.user;
+  } catch(e) { console.error(e); return null; }
 }

@@ -1,140 +1,173 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
+<html lang="en"><head>
+<title>Chat · NexusBox</title>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Chat · NexusBox</title>
+<link rel="stylesheet" href="/shared/toolbar.css">
 <style>
-* { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: Tahoma, sans-serif; background: #FFE4E1; }
-
-.chat-container {
-  display: flex;
-  flex-direction: column;
-  height: 100vh;
-  background: #FFE4E1;
-}
-
-.messages-area {
-  flex: 1;
-  overflow-y: auto;
-  padding: 10px;
-  background: #FFE4E1;
-}
-
-.message {
-  margin-bottom: 10px;
-  padding: 8px;
-  background: #FFFAFA;
-  border-radius: 5px;
-}
-
-.message.user2 {
-  background: #FFE4E1;
-}
-
-.message .username {
-  font-weight: bold;
-  color: #141CEE;
-  margin-left: 5px;
-}
-
-.message .time {
-  font-size: 8pt;
-  color: #666;
-  float: left;
-}
-
-.message .text {
-  margin-top: 5px;
-}
-
-.form-area {
-  background: #FFE4E1;
-  padding: 10px;
-  border-top: 1px solid #ccc;
-}
-
-.form-area input {
-  width: 85px;
-  height: 55px;
-  padding: 5px;
-  background: Whitesmoke;
-  border: #0000FF 2px solid;
-  border-radius: 15px;
-  font-family: Arial, sans-serif;
-  font-size: 15pt;
-  margin: 1px;
-}
-
-.form-area button {
-  border: black 1px solid;
-  border-radius: 9px;
-  width: 30px;
-  height: 50px;
-  font-size: 15pt;
-  background: #FF0000;
-  color: #000000;
-  vertical-align: top;
-  margin: 1px;
-  cursor: pointer;
-}
-
-a { color: Deeppink; text-decoration: none; font-size: 14pt; }
-a:visited { color: #D80000; }
-a:hover { text-decoration: underline; color: #000; }
-
-/* Preview mode - hide header/footer */
-body.preview-mode #header,
-body.preview-mode #footer {
-  display: none;
-}
-
-body.preview-mode {
-  padding: 0;
-  margin: 0;
-}
+#chat-container { display: flex; flex-direction: column; height: 500px; background: #1e1b4b; border: 1px solid #444; border-radius: 5px; overflow: hidden; }
+#chat-messages { flex: 1; overflow-y: auto; padding: 15px; background: #fff; color: #333; }
+.chat-msg { padding: 8px 12px; margin-bottom: 8px; border-radius: 5px; background: #f5f5f5; border-left: 3px solid #059ad0; }
+.chat-msg.sticky { background: #fff9e6; border-left-color: #ffc107; }
+.chat-msg .username { font-weight: bold; color: #059ad0; margin-right: 8px; }
+.chat-msg .time { font-size: 10px; color: #999; float: right; }
+.chat-msg .text { margin-top: 4px; word-wrap: break-word; }
+#chat-form { display: flex; padding: 10px; background: #2d2a5e; border-top: 1px solid #444; gap: 8px; }
+#chat-form input[type="text"] { flex: 1; background: #1e1b4b; color: #fff; border: 1px solid #444; padding: 8px; border-radius: 3px; }
+#chat-form button { background: #059ad0; color: #fff; border: none; padding: 8px 20px; border-radius: 3px; cursor: pointer; }
+#channel-selector { padding: 10px; background: #2d2a5e; border-bottom: 1px solid #444; }
+#channel-selector select { background: #1e1b4b; color: #fff; border: 1px solid #444; padding: 5px; }
+.online-count { color: #6bff6b; font-size: 11px; margin-left: 10px; }
 </style>
 </head>
-<body>
+<body id="mainbody">
 
-<div class="chat-container">
-  <div class="messages-area" id="messages">
-    <div class="message user1">
-      <span class="time">12:00 PM</span>
-      <span class="username">Admin:</span>
-      <div class="text">Welcome to NexusBox Chat!</div>
-    </div>
-    <div class="message user2">
-      <span class="time">12:01 PM</span>
-      <span class="username">User:</span>
-      <div class="text">Hello everyone!</div>
-    </div>
-    <div class="message user1">
-      <span class="time">12:02 PM</span>
-      <span class="username">Admin:</span>
-      <div class="text">This is a sample message to preview your theme.</div>
-    </div>
-  </div>
-  
-  <div class="form-area">
-    <input type="text" placeholder="Name">
-    <input type="text" placeholder="Message" style="width: 200px;">
-    <button>»</button>
-  </div>
+<div id="bodywrap">
+<div id="header">
+<div class="wrap">
+<a id="logo" href="/dashboard/index.html"><span style="color:#fff;font-size:24px;font-weight:bold">NexusBox</span></a>
+<div id="headerExtras">
+<span id="userWelcome">Loading...</span>
+<a href="/dashboard/index.html">My Cboxes</a>
+<a href="#" onclick="globalLogout(); return false;">Log out</a>
+</div>
+</div>
 </div>
 
+<div id="subbar">
+<div class="wrap">
+<a href="/dashboard/index.html" class="submenuitem"><b id="cbox-name">MSASDWEC2015HKARNO</b></a>
+<a href="/publish/publish.html" class="submenuitem">Publish</a>
+<a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+<a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options</a>
+<a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users</a>
+<a href="#" id="hovmenu4" class="submenuitem active" onmousedown="return hovmenu(this, 4)">Messages</a>
+</div>
+</div>
+<div id="bar3">
+<div id="hovmenu" class="wrap"><a></a></div>
+</div>
+
+<div id="main">
+<div id="content">
+
+<h1>💬 Live Chat</h1>
+<p>Real-time chat for your community. Messages appear instantly.</p>
+
+<div id="channel-selector">
+<label style="display:inline; color:#ddd;">Channel:</label>
+<select id="current-channel" onchange="switchChannel()">
+<option value="general">General</option>
+<option value="announcements">Announcements</option>
+<option value="support">Support</option>
+</select>
+<span class="online-count" id="online-count">● Connected</span>
+</div>
+
+<div id="chat-container">
+<div id="chat-messages">
+<div style="text-align:center; color:#999; padding:20px;">Loading messages...</div>
+</div>
+<form id="chat-form" onsubmit="return sendMessage(event)">
+<input type="text" id="chat-input" placeholder="Type your message..." maxlength="500" autocomplete="off">
+<button type="submit">Send</button>
+</form>
+</div>
+
+</div>
+</div>
+</div>
+
+<div id="footer">
+<a href="#">About</a><a href="#">Contact us</a>
+<div class="verybottom">© 2004–2026 NexusBox Communications</div>
+</div>
+
+<script src="/shared/toolbar.js"></script>
+<script src="/shared/auth.js"></script>
+<script src="/shared/nav.js"></script>
 <script>
-// Check if in preview mode
-if (window.location.search.indexOf('preview=') !== -1) {
-  document.body.classList.add('preview-mode');
+var currentChannel = 'general';
+var currentUser = null;
+var refreshInterval = null;
+
+async function init() {
+  currentUser = await loadUserInfo();
+  loadMessages();
+  refreshInterval = setInterval(loadMessages, 3000);
 }
 
-// Auto-scroll to bottom
-var messagesArea = document.getElementById('messages');
-messagesArea.scrollTop = messagesArea.scrollHeight;
+async function loadMessages() {
+  var token = localStorage.getItem('token');
+  try {
+    var res = await fetch('/api/messages?channel=' + currentChannel, {
+      headers: {'Authorization': 'Bearer ' + token}
+    });
+    var data = await res.json();
+    if (data.success) renderMessages(data.messages);
+  } catch(e) { console.error(e); }
+}
+
+function renderMessages(messages) {
+  var container = document.getElementById('chat-messages');
+    container.innerHTML = '<div style="text-align:center; color:#999; padding:40px;">No messages yet. Start the conversation!</div>';
+    return;
+  }
+  
+  var sorted = messages.slice().sort(function(a,b) {
+    return new Date(a.createdAt) - new Date(b.createdAt);
+  });
+  
+  container.innerHTML = '';
+  sorted.forEach(function(msg) {
+    var div = document.createElement('div');
+    div.className = 'chat-msg' + (msg.isSticky ? ' sticky' : '');
+    var time = new Date(msg.createdAt).toLocaleTimeString();
+    var username = msg.author ? msg.author.username : 'Unknown';
+    div.innerHTML = '<span class="time">' + time + '</span>' +
+      (msg.isSticky ? '📌 ' : '') +
+      '<span class="username">' + escapeHtml(username) + ':</span>' +
+      '<div class="text">' + escapeHtml(msg.content) + '</div>';
+    container.appendChild(div);
+  });
+  container.scrollTop = container.scrollHeight;
+}
+
+function escapeHtml(text) {
+  var div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+
+async function sendMessage(e) {
+  e.preventDefault();
+  var input = document.getElementById('chat-input');
+  var content = input.value.trim();
+  
+  var token = localStorage.getItem('token');
+  try {
+    var res = await fetch('/api/messages', {
+      method: 'POST',
+      headers: {'Content-Type':'application/json', 'Authorization':'Bearer '+token},
+      body: JSON.stringify({content: content, channel: currentChannel})
+    });
+    var data = await res.json();
+    if (data.success) {
+      input.value = '';
+      loadMessages();
+    } else {
+      alert('Error: ' + data.error);
+    }
+  } catch(e) { alert('Connection error'); }
+  return false;
+}
+
+function switchChannel() {
+  currentChannel = document.getElementById('current-channel').value;
+  loadMessages();
+}
+
+document.addEventListener('DOMContentLoaded', init);
 </script>
 
-<script src="/shared/nav.js"></script>
-</body>
-</html>
+</body></html>
