@@ -1,5 +1,8 @@
-// ===== NexusBox Navigation System - Event Delegation =====
+// ===== NexusBox Navigation System v3 - Event Delegation =====
 (function() {
+  'use strict';
+  
+  // Menu definitions
   var menus = {
     1: [
       {text:'Layout', href:'/layout-options/layout-options.html'},
@@ -26,129 +29,127 @@
     ]
   };
 
-  // Mapping by text content
-  var textToMenu = {
-    'Look & feel': 1,
-    'Look &amp; feel': 1,
-    'Look and feel': 1,
-    'Options': 2,
-    'Users': 3,
-    'Messages': 4
-  };
-
-  function openMenu(menuId) {
-    var hovmenuDiv = document.getElementById('hovmenu');
-      console.warn('hovmenu div not found');
-      return false;
-    }
-    var items = menus[menuId] || [];
-    hovmenuDiv.innerHTML = '';
-    hovmenuDiv.style.display = 'block';
-    for (var i = 0; i < items.length; i++) {
-      var a = document.createElement('a');
-      a.href = items[i].href;
-      a.className = 'submenuitem';
-      a.textContent = items[i].text;
-      hovmenuDiv.appendChild(a);
-    }
+  // Show menu
+  function showMenu(menuId) {
+    var container = document.getElementById('hovmenu');
+    if (!container) return false;
+    
+    var items = menus[menuId];
+    if (!items) return false;
+    
+    container.innerHTML = '';
+    container.style.display = 'block';
+    
+    items.forEach(function(item) {
+      var link = document.createElement('a');
+      link.href = item.href;
+      link.className = 'submenuitem';
+      link.textContent = item.text;
+      container.appendChild(link);
+    });
+    
     return false;
   }
 
-  function closeMenu() {
-    var hovmenuDiv = document.getElementById('hovmenu');
-    if (hovmenuDiv) {
-      hovmenuDiv.innerHTML = '';
-      hovmenuDiv.style.display = 'none';
+  // Hide menu
+  function hideMenu() {
+    var container = document.getElementById('hovmenu');
+    if (container) {
+      container.innerHTML = '';
+      container.style.display = 'none';
     }
   }
 
-  // Event delegation on subbar
+  // Initialize navigation
   function init() {
+    console.log('🚀 Navigation system initializing...');
+    
     var subbar = document.getElementById('subbar');
-      console.warn('subbar not found');
+    if (!subbar) {
+      console.error('❌ subbar not found');
       return;
     }
 
-    subbar.addEventListener('mousedown', function(e) {
-      var target = e.target;
-      // Find the closest submenuitem
-      while (target && target !== subbar) {
-        if (target.classList && target.classList.contains('submenuitem')) break;
-        target = target.parentElement;
-      }
-
-      var text = target.textContent.trim();
-      var menuId = textToMenu[text];
-
-      // Also check by ID
-        var m = target.id.match(/hovmenu(\d)/);
-        if (m) menuId = parseInt(m[1]);
-      }
-
-      if (menuId) {
-        e.preventDefault();
-        e.stopPropagation();
-        openMenu(menuId);
-        return false;
-      }
-    });
-
+    // Event delegation on subbar
     subbar.addEventListener('click', function(e) {
-      var target = e.target;
-      while (target && target !== subbar) {
-        if (target.classList && target.classList.contains('submenuitem')) break;
-        target = target.parentElement;
-      }
-
-      var text = target.textContent.trim();
-      var menuId = textToMenu[text];
-
-        var m = target.id.match(/hovmenu(\d)/);
-        if (m) menuId = parseInt(m[1]);
-      }
-
-      if (menuId) {
-        e.preventDefault();
-        e.stopPropagation();
-        return false;
+      var target = e.target.closest('.submenuitem');
+      if (!target) return;
+      
+      var id = target.id;
+      if (id && id.startsWith('hovmenu')) {
+        var menuId = parseInt(id.replace('hovmenu', ''));
+        if (menuId >= 1 && menuId <= 4) {
+          e.preventDefault();
+          e.stopPropagation();
+          showMenu(menuId);
+          return false;
+        }
       }
     });
 
     // Close menu when clicking outside
     document.addEventListener('click', function(e) {
+      var subbar = document.getElementById('subbar');
       var bar3 = document.getElementById('bar3');
-        closeMenu();
+      if (subbar && bar3 && !subbar.contains(e.target) && !bar3.contains(e.target)) {
+        hideMenu();
       }
     });
 
-    console.log('✅ Navigation system initialized');
+    // Set active state for current page
+    var currentPath = window.location.pathname;
+    var allLinks = subbar.querySelectorAll('.submenuitem');
+    allLinks.forEach(function(link) {
+      if (link.href && link.href.endsWith(currentPath)) {
+        link.classList.add('active');
+      }
+    });
+
+    console.log('✅ Navigation system ready');
   }
 
+  // Run when DOM is ready
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
-
+  
   // Global function
-  window.hovmenu = openMenu;
+  window.hovmenu = showMenu;
 })();
 
+// Global logout
 function globalLogout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
   window.location.href = '/login/index.html';
 }
 
+// Load user info
 async function loadUserInfo() {
   var token = localStorage.getItem('token');
+  if (!token) {
+    window.location.href = '/login/index.html';
+    return null;
+  }
   try {
-    var res = await fetch('/api/auth/me', {headers:{'Authorization':'Bearer '+token}});
+    var res = await fetch('/api/auth/me', {
+      headers: {'Authorization': 'Bearer ' + token}
+    });
     var data = await res.json();
+    if (!data.success) {
+      localStorage.removeItem('token');
+      window.location.href = '/login/index.html';
+      return null;
+    }
     var uw = document.getElementById('userWelcome');
     var cn = document.getElementById('cbox-name');
     if (uw) uw.textContent = data.user.email || data.user.username;
     if (cn) cn.textContent = data.user.username.toUpperCase();
     return data.user;
-  } catch(e) { console.error(e); return null; }
+  } catch(e) {
+    console.error('Error loading user:', e);
+    return null;
+  }
 }
