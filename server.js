@@ -5,6 +5,8 @@ const cors = require('cors');
 const helmet = require('helmet');
 const rateLimit = require('express-rate-limit');
 const compression = require('compression');
+const bcrypt = require('bcryptjs');
+const jwt = require('jsonwebtoken');
 const app = express();
 app.set('trust proxy', 1);
 app.use(helmet({ contentSecurityPolicy: false }));
@@ -15,24 +17,36 @@ app.use(express.urlencoded({ extended: true }));
 const limiter = rateLimit({ windowMs: 15 * 60 * 1000, max: 1000, validate: { xForwardedForHeader: false } });
 app.use(limiter);
 app.use(express.static('public'));
-const authRoutes = require('./routes/auth');
-const chatRoutes = require('./routes/chat');
-const settingsRoutes = require('./routes/settings');
-const regUserRoutes = require('./routes/registered-users');
-app.use('/api/auth', authRoutes);
-app.use('/api', chatRoutes);
-app.use('/api', settingsRoutes);
-app.use('/api/registered-users', regUserRoutes);
-app.get('/api/health', (req, res) => {
-  res.json({ success: true, message: 'NexusBox Backend is running', timestamp: new Date().toISOString(), database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected', version: '1.0.0' });
-});
+const userSchema = new mongoose.Schema({ username: { type: String, required: true, unique: true, trim: true }, email: { type: String, required: true, unique: true, lowercase: true }, password: { type: String, required: true }, role: { type: String, default: 'user', enum: ['user', 'moderator', 'admin'] }, status: { type: String, default: 'active', enum: ['active', 'banned', 'suspended'] }, createdAt: { type: Date, default: Date.now }, lastLogin: { type: Date } });
+userSchema.methods.comparePassword = async function(pwd) { return await bcrypt.compare(pwd, this.password); };
+userSchema.methods.toJSON = function() { const obj = this.toObject(); delete obj.password; return obj; };
+const User = mongoose.model('User', userSchema);
+const Message = mongoose.model('Message', new mongoose.Schema({ content: { type: String, required: true }, author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, channel: { type: String, default: 'general' }, isSticky: { type: Boolean, default: false }, createdAt: { type: Date, default: Date.now } }));
+const Ban = mongoose.model('Ban', new mongoose.Schema({ target: { type: String, required: true }, reason: { type: String, default: '' }, bannedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, createdAt: { type: Date, default: Date.now }, expiresAt: { type: Date } }));
+const Channel = mongoose.model('Channel', new mongoose.Schema({ name: { type: String, required: true, unique: true }, description: { type: String, default: '' }, createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' }, createdAt: { type: Date, default: Date.now } }));
+const PublishSettings = mongoose.model('PublishSettings', new mongoose.Schema({ user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true }, siteUrl: { type: String, default: '' }, whitelistEnabled: { type: Boolean, default: false }, whitelist: { type: String, default: '' }, useSSL: { type: Boolean, default: false }, securityTag: { type: String, default: '' }, updatedAt: { type: Date, default: Date.now } }));
+const Theme = mongoose.model('Theme', new mongoose.Schema({ user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true }, name: { type: String, default: 'My custom CSS' }, css: { type: String, default: '' }, preset: { type: Number, default: -1000 }, updatedAt: { type: Date, default: Date.now } }));
+const LayoutSettings = mongoose.model('LayoutSettings', new mongoose.Schema({ user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true }, width: { type: Number, default: 400 }, height: { type: Number, default: 400 }, formHeight: { type: Number, default: 107 }, autoFormHeight: { type: Boolean, default: true }, adaptiveHeight: { type: Boolean, default: false }, formOnTop: { type: Boolean, default: false }, narrowLayout: { type: Boolean, default: false }, language: { type: String, default: 'ar' }, messagesPerPage: { type: Number, default: 20 }, sortDirection: { type: Number, default: 1 }, updatedAt: { type: Date, default: Date.now } }));
+const IntegrationSettings = mongoose.model('IntegrationSettings', new mongoose.Schema({ user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true }, privateKey: { type: String, required: true }, enabled: { type: Boolean, default: false }, autoRegister: { type: Boolean, default: false }, updatedAt: { type: Date, default: Date.now } }));
+const RegUserSettings = mongoose.model('RegUserSettings', new mongoose.Schema({ user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true }, regOnly: { type: Boolean, default: false }, selfReg: { type: Boolean, default: true }, authFacebook: { type: Boolean, default: false }, lastPostDel: { type: Boolean, default: false }, updatedAt: { type: Date, default: Date.now } }));
+const registeredUserSchema = new mongoose.Schema({ owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true }, name: { type: String, required: true }, password: { type: String, required: true }, level: { type: Number, default: 2 }, voiced: { type: Boolean, default: false }, lastUsed: { type: Date }, lastIP: { type: String, default: '' }, registeredAt: { type: Date, default: Date.now } });
+registeredUserSchema.methods.toJSON = function() { const obj = this.toObject(); delete obj.password; return obj; };
+const RegisteredUser = mongoose.model('RegisteredUser', registeredUserSchema);
+const authMiddleware = async (req, res, next) => { try { const token = req.headers.authorization?.split(' ')[1]; if (!token) return res.status(401).json({ success: false, error: 'No token' }); const decoded = jwt.verify(token, process.env.JWT_SECRET); const user = await User.findById(decoded.userId); if (!user) return res.status(401).json({ success: false, error: 'User not found' }); if (user.status !== 'active') return res.status(403).json({ success: false, error: 'Account not active' }); req.user = user; req.userId = user._id; next(); } catch (error) { return res.status(401).json({ success: false, error: 'Invalid token' }); } };
+const adminMiddleware = (req, res, next) => { if (req.user.role !== 'admin') return res.status(403).json({ success: false, error: 'Admin access required' }); next(); };
+app.get('/api/auth/me', authMiddleware, (req, res) => { res.json({ success: true, user: req.user.toJSON() }); });
+app.get('/api/auth/users', authMiddleware, adminMiddleware, async (req, res) => { try { const users = await User.find().sort({ createdAt: -1 }); res.json({ success: true, count: users.length, users }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
+app.get('/api/messages', authMiddleware, async (req, res) => { try { const messages = await Message.find().populate('author', 'username role').sort({ createdAt: -1 }).limit(100); res.json({ success: true, count: messages.length, messages }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
+app.get('/api/bans', authMiddleware, moderatorMiddleware, async (req, res) => { try { const bans = await Ban.find().populate('bannedBy', 'username').sort({ createdAt: -1 }); res.json({ success: true, count: bans.length, bans }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
+app.get('/api/channels', authMiddleware, async (req, res) => { try { const channels = await Channel.find().populate('createdBy', 'username').sort({ createdAt: -1 }); res.json({ success: true, count: channels.length, channels }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
+app.post('/api/publish/generate-tag', authMiddleware, async (req, res) => { try { const tag = Math.round(Math.random() * 1838265624).toString(35).replace('u', 'z').replace('i', '5').replace('o', 'w'); res.json({ success: true, tag }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
+app.get('/api/theme/presets', authMiddleware, async (req, res) => { try { const presets = [{ id: 13, name: 'Default blue', css: 'body { background: #f0f8ff; }' }, { id: 11, name: 'Basic transparent', css: 'body { background: transparent; }' }, { id: 1, name: 'Classic blue', css: 'body { background: #0066cc; color: white; }' }, { id: 2, name: 'Classic red', css: 'body { background: #cc0000; color: white; }' }, { id: 3, name: 'Classic yellow', css: 'body { background: #ffcc00; }' }, { id: 4, name: 'Classic light', css: 'body { background: #ffffff; }' }, { id: 5, name: 'Classic dark', css: 'body { background: #333333; color: white; }' }]; res.json({ success: true, presets }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
+app.get('/api/registered-users', authMiddleware, async (req, res) => { try { const { srch, srchin } = req.query; let query = { owner: req.userId }; if (srch && srchin) { if (srchin === 'nme') query.name = { $regex: srch, $options: 'i' }; else if (srchin === 'lastip') query.lastIP = { $regex: srch, $options: 'i' }; } const users = await RegisteredUser.find(query).sort({ registeredAt: -1 }); res.json({ success: true, count: users.length, users }); } catch (error) { res.status(500).json({ success: false, error: error.message }); } });
+app.get('/api/health', (req, res) => { res.json({ success: true, message: 'NexusBox Backend is running', timestamp: new Date().toISOString(), database: mongoose.connection.readyState === 1 ? 'connected' : 'disconnected', version: '1.0.0' }); });
 app.get('/', (req, res) => { res.json({ name: 'NexusBox API', version: '1.0.0', status: 'online' }); });
 app.use((err, req, res, next) => { console.error('Server error:', err); res.status(500).json({ success: false, error: 'Internal server error' }); });
 app.use((req, res) => { res.status(404).json({ success: false, error: 'Endpoint not found' }); });
-async function connectToMongo() {
-  try { await mongoose.connect(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 10000, socketTimeoutMS: 45000 }); console.log('✅ Connected to MongoDB Atlas'); }
-  catch (error) { console.log('❌ MongoDB error:', error.message); setTimeout(connectToMongo, 5000); }
-}
+async function connectToMongo() { try { await mongoose.connect(process.env.MONGODB_URI, { serverSelectionTimeoutMS: 10000, socketTimeoutMS: 45000 }); console.log('✅ Connected to MongoDB Atlas'); } catch (error) { console.log('❌ MongoDB error:', error.message); setTimeout(connectToMongo, 5000); } }
 const PORT = process.env.PORT || 3000;
 connectToMongo();
 app.listen(PORT, '0.0.0.0', () => { console.log('═══════════════════════════════════════'); console.log('🚀 NexusBox Backend Started!'); console.log('📡 Port: ' + PORT); console.log('═══════════════════════════════════════'); });
