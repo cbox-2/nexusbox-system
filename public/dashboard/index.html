@@ -1,96 +1,425 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="Dashboard · NexusBox">
-<meta name="twitter:description" content="NexusBox dashboard - manage your chat boxes">
-<meta property="og:title" content="Dashboard · NexusBox">
-<meta property="og:description" content="Dashboard · NexusBox - Professional chat platform">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://nexusbox-system-production-c290.up.railway.app/">
-
-<meta name="description" content="Dashboard · NexusBox - Professional chat platform by NexusBox">
-<link rel="canonical" href="https://nexusbox-system-production-c290.up.railway.app/dashboard">
-<link rel="icon" type="image/svg+xml" href="/shared/favicon.svg">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Dashboard · NexusBox</title>
-<link rel="stylesheet" href="/shared/toolbar.css">
-<link rel="stylesheet" href="/shared/buttons.css">
+<title>صناديق بريدي - NexusBox</title>
 <style>
-.dashboard-container { max-width: 1200px; margin: 40px auto; padding: 0 20px; }
-.dashboard-title { color: #fff; font-size: 28px; margin-bottom: 30px; }
-.cbox-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-.create-new { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: #fff; padding: 40px; border-radius: 12px; text-align: center; cursor: pointer; transition: all 0.3s; border: 2px dashed rgba(255,255,255,0.3); }
-.create-new:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(102,126,234,0.4); }
-.create-icon { font-size: 48px; margin-bottom: 10px; }
-.create-text { color: #fff; font-size: 18px; font-weight: bold; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #2d2a5e; color: white; }
+.topbar { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; box-shadow: 0 2px 10px rgba(0,0,0,0.3); }
+.topbar h1 { font-size: 24px; }
+.topbar a { color: white; text-decoration: none; margin-right: 20px; padding: 8px 16px; border-radius: 5px; transition: background 0.3s; }
+.topbar a:hover { background: rgba(255,255,255,0.2); }
+.navbar { background: rgba(0,0,0,0.3); padding: 15px 30px; display: flex; gap: 20px; flex-wrap: wrap; align-items: center; }
+.navbar a { color: white; text-decoration: none; padding: 10px 20px; border-radius: 5px; transition: background 0.3s; }
+.navbar a:hover, .navbar a.active { background: #667eea; }
+.container { max-width: 1200px; margin: 30px auto; padding: 0 20px; }
+.section { background: rgba(255,255,255,0.05); border-radius: 15px; padding: 30px; margin-bottom: 25px; border: 1px solid rgba(255,255,255,0.1); }
+.section h2 { color: #fff; margin-bottom: 20px; font-size: 22px; border-bottom: 3px solid #667eea; padding-bottom: 10px; }
+.section p { color: #ccc; margin-bottom: 20px; line-height: 1.6; }
+.tabs { display: flex; gap: 10px; margin-bottom: 25px; border-bottom: 2px solid rgba(255,255,255,0.1); flex-wrap: wrap; }
+.tab { padding: 12px 24px; background: rgba(255,255,255,0.1); border: none; color: white; cursor: pointer; font-size: 16px; font-weight: bold; border-radius: 8px 8px 0 0; transition: background 0.3s; }
+.tab:hover { background: rgba(255,255,255,0.2); }
+.tab.active { background: #667eea; }
+.tab-content { display: none; }
+.tab-content.active { display: block; }
+.btn { padding: 12px 30px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: transform 0.2s, opacity 0.2s; }
+.btn:hover { transform: translateY(-2px); opacity: 0.9; }
+.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; }
+.btn-success { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; }
+.btn-secondary { background: rgba(255,255,255,0.2); color: white; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #fff; }
+.form-group input, .form-group select { width: 100%; padding: 12px; border: 2px solid rgba(255,255,255,0.2); border-radius: 8px; font-size: 14px; background: rgba(255,255,255,0.1); color: white; }
+.form-group input:focus, .form-group select:focus { border-color: #667eea; outline: none; background: rgba(255,255,255,0.15); }
+.toggle-row { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: rgba(255,255,255,0.05); border-radius: 8px; margin-bottom: 12px; border: 1px solid rgba(255,255,255,0.1); }
+.toggle-row small { color: #aaa; display: block; margin-top: 3px; }
+.toggle { position: relative; display: inline-block; width: 60px; height: 34px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: rgba(255,255,255,0.3); transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: #667eea; }
+input:checked + .slider:before { transform: translateX(26px); }
+.code-box { background: rgba(0,0,0,0.5); border: 2px solid rgba(255,255,255,0.2); border-radius: 8px; padding: 20px; font-family: 'Courier New', monospace; overflow-x: auto; white-space: pre-wrap; word-break: break-all; direction: ltr; text-align: left; margin: 15px 0; color: #4ade80; }
+.success-msg { background: rgba(72, 187, 120, 0.2); border: 2px solid #48bb78; color: #4ade80; padding: 15px; border-radius: 8px; margin: 15px 0; display: none; }
+.box-item { background: rgba(255,255,255,0.05); padding: 20px; border-radius: 8px; border-right: 4px solid #667eea; margin-bottom: 15px; }
+.box-item h3 { margin: 0 0 10px 0; color: #fff; }
+.box-item p { margin: 5px 0; color: #ccc; }
+.instructions { background: rgba(33, 150, 243, 0.1); border-right: 4px solid #2196F3; padding: 20px; border-radius: 8px; margin: 15px 0; }
+.instructions h3 { color: #64b5f6; margin-bottom: 15px; }
+.instructions ol { padding-right: 20px; color: #ccc; }
+.instructions li { margin: 10px 0; line-height: 1.6; }
+.help-box { background: rgba(255, 193, 7, 0.1); border: 1px solid #ffc107; padding: 15px; border-radius: 8px; margin: 15px 0; }
+.help-box h4 { color: #ffd54f; margin-bottom: 10px; }
+.help-box p { color: #ccc; margin: 5px 0; }
 </style>
 </head>
-<body id="mainbody">
+<body>
 
-<div id="bodywrap">
-<div id="header">
-<div class="wrap">
-<a id="logo" href="/dashboard/index.html">
-<span style="color:#fff;font-size:24px;font-weight:bold">NexusBox</span>
-</a>
-<div id="headerExtras">
-<span id="userWelcome">Loading...</span>
-<a href="/dashboard/index.html">My Cboxes</a>
-<a href="#" onclick="return globalLogout();">Log out</a>
-</div>
-</div>
+<div class="topbar">
+  <h1>📦 نيكسوس بوكس</h1>
+  <div>
+    <span id="userEmail" style="margin-left:20px; opacity:0.8"></span>
+    <a href="#" onclick="logout()">تسجيل الخروج</a>
+  </div>
 </div>
 
-<div id="subbar">
-<div class="wrap">
-<a href="/dashboard/index.html" class="submenuitem active"><b id="cbox-name">DASHBOARD</b></a>
-<a href="/publish/publish.html" class="submenuitem">Publish</a>
-<a href="#" id="hovmenu1" class="submenuitem">Look &amp; feel</a>
-<a href="#" id="hovmenu2" class="submenuitem">Options</a>
-<a href="#" id="hovmenu3" class="submenuitem">Users</a>
-<a href="#" id="hovmenu4" class="submenuitem">Messages</a>
-</div>
+<div class="navbar">
+  <a href="#" class="active">صناديق بريدي</a>
+  <a href="#">رسائل</a>
+  <a href="#">المستخدمون</a>
+  <a href="#">خيارات</a>
+  <a href="#">المظهر والملمس</a>
 </div>
 
-<div id="bar3">
-<div id="hovmenu" class="wrap" style="display:none"></div>
+<div class="container">
+
+  <div class="section">
+    <h1 style="font-size:32px; margin-bottom:15px">انشر صندوق بريدك الإلكتروني</h1>
+    <p>احصل على رمز التضمين لإضافة صندوق التحكم الخاص بك إلى موقعك الإلكتروني.</p>
+  </div>
+
+  <div class="tabs">
+    <button class="tab active" onclick="switchTab('publish')">🚀 انشر</button>
+    <button class="tab" onclick="switchTab('boxes')">📦 صناديق البريد</button>
+    <button class="tab" onclick="switchTab('settings')">⚙️ الإعدادات</button>
+  </div>
+
+  <!-- Tab 1: Publish/Embed -->
+  <div id="publish-tab" class="tab-content active">
+    
+    <div class="section">
+      <h2>🔧 خيارات التضمين</h2>
+      
+      <div class="form-group">
+        <label>اختر الصندوق:</label>
+        <select id="boxSelect" onchange="loadBoxSettings()">
+          <option value="">-- اختر Box --</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>رابط موقعك الإلكتروني:</label>
+        <input type="url" id="siteUrl" placeholder="https://www.yourwebsite.com">
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <strong>تفعيل القائمة البيضاء للمواقع</strong><br>
+          <small>السماح فقط للمواقع المحددة بتضمين الـ Box</small>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="whitelistToggle" onchange="toggleWhitelist()">
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="form-group" id="whitelistInput" style="display:none;">
+        <label>المواقع المسموحة (افصل بينها بفاصلة):</label>
+        <input type="text" id="allowedSites" placeholder="example.com, another.com">
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <strong>استخدام بروتوكول HTTP الآمن (SSL/TLS)</strong><br>
+          <small>تفعيل HTTPS للاتصال الآمن</small>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="sslToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>علامة الأمان:</label>
+        <input type="text" id="securityTag" readonly placeholder="يتم إنشاؤه تلقائياً">
+      </div>
+
+      <div class="toggle-row">
+        <div>
+          <strong>Auto-Resize</strong><br>
+          <small>تعديل الارتفاع تلقائياً حسب المحتوى</small>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="autoResizeToggle" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>العرض (px):</label>
+        <input type="number" id="widthInput" value="400" min="200" max="800">
+      </div>
+
+      <div class="form-group">
+        <label>الارتفاع (px):</label>
+        <input type="number" id="heightInput" value="500" min="300" max="1000">
+      </div>
+
+      <button class="btn btn-primary" onclick="generateCode()">💾 حفظ وتوليد الكود</button>
+    </div>
+
+    <div class="section">
+      <h2>📝 رمز التضمين</h2>
+      
+      <div class="form-group">
+        <label>تنسيق الكود:</label>
+        <select id="codeType" onchange="generateCode()">
+          <option value="iframe">Iframe (موصى به)</option>
+          <option value="script">Script Widget</option>
+        </select>
+      </div>
+
+      <div class="success-msg" id="successMsg">✅ تم نسخ الكود إلى الحافظة بنجاح!</div>
+
+      <label>الكود الجاهز للنسخ:</label>
+      <div class="code-box" id="codeOutput">اختر Box واضغط على "حفظ وتوليد الكود"...</div>
+
+      <button class="btn btn-success" onclick="copyCode()">📋 نسخ الكود</button>
+    </div>
+
+    <div class="section">
+      <h2>📖 تعليمات التضمين</h2>
+      
+      <div class="instructions">
+        <h3>كيفية التثبيت:</h3>
+        <ol>
+          <li>انسخ الكود الخاص بك بالنقر على الزر أعلاه</li>
+          <li>افتح محرر الصفحات أو القوالب لموقعك</li>
+          <li>قم بالتبديل إلى وضع التحرير HTML أو وضع التحرير الخام</li>
+          <li>ألصق الكود الخاص بك في المحرر</li>
+          <li>احفظ التغييرات وانشرها</li>
+          <li>افتح موقعك للتحقق من ظهور الـ Box</li>
+        </ol>
+      </div>
+
+      <div class="help-box">
+        <h4>⚠️ هل تواجه مشاكل في التثبيت؟</h4>
+        <p>إذا رأيت رمزاً على صفحتك بدلاً من NexusBox، فقد يقوم محرر النصوص الخاص بك بإزالة أو تنظيف HTML.</p>
+        <p>إذا كانت منصتك تدعم التطبيقات أو الأدوات المصغرة، ابحث عن أداة تتيح لك تضمين صندوق التحكم.</p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Tab 2: Boxes List -->
+  <div id="boxes-tab" class="tab-content">
+    <div class="section">
+      <h2>📦 صناديق البريد الخاصة بك</h2>
+      <div id="boxes-list">جاري التحميل...</div>
+    </div>
+  </div>
+
+  <!-- Tab 3: Settings -->
+  <div id="settings-tab" class="tab-content">
+    <div class="section">
+      <h2>⚙️ الإعدادات العامة</h2>
+      <p>قريباً...</p>
+    </div>
+  </div>
+
 </div>
 
-<div id="main">
-<div id="content">
-<div class="dashboard-container">
-<h1 class="dashboard-title">Select a Cbox</h1>
-
-<div class="cbox-grid">
-<div class="create-new" onclick="window.location.href='/publish/publish.html'">
-<div class="create-icon">+</div>
-<div class="create-text">Create new Cbox</div>
-</div>
-</div>
-
-<div style="margin-top: 40px; text-align: center; color: #666;">
-<p>No Cboxes yet. Create your first one!</p>
-</div>
-</div>
-</div>
-</div>
-</div>
-
-<div id="footer">
-<a href="/about.html">About</a>
-<a href="/contact.html">Contact us</a>
-<div class="verybottom">© 2004–2026 NexusBox Communications</div>
-</div>
-
-<script src="/shared/toolbar.js"></script>
-<script src="/shared/auth.js"></script>
-<script src="/shared/nav.js"></script>
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-loadUserInfo();
-});
+const API = window.location.origin;
+const TOKEN = localStorage.getItem('token');
+let boxes = [];
+let currentBox = null;
+
+window.onload = async function() {
+  if (!TOKEN) {
+    alert('الرجاء تسجيل الدخول أولاً');
+    window.location.href = '/test.html';
+    return;
+  }
+  
+  // Get user info from URL params or storage
+  const urlParams = new URLSearchParams(window.location.search);
+  const user = urlParams.get('user') || localStorage.getItem('username') || 'User';
+  document.getElementById('userEmail').textContent = user;
+  
+  await loadBoxes();
+};
+
+async function loadBoxes() {
+  try {
+    const res = await fetch(API + '/api/boxes', {
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      boxes = data.boxes;
+      displayBoxes(boxes);
+      populateBoxSelect(boxes);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+function displayBoxes(boxes) {
+  const container = document.getElementById('boxes-list');
+  
+  if (boxes.length === 0) {
+    container.innerHTML = '<p style="text-align:center; padding:40px; color:#aaa;">لا توجد صناديق. أنشئ Box جديد من test.html</p>';
+    return;
+  }
+  
+  let html = '';
+  boxes.forEach(box => {
+    html += '<div class="box-item">';
+    html += '<h3>' + box.name + '</h3>';
+    html += '<p><strong>Slug:</strong> ' + box.slug + '</p>';
+    html += '<p><strong>Embed Key:</strong> ' + box.embedKey + '</p>';
+    html += '<p><strong>الحالة:</strong> ' + (box.status === 'active' ? '✅ نشط' : '❌ ' + box.status) + '</p>';
+    html += '<p><strong>تاريخ الإنشاء:</strong> ' + new Date(box.createdAt).toLocaleDateString('ar') + '</p>';
+    html += '<div style="margin-top:15px">';
+    html += '<button class="btn btn-primary" onclick="selectBox('' + box.embedKey + '')" style="margin-left:10px">استخدام في التضمين</button>';
+    html += '<a href="/embed.html?key=' + box.embedKey + '" class="btn btn-success" target="_blank">معاينة</a>';
+    html += '</div></div>';
+  });
+  
+  container.innerHTML = html;
+}
+
+function populateBoxSelect(boxes) {
+  const select = document.getElementById('boxSelect');
+  select.innerHTML = '<option value="">-- اختر Box --</option>';
+  boxes.forEach(box => {
+    select.innerHTML += '<option value="' + box.embedKey + '">' + box.name + ' (' + box.slug + ')</option>';
+  });
+}
+
+function selectBox(key) {
+  document.getElementById('boxSelect').value = key;
+  switchTab('publish');
+  loadBoxSettings();
+}
+
+async function loadBoxSettings() {
+  const key = document.getElementById('boxSelect').value;
+  if (!key) return;
+
+  try {
+    const res = await fetch(API + '/api/embed/' + key);
+    const data = await res.json();
+    
+    if (data.success) {
+      currentBox = data.box;
+      document.getElementById('securityTag').value = currentBox.slug || 'auto-generated';
+      
+      if (currentBox.layout) {
+        document.getElementById('widthInput').value = currentBox.layout.width || 400;
+        document.getElementById('heightInput').value = currentBox.layout.height || 500;
+      }
+      
+      if (currentBox.publish && currentBox.publish.siteUrl) {
+        document.getElementById('siteUrl').value = currentBox.publish.siteUrl;
+      }
+      
+      generateCode();
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+function toggleWhitelist() {
+  const enabled = document.getElementById('whitelistToggle').checked;
+  document.getElementById('whitelistInput').style.display = enabled ? 'block' : 'none';
+}
+
+function generateCode() {
+  if (!currentBox) {
+    document.getElementById('codeOutput').textContent = 'اختر Box أولاً...';
+    return;
+  }
+
+  const width = document.getElementById('widthInput').value;
+  const height = document.getElementById('heightInput').value;
+  const useSSL = document.getElementById('sslToggle').checked;
+  const codeType = document.getElementById('codeType').value;
+  const autoResize = document.getElementById('autoResizeToggle').checked;
+  
+  const protocol = useSSL ? 'https' : 'http';
+  const domain = 'nexusbox-system-production-c290.up.railway.app';
+  const embedUrl = protocol + '://' + domain + '/embed.html?key=' + currentBox.embedKey;
+  
+  let code = '';
+  
+  if (codeType === 'iframe') {
+    code = '<!-- BEGIN NEXUSBOX - ' + currentBox.name + ' -->\n';
+    code += '<iframe\n';
+    code += '  src="' + embedUrl + '"\n';
+    code += '  width="' + width + '"\n';
+    code += '  height="' + height + '"\n';
+    code += '  style="border:none; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.1);"\n';
+    code += '  allowfullscreen\n';
+    code += '  loading="lazy"\n';
+    if (autoResize) code += '  id="nexusbox-iframe"\n';
+    code += '>\n';
+    code += '</iframe>\n';
+    if (autoResize) {
+      code += '<script>\n';
+      code += '  window.addEventListener(\'message\', function(e) {\n';
+      code += '    if (e.origin === \'' + protocol + '://' + domain + '\') {\n';
+      code += '      var iframe = document.getElementById(\'nexusbox-iframe\');\n';
+      code += '      if (iframe && e.data.height) {\n';
+      code += '        iframe.style.height = e.data.height + \'px\';\n';
+      code += '      }\n';
+      code += '    }\n';
+      code += '  });\n';
+      code += '<\/script>\n';
+    }
+    code += '<!-- END NEXUSBOX -->';
+  } else {
+    code = '<!-- BEGIN NEXUSBOX WIDGET -->\n';
+    code += '<script\n';
+    code += '  src="' + protocol + '://' + domain + '/widget.js"\n';
+    code += '  data-box="' + currentBox.embedKey + '"\n';
+    code += '  data-width="' + width + '"\n';
+    code += '  data-height="' + height + '"\n';
+    code += '  data-ssl="' + useSSL + '"\n';
+    code += '  data-autoresize="' + autoResize + '"\n';
+    code += '><\/script>\n';
+    code += '<!-- END NEXUSBOX WIDGET -->';
+  }
+  
+  document.getElementById('codeOutput').textContent = code;
+}
+
+function copyCode() {
+  const code = document.getElementById('codeOutput').textContent;
+  
+  if (!code || code === 'اختر Box أولاً...') {
+    alert('الرجاء توليد الكود أولاً');
+    return;
+  }
+  
+  navigator.clipboard.writeText(code).then(() => {
+    const msg = document.getElementById('successMsg');
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+  }).catch(err => {
+    console.error('Copy error:', err);
+    alert('فشل نسخ الكود');
+  });
+}
+
+function switchTab(tabName) {
+  document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+  document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+  
+  event.target.classList.add('active');
+  document.getElementById(tabName + '-tab').classList.add('active');
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/test.html';
+}
 </script>
 
 </body>
