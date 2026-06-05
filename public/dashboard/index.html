@@ -8,7 +8,6 @@
 <style>
 body { background-color: #1e1b4b !important; padding-top: 120px !important; }
 
-/* Dropdown menu styling - يستخدم نفس ألوان toolbar */
 .submenu-wrapper { position: relative; display: inline-block; }
 
 .dropdown-menu {
@@ -46,7 +45,6 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
   color: #fff;
 }
 
-/* Content area */
 #content-area { padding: 20px; color: white; }
 #content-frame {
   display: none;
@@ -123,6 +121,29 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
         <a href="/sticky-message/index.html">الرسائل المثبتة</a>
       </div>
     </div>
+
+    <div class="submenu-wrapper">
+      <a href="#" class="submenuitem" data-menu="chat">Chat</a>
+      <div class="dropdown-menu" id="menu-chat">
+        <a href="/chat/chat.html">الدردشة</a>
+        <a href="/channels/index.html">القنوات</a>
+      </div>
+    </div>
+
+    <div class="submenu-wrapper">
+      <a href="#" class="submenuitem" data-menu="archives">Archives</a>
+      <div class="dropdown-menu" id="menu-archives">
+        <a href="/archives/index.html">الأرشيف</a>
+      </div>
+    </div>
+
+    <div class="submenu-wrapper">
+      <a href="#" class="submenuitem" data-menu="account">Account</a>
+      <div class="dropdown-menu" id="menu-account">
+        <a href="/login/index.html">تسجيل الدخول</a>
+        <a href="/signup/signup.html">إنشاء حساب</a>
+      </div>
+    </div>
   </div>
 </div>
 
@@ -141,7 +162,6 @@ document.addEventListener('DOMContentLoaded', function() {
   var contentArea = document.getElementById('content-area');
   var contentFrame = document.getElementById('content-frame');
   
-  // إغلاق القوائم عند الضغط خارجها
   document.addEventListener('click', function(e) {
     if (!e.target.closest('.submenu-wrapper')) {
       document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
@@ -150,7 +170,6 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
-  // التعامل مع الأزرار الرئيسية
   mainButtons.forEach(function(btn) {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -160,19 +179,16 @@ document.addEventListener('DOMContentLoaded', function() {
       var menu = document.getElementById(menuId);
       var isOpen = menu.classList.contains('show');
       
-      // إغلاق كل القوائم
       document.querySelectorAll('.dropdown-menu').forEach(function(m) {
         m.classList.remove('show');
       });
       
-      // فتح القائمة الحالية إذا كانت مغلقة
       if (!isOpen) {
         menu.classList.add('show');
       }
     });
   });
   
-  // التعامل مع الأزرار الفرعية
   document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
     link.addEventListener('click', function(e) {
       e.preventDefault();
@@ -180,18 +196,15 @@ document.addEventListener('DOMContentLoaded', function() {
       
       var href = this.getAttribute('href');
       
-      // تحديث الزر النشط
       document.querySelectorAll('.dropdown-menu a').forEach(function(a) {
         a.classList.remove('active');
       });
       this.classList.add('active');
       
-      // إغلاق القائمة
       document.querySelectorAll('.dropdown-menu').forEach(function(m) {
         m.classList.remove('show');
       });
       
-      // فتح الصفحة في iframe
       contentArea.style.display = 'none';
       contentFrame.style.display = 'block';
       contentFrame.src = href;
