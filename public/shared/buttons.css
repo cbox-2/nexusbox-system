@@ -1,0 +1,352 @@
+/* ===== NexusBox Modern Button Design System ===== */
+
+/* Base Button Styles */
+button,
+input[type="submit"],
+input[type="button"],
+.btn,
+.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 10px 20px;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  font-size: 14px;
+  font-weight: 600;
+  text-decoration: none;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+  outline: none;
+  position: relative;
+  overflow: hidden;
+  user-select: none;
+  -webkit-tap-highlight-color: transparent;
+}
+
+/* Primary Button - Main actions (Save, Create, Publish) */
+button,
+input[type="submit"],
+input[type="button"],
+.btn-primary,
+.btn {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+button:hover,
+input[type="submit"]:hover,
+input[type="button"]:hover,
+.btn-primary:hover,
+.btn:hover {
+  background: linear-gradient(135deg, #764ba2 0%, #667eea 100%);
+  box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+  transform: translateY(-2px);
+}
+
+button:active,
+input[type="submit"]:active,
+input[type="button"]:active,
+.btn-primary:active,
+.btn:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.3);
+}
+
+/* Secondary Button - Less prominent actions */
+.btn-secondary,
+input[type="button"].secondary {
+  background: linear-gradient(135deg, #4a5568 0%, #2d3748 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(74, 85, 104, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-secondary:hover,
+input[type="button"].secondary:hover {
+  background: linear-gradient(135deg, #2d3748 0%, #4a5568 100%);
+  box-shadow: 0 6px 20px rgba(74, 85, 104, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-secondary:active,
+input[type="button"].secondary:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: 0 2px 10px rgba(74, 85, 104, 0.3);
+}
+
+/* Danger Button - Delete, Remove, Ban */
+.btn-danger,
+input[type="button"].danger,
+button.danger {
+  background: linear-gradient(135deg, #f56565 0%, #c53030 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(245, 101, 101, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-danger:hover,
+input[type="button"].danger:hover,
+button.danger:hover {
+  background: linear-gradient(135deg, #c53030 0%, #f56565 100%);
+  box-shadow: 0 6px 20px rgba(245, 101, 101, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-danger:active,
+input[type="button"].danger:active,
+button.danger:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: 0 2px 10px rgba(245, 101, 101, 0.3);
+}
+
+/* Ghost Button - Transparent, no background */
+.btn-ghost,
+input[type="button"].ghost,
+button.ghost {
+  background: transparent;
+  color: #667eea;
+  box-shadow: none;
+  border: 1px solid rgba(102, 126, 234, 0.3);
+}
+
+.btn-ghost:hover,
+input[type="button"].ghost:hover,
+button.ghost:hover {
+  background: rgba(102, 126, 234, 0.1);
+  box-shadow: 0 4px 15px rgba(102, 126, 234, 0.2);
+  transform: translateY(-2px);
+}
+
+.btn-ghost:active,
+input[type="button"].ghost:active,
+button.ghost:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: none;
+}
+
+/* Icon Button - Small buttons for icons */
+.btn-icon,
+input[type="button"].icon,
+button.icon {
+  padding: 8px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+  background: rgba(102, 126, 234, 0.15);
+  color: #667eea;
+  box-shadow: none;
+  border: 1px solid rgba(102, 126, 234, 0.2);
+}
+
+.btn-icon:hover,
+input[type="button"].icon:hover,
+button.icon:hover {
+  background: rgba(102, 126, 234, 0.25);
+  box-shadow: 0 2px 10px rgba(102, 126, 234, 0.2);
+  transform: translateY(-1px);
+}
+
+.btn-icon:active,
+input[type="button"].icon:active,
+button.icon:active {
+  transform: translateY(0) scale(0.96);
+}
+
+/* Success Button - Confirm, Approve */
+.btn-success,
+input[type="button"].success,
+button.success {
+  background: linear-gradient(135deg, #48bb78 0%, #38a169 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 15px rgba(72, 187, 120, 0.35);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+.btn-success:hover,
+input[type="button"].success:hover,
+button.success:hover {
+  background: linear-gradient(135deg, #38a169 0%, #48bb78 100%);
+  box-shadow: 0 6px 20px rgba(72, 187, 120, 0.5);
+  transform: translateY(-2px);
+}
+
+.btn-success:active,
+input[type="button"].success:active,
+button.success:active {
+  transform: translateY(0) scale(0.96);
+  box-shadow: 0 2px 10px rgba(72, 187, 120, 0.3);
+}
+
+/* Button Sizes */
+.btn-sm,
+input[type="button"].btn-sm,
+button.btn-sm {
+  padding: 6px 12px;
+  font-size: 12px;
+  border-radius: 8px;
+}
+
+.btn-lg,
+input[type="button"].btn-lg,
+button.btn-lg {
+  padding: 14px 28px;
+  font-size: 16px;
+  border-radius: 12px;
+}
+
+/* Disabled State */
+button:disabled,
+input[type="submit"]:disabled,
+input[type="button"]:disabled,
+.btn:disabled,
+.btn-primary:disabled,
+.btn-secondary:disabled,
+.btn-danger:disabled,
+.btn-ghost:disabled,
+.btn-icon:disabled,
+.btn-success:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+/* Button with Icon */
+button i,
+button svg,
+.btn i,
+.btn svg {
+  font-size: 16px;
+  width: 16px;
+  height: 16px;
+}
+
+/* Loading State */
+button.loading,
+.btn.loading {
+  position: relative;
+  pointer-events: none;
+}
+
+button.loading::after,
+.btn.loading::after {
+  content: '';
+  position: absolute;
+  width: 16px;
+  height: 16px;
+  top: 50%;
+  left: 50%;
+  margin-left: -8px;
+  margin-top: -8px;
+  border: 2px solid rgba(255, 255, 255, 0.3);
+  border-top-color: #ffffff;
+  border-radius: 50%;
+  animation: spin 0.6s linear infinite;
+}
+
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  button,
+  input[type="submit"],
+  input[type="button"],
+  .btn {
+    padding: 8px 16px;
+    font-size: 13px;
+  }
+  
+  .btn-lg {
+    padding: 12px 24px;
+    font-size: 15px;
+  }
+}
+
+/* Focus State for Accessibility */
+button:focus-visible,
+input[type="submit"]:focus-visible,
+input[type="button"]:focus-visible,
+.btn:focus-visible {
+  outline: 2px solid #667eea;
+  outline-offset: 2px;
+}
+
+/* Link Buttons */
+a.btn,
+a.button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+/* Table Action Buttons */
+.table-actions button,
+.table-actions .btn {
+  padding: 6px 12px;
+  font-size: 12px;
+  margin: 0 2px;
+}
+
+/* Modal Buttons */
+.modal-footer button,
+.modal-footer .btn {
+  margin-left: 8px;
+}
+
+/* Form Buttons */
+.form-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+/* Button Group */
+.btn-group {
+  display: inline-flex;
+  gap: 0;
+}
+
+.btn-group button,
+.btn-group .btn {
+  border-radius: 0;
+  margin-left: -1px;
+}
+
+.btn-group button:first-child,
+.btn-group .btn:first-child {
+  border-radius: 10px 0 0 10px;
+  margin-left: 0;
+}
+
+.btn-group button:last-child,
+.btn-group .btn:last-child {
+  border-radius: 0 10px 10px 0;
+}
+
+/* Ripple Effect */
+button::before,
+.btn::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+button:active::before,
+.btn:active::before {
+  width: 300px;
+  height: 300px;
+}

@@ -1,3 +1,6 @@
+/* Import Button Design System */
+@import url("buttons.css");
+
 /* ===== NexusBox Toolbar CSS ===== */
 * { box-sizing: border-box; }
 body { margin: 0; padding: 0; font-family: Tahoma, Verdana, sans-serif; font-size: 13px; background: #1e1b4b; color: #fff; }
