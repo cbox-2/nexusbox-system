@@ -21,6 +21,7 @@ body#mainbody { padding-top: 0; }
 
 #bar3 { background: #2d2a5e; min-height: 32px; border-bottom: 1px solid #444; }
 #bar3 .wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; gap: 5px; flex-wrap: wrap; }
+#hovmenu { display: block; }
 #hovmenu a { color: #ddd; text-decoration: none; padding: 6px 12px; font-size: 12px; display: inline-block; }
 #hovmenu a:hover { background: #4a4780; color: #fff; }
 #hovmenu a.active { background: #059ad0; color: #fff; }

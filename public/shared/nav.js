@@ -25,10 +25,13 @@ var hovmenu = function(btn, menuId) {
       {text:'Channels', href:'/channels/index.html'}
     ]
   };
+  
   var hovmenuDiv = document.getElementById('hovmenu');
+  
   var items = menus[menuId] || [];
   hovmenuDiv.innerHTML = '';
   hovmenuDiv.style.display = 'block';
+  
   items.forEach(function(item) {
     var a = document.createElement('a');
     a.href = item.href;
@@ -36,6 +39,7 @@ var hovmenu = function(btn, menuId) {
     a.textContent = item.text;
     hovmenuDiv.appendChild(a);
   });
+  
   return false;
 };
 
