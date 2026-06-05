@@ -501,3 +501,57 @@ app.get('/api/theme/presets', authMiddleware, async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// ===== LAYOUT API =====
+const layoutSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  width: { type: Number, default: 400 },
+  height: { type: Number, default: 400 },
+  formHeight: { type: Number, default: 107 },
+  autoFormHeight: { type: Boolean, default: true },
+  adaptiveHeight: { type: Boolean, default: false },
+  formOnTop: { type: Boolean, default: false },
+  narrowLayout: { type: Boolean, default: false },
+  language: { type: String, default: 'ar' },
+  messagesPerPage: { type: Number, default: 20 },
+  sortDirection: { type: Number, default: 1 },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const LayoutSettings = mongoose.model('LayoutSettings', layoutSchema);
+
+app.get('/api/layout', authMiddleware, async (req, res) => {
+  try {
+    let settings = await LayoutSettings.findOne({ user: req.userId });
+    if (!settings) {
+      settings = new LayoutSettings({ user: req.userId });
+      await settings.save();
+    }
+    res.json({ success: true, settings });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/layout', authMiddleware, async (req, res) => {
+  try {
+    const { width, height, formHeight, autoFormHeight, adaptiveHeight, formOnTop, narrowLayout, language, messagesPerPage, sortDirection } = req.body;
+    let settings = await LayoutSettings.findOne({ user: req.userId });
+    if (!settings) settings = new LayoutSettings({ user: req.userId });
+    if (width !== undefined) settings.width = width;
+    if (height !== undefined) settings.height = height;
+    if (formHeight !== undefined) settings.formHeight = formHeight;
+    if (autoFormHeight !== undefined) settings.autoFormHeight = autoFormHeight;
+    if (adaptiveHeight !== undefined) settings.adaptiveHeight = adaptiveHeight;
+    if (formOnTop !== undefined) settings.formOnTop = formOnTop;
+    if (narrowLayout !== undefined) settings.narrowLayout = narrowLayout;
+    if (language !== undefined) settings.language = language;
+    if (messagesPerPage !== undefined) settings.messagesPerPage = messagesPerPage;
+    if (sortDirection !== undefined) settings.sortDirection = sortDirection;
+    settings.updatedAt = new Date();
+    await settings.save();
+    res.json({ success: true, settings });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});

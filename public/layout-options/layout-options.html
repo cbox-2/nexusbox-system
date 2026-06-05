@@ -1,6 +1,555 @@
-<html><body>Layout options<script>
-if (window.self !== window.top) {
-  document.body.classList.add('in-iframe');
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>Layout Options · NexusBox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta name="description" content="NexusBox Layout Options - Customize your chat dimensions and layout">
+<link rel="stylesheet" href="/shared/toolbar.css">
+</head>
+<body id="mainbody">
+
+<script>
+var rcvdformresponse = function () {};
+</script>
+
+<div id="mask"></div>
+
+<div id="popovr_box">
+<div class="wrap">
+<div style="padding: 20px; background-color: #fff">
+<div id="popovr_title"></div>
+<div id="popovr_text" style="text-align: left; clear:both"></div>
+<div id="popovr_t_login" style="display: none; text-align: left; clear:both">
+<p>Your session has expired. Please log back in to continue.</p>
+<form id="qlpop-form" onsubmit="return quickLogin(event)">
+<fieldset>
+<label>Username:</label>
+<input type="text" name="uname" id="ql-uname" maxlength="50" class="txtbox">
+<label>Password:</label>
+<input type="password" name="pword" id="ql-pword" maxlength="50" class="txtbox">
+<input type="submit" name="sub" value=" Log in ">
+<div id="m_qlpop" class="frmmsg1"></div>
+<div id="em_qlpop" class="frmmsg2"></div>
+</fieldset>
+</form>
+</div>
+</div>
+</div>
+</div>
+
+<div id="bodywrap">
+<div id="header">
+<div class="wrap">
+<a id="logo" href="/dashboard/index.html">
+<span style="color:#fff;font-size:24px;font-weight:bold">NexusBox</span>
+</a>
+<div id="headerExtras">
+<span id="userWelcome">جاري التحميل...</span>
+<a href="/dashboard/index.html">My Cboxes</a>
+<a href="#" onclick="globalLogout(); return false;">Log out</a>
+</div>
+</div>
+</div>
+
+<div id="subbar">
+<div class="wrap">
+<a href="/dashboard/index.html" class="submenuitem"><b id="cbox-name">MSASDWEC2015HKARNO</b></a>
+<a href="/publish/publish.html" class="submenuitem">Publish</a>
+<a href="#" id="hovmenu1" class="submenuitem active" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+<a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options</a>
+<a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users</a>
+<a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages</a>
+</div>
+</div>
+<div id="bar3">
+<div id="hovmenu" class="wrap"><a></a></div>
+</div>
+
+<div id="wideimg" style="position: relative; width: 100%; left: 0"></div>
+
+<div id="main" class="wrap">
+<div id="content">
+
+<script type="text/javascript">
+var noticetogorig = "";
+function noticetoggle(xo, v) {
+  var xo = document.getElementById(xo);
+  z = document.getElementById('notice-more');
+  if (z.style.display == 'none') {
+    z.style.display = '';
+    noticetogorig = xo.innerHTML;
+    xo.innerHTML = v;
+  }
+  else {
+    z.style.display = 'none';
+    xo.innerHTML = noticetogorig;
+  }
+}
+
+function noticeclose(x) {
+  z = document.getElementById('notice');
+  z.style.display = "none";
+  document.cookie = "rnot="+x+";";
+}
+
+function highlighthelp(sec, para, on) {
+var ico = document.getElementById("hlpico-"+sec+"-"+para);
+  if (!ico) return;
+  if (!on) {
+  ico.style.filter = "alpha(opacity=60)";
+  ico.style.opacity = 0.6;
+  }
+  else {
+  ico.style.filter = "";
+  ico.style.opacity = 1;
+  }
+}
+
+var createBar = function ($elem, isLog, showLimit) {
+var $bar = document.createElement("div");
+$bar.className = "barFill";
+var $text = document.createElement("div");
+$text.className = "barText";
+$elem.appendChild($bar);
+$elem.appendChild($text);
+var minWidth = 5;
+var format = function (n) {
+return (n+'').split('').reverse().join('').replace(/([0-9]{3})(?=[0-9])/g, "$1,").split('').reverse().join('');
+}
+$bar.style.width = "0%";
+return {
+setBarSize: function (val, max) {
+var over = false;
+if (val > max) over = true;
+var val = Math.min(max, Math.max(0, val));
+var prop = val / max;
+$text.innerHTML = format(val) + (over ? "+" : "") + (showLimit ? "/" + max : "");
+var w = (isLog ? (Math.log((prop*1.718 + 1))) : prop) * 100;
+var r = prop/0.7 * 255 + 50;
+var g = 255 - prop*0.6*255;
+var b = 80;
+var comp = (255 / (r*0.9 + g * 1.1)) * 1.4;
+r = r / comp; g = g / comp; b = b / comp;
+window.setTimeout(function () {
+$bar.style.width = Math.max(w, minWidth) + "%";
+$bar.style.backgroundColor = "rgb("+(r|0)+", "+(g|0)+", "+(b|0)+")";
+}, 100);
+}
+}
+};
+</script>
+
+<h1>Layout Options</h1>
+
+<script type="text/javascript">
+function inorm (i, low, high) {
+  val = (isNaN(val = parseInt(i.value)))?null:val;
+  bad = false;
+  if (val === null) {bad = true;val = low;}
+  else if (val < low) {bad = true;val = low;}
+  else if (val > high) {bad = true;val = high;}
+  
+  if (bad) i.style.color = "#ff0000";
+  else i.style.color = "#000000";
+  return val;
+}
+
+var f = null;
+
+function resizetbl() {
+  f = document.forms["flayout"];
+  twidth = inorm(f.twidth, 150 + 0*5, 5000);
+  theight = inorm(f.theight, 76, 5000);
+  flns = inorm(f.flines, 1, 20);
+  falt = f.falt.checked;
+  fontop = f.fontop.checked;
+
+  fheight = 75;
+  
+  if (falt) fheight += 42;
+  if (flns > 1) fheight += (flns-1)*16;
+  fheight += 0*3;
+  fheight += 0*4;
+
+  if (f.fhauto.checked) f.fheight.value = fheight;
+  else fheight = f.fheight.value;
+
+  theight = inorm(f.theight, (fheight*1)+100, 5000);  
+
+  ftr = 0;
+  if (twidth/160 > ftr) ftr = twidth/160;
+  if (theight/120 > ftr) ftr = theight/120;
+
+  ttbl = document.getElementById("ctop");
+  btbl = document.getElementById("cbot");
+  
+  ttbl.style.width = Math.ceil(twidth / ftr)+"px";
+  btbl.style.width = Math.ceil(twidth / ftr)+"px";
+
+  if (fontop) {
+    ttbl.innerHTML = "&laquo; form &raquo;";
+    btbl.innerHTML = "&laquo; posts &raquo;";
+    btbl.style.height = Math.ceil((theight-fheight) / ftr)+"px";
+    ttbl.style.height = Math.ceil(fheight / ftr)+"px";
+  }
+  else {
+    btbl.innerHTML = "&laquo; form &raquo;";
+    ttbl.innerHTML = "&laquo; posts &raquo;";
+    ttbl.style.height = Math.ceil((theight-fheight) / ftr)+"px";
+    btbl.style.height = Math.ceil(fheight / ftr)+"px";
+  }
+}
+    
+</script>
+
+<p>
+These settings control the way your NexusBox is displayed on your website. Options marked with an asterisk (<span style="color:red">*</span>) 
+may cause your NexusBox HTML code to change.
+</p>
+
+<script type="text/javascript">
+function chk_flayout() {
+  err = "";
+  f = document.forms["flayout"];
+
+  resetmsgs("flayout");
+
+  if (err) {
+    setmsg("flayout", "Error. Check inputs.", 2);
+    setmsgdesc("flayout", err, 2);
+    return false;
+  }
+  return saveLayoutSettings();
+}
+
+function resetmsgs(formName) {
+  var m = document.getElementById("m_"+formName);
+  var em = document.getElementById("em_"+formName);
+  if (m) { m.textContent = ""; m.className = "frmmsg1"; }
+  if (em) { em.innerHTML = ""; em.className = "frmmsg2"; }
+}
+
+function setmsg(formName, msg, type) {
+  var m = document.getElementById("m_"+formName);
+  var em = document.getElementById("em_"+formName);
+  if (type === 1 && m) {
+    m.textContent = msg;
+    m.className = "frmmsg1 Okay";
+  } else if (type === 2 && em) {
+    em.innerHTML = "<ul><li>" + msg + "</li></ul>";
+    em.className = "frmmsg2 Error";
+  }
+}
+
+function setmsgdesc(formName, msg, type) {
+  setmsg(formName, msg, type);
+}
+
+async function saveLayoutSettings() {
+  var token = localStorage.getItem('token');
+  var f = document.forms["flayout"];
+  
+  var data = {
+    width: parseInt(f.twidth.value),
+    height: parseInt(f.theight.value),
+    formHeight: parseInt(f.fheight.value),
+    autoFormHeight: f.fhauto.checked,
+    adaptiveHeight: f.flines.checked,
+    formOnTop: f.fontop.checked,
+    narrowLayout: f.falt.checked,
+    language: f.lang.value,
+    messagesPerPage: parseInt(f.mpp.value),
+    sortDirection: parseInt(f.sortdir.value)
+  };
+  
+  try {
+    var res = await fetch('/api/layout', {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + token
+      },
+      body: JSON.stringify(data)
+    });
+    
+    var result = await res.json();
+    
+    if (result.success) {
+      setmsg("flayout", "Saved successfully!", 1);
+      return false;
+    } else {
+      setmsg("flayout", result.error || "Error saving", 2);
+      return false;
+    }
+  } catch (error) {
+    setmsg("flayout", "Connection error", 2);
+    return false;
+  }
+}
+
+async function loadLayoutSettings() {
+  var token = localStorage.getItem('token');
+  
+  try {
+    var res = await fetch('/api/layout', {
+      headers: { 'Authorization': 'Bearer ' + token }
+    });
+    
+    var data = await res.json();
+    
+    if (data.success) {
+      var s = data.settings;
+      var f = document.forms["flayout"];
+      
+      f.twidth.value = s.width || 400;
+      f.theight.value = s.height || 400;
+      f.fheight.value = s.formHeight || 107;
+      f.fhauto.checked = s.autoFormHeight !== false;
+      f.flines.checked = s.adaptiveHeight || false;
+      f.fontop.checked = s.formOnTop || false;
+      f.falt.checked = s.narrowLayout || false;
+      f.lang.value = s.language || 'ar';
+      f.mpp.value = s.messagesPerPage || 20;
+      f.sortdir.value = s.sortDirection !== undefined ? s.sortDirection : 1;
+      
+      resizetbl();
+    }
+  } catch (error) {
+    console.error('Error loading layout settings:', error);
+  }
 }
 </script>
+
+<form name="flayout" onsubmit="return chk_flayout();">
+
+<input type="hidden" name="codechanged" value="0">
+
+<div class="col1_2">
+
+<fieldset class="Short">
+<div class="fsInlineHelp"><a href="#" title="Get help on this section">?</a></div><legend>Width and height</legend>
+  <label>Width (px)<span style="color:red">*</span>:</label>
+  <input type="text" class="txtbox" size="5" name="twidth" value="400" onkeyup="resizetbl()" onchange="this.form.codechanged.value = 1" style="color: rgb(0, 0, 0);">
+  <label>Height (px)<span style="color:red">*</span>:</label>
+  <input type="text" class="txtbox" size="5" name="theight" value="400" onkeyup="resizetbl()" onchange="this.form.codechanged.value = 1" style="color: rgb(0, 0, 0);">
+  <label>Form height (px)<span style="color:red">*</span>:</label>
+  <input type="text" class="txtbox" size="5" name="fheight" value="107" onkeyup="resizetbl()">
+  <label for="i_fhauto">Auto form height:</label>
+  
+<div class="slideThree"><input type="checkbox" name="fhauto" value="1" id="i_fhauto" checked="checked" onclick="resizetbl()"><label></label></div></fieldset>
+
+
+<fieldset class="Short">
+<div class="fsInlineHelp"><a href="#" title="Get help on this section">?</a></div><legend>Form layout</legend>
+<label>Adaptive height<span style="color:red">*</span>:</label>
+
+<div class="slideThree"><input type="checkbox" name="flines" value="3" id="i_flines" onchange="this.form.codechanged.value = 1" style="color: rgb(0, 0, 0);"><label></label></div><label for="i_fontop"> Form above posts<span style="color:red">*</span>:</label>
+
+    <div class="slideThree"><input type="checkbox" name="fontop" value="1" id="i_fontop" onchange="resizetbl(); this.form.codechanged.value = 1"><label></label></div><label for="i_falt"> Narrow layout<span style="color:red">*</span>:</label>
+
+<div class="slideThree"><input type="checkbox" name="falt" value="1" onclick="resizetbl()" id="i_falt" onchange="this.form.codechanged.value = 1"><label></label></div></fieldset>
+
+</div>
+<div class="col2_2">
+
+<fieldset class="Med">
+<legend>Language</legend>
+<label>Set UI language:</label>
+<select name="lang" class="txtbox"><option value="af">Afrikaans</option><option value="sq">Albanian</option><option value="ar" selected="selected">Arabic</option><option value="az">Azerbaijani</option><option value="bg">Bulgarian</option><option value="be">Byelorussian</option><option value="zs">Chinese (simp.)</option><option value="zh">Chinese (trad.)</option><option value="ca">Catalan</option><option value="hr">Croatian</option><option value="cs">Czech</option><option value="da">Danish</option><option value="nl">Dutch</option><option value="en">English</option><option value="et">Estonian</option><option value="fi">Finnish</option><option value="fr">French</option><option value="de">German</option><option value="el">Greek</option><option value="iw">Hebrew</option><option value="hi">Hindi</option><option value="hu">Hungarian</option><option value="is">Icelandic</option><option value="it">Italian</option><option value="ja">Japanese</option><option value="ko">Korean</option><option value="lo">Lao</option><option value="lv">Latvian</option><option value="lt">Lithuanian</option><option value="mk">Macedonian</option><option value="ms">Malay</option><option value="no">Norwegian</option><option value="pl">Polish</option><option value="pt">Portuguese</option><option value="px">Portuguese (Brazil)</option><option value="ro">Romanian</option><option value="ru">Russian</option><option value="sr">Serbian</option><option value="sk">Slovak</option><option value="sl">Slovenian</option><option value="es">Spanish</option><option value="sv">Swedish</option><option value="ta">Tamil</option><option value="th">Thai</option><option value="tr">Turkish</option><option value="uk">Ukrainian</option><option value="vi">Vietnamese</option><option value="yi">Yiddish</option></select>
+</fieldset>
+
+<fieldset class="Med">
+<div class="fsInlineHelp"><a href="#" title="Get help on this section">?</a></div><legend>Messages</legend>
+  <label>No. displayed:</label>
+  <select name="mpp" class="txtbox">
+<option value="5">5
+</option><option value="10">10
+</option><option value="20" selected="selected">20
+</option><option value="40">40
+</option><option value="80">80
+  </option></select>
+  <label>In order: </label>
+  <select name="sortdir" class="txtbox">
+    <option value="0">Newest at top</option>
+<option value="1" selected="selected">Newest at bottom</option>
+  </select>
+</fieldset>
+
+<div>
+    <div id="ctop" style="margin: 0px auto; overflow: hidden; text-align: center; width: 120px; height: 88px; background-color: rgb(205, 205, 205); border: 1px solid rgb(171, 171, 171); color: rgb(255, 255, 255); font-size: 8pt;">« posts »</div>
+    <div id="cbot" style="margin: 0px auto; overflow: hidden; text-align: center; width: 120px; height: 33px; background-color: rgb(205, 205, 205); border-color: currentcolor rgb(171, 171, 171) rgb(171, 171, 171); border-style: none solid solid; border-width: 0px 1px 1px; border-image: none 100% / 1 / 0 stretch; color: rgb(255, 255, 255); font-size: 8pt;">« form »</div>
+</div>
+
+</div>
+
+<fieldset>
+<input type="submit" name="sub" value=" Save ">
+<div id="m_flayout" class="frmmsg1"></div>
+<div id="em_flayout" class="frmmsg2"></div>
+</fieldset>
+
+</form>
+<script type="text/javascript">resizetbl();</script>
+
+</div>
+<div style="clear: both"></div>
+</div>
+</div>
+
+<div id="siteErrorBar"><div class="wrap" id="siteErrorBarCont">Loading...</div></div>
+
+<div id="footer">
+<a href="#">About</a>
+<a href="#">Plans &amp; pricing</a>
+<a href="#">Terms &amp; conditions</a>
+<a href="#">Privacy policy</a>
+<a href="#">Notices</a>
+<a href="#">Contact us</a>
+<div class="verybottom">
+© 2004–2026 NexusBox Communications, all rights reserved.
+</div>
+</div>
+
+<script src="/shared/toolbar.js"></script>
+<script src="/shared/auth.js"></script>
+<script>
+var hovmenu = function(btn, menuId) {
+var menus = {
+1: [
+{ text: 'Layout', href: '/layout-options/layout-options.html', active: true },
+{ text: 'Theme', href: '/Theme-editor/Theme-editor.html' },
+{ text: 'Emoticons', href: '/emoticons/index.html' }
+],
+2: [
+{ text: 'Posting', href: '/posting-options/index.html' },
+{ text: 'Date', href: '/date-options/index.html' },
+{ text: 'Filtering', href: '/filtering/index.html' },
+{ text: 'Sticky Message', href: '/sticky-message/index.html' },
+{ text: 'Webhook', href: '/webhook/index.html' }
+],
+3: [
+{ text: 'Registered Users', href: '/registered-users/registered-users.html' },
+{ text: 'User Integration', href: '/user-integration/user-integration.html' },
+{ text: 'Bans', href: '/bans/index.html' }
+],
+4: [
+{ text: 'Messages', href: '/messages/index.html' },
+{ text: 'Archives', href: '/archives/index.html' },
+{ text: 'Chat', href: '/chat/chat.html' },
+{ text: 'Channels', href: '/channels/index.html' }
+]
+};
+
+var hovmenuDiv = document.getElementById('hovmenu');
+var items = menus[menuId] || [];
+
+hovmenuDiv.innerHTML = '';
+items.forEach(function(item) {
+var a = document.createElement('a');
+a.href = item.href;
+a.className = 'submenuitem' + (item.active ? ' active' : '');
+a.textContent = item.text;
+hovmenuDiv.appendChild(a);
+});
+
+return false;
+};
+
+document.addEventListener('click', function(e) {
+if (!e.target.closest('#subbar') && !e.target.closest('#bar3')) {
+document.getElementById('hovmenu').innerHTML = '';
+}
+});
+
+async function loadUserInfo() {
+const token = localStorage.getItem('token');
+if (!token) {
+window.location.href = '/login/index.html';
+return;
+}
+
+try {
+const res = await fetch('/api/auth/me', {
+headers: { 'Authorization': 'Bearer ' + token }
+});
+const data = await res.json();
+
+if (!data.success) {
+localStorage.removeItem('token');
+window.location.href = '/login/index.html';
+return;
+}
+
+document.getElementById('userWelcome').textContent = data.user.email || data.user.username;
+document.getElementById('cbox-name').textContent = data.user.username.toUpperCase();
+
+loadLayoutSettings();
+} catch (error) {
+console.error('Error loading user:', error);
+}
+}
+
+async function quickLogin(e) {
+e.preventDefault();
+var uname = document.getElementById('ql-uname').value;
+var pword = document.getElementById('ql-pword').value;
+
+try {
+const res = await fetch('/api/auth/login', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ username: uname, password: pword })
+});
+
+const data = await res.json();
+
+if (data.success) {
+localStorage.setItem('token', data.token);
+localStorage.setItem('user', JSON.stringify(data.user));
+document.getElementById('popovr_box').style.display = 'none';
+location.reload();
+} else {
+document.getElementById('em_qlpop').innerHTML = '<ul><li>' + data.error + '</li></ul>';
+document.getElementById('em_qlpop').className = 'frmmsg2 Error';
+}
+} catch (error) {
+document.getElementById('em_qlpop').innerHTML = '<ul><li>Connection error</li></ul>';
+}
+
+return false;
+}
+
+function logout() {
+globalLogout();
+return false;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+loadUserInfo();
+});
+
+if (window.isPopup) {
+document.body.className = "Popped";
+}
+
+var dropCrumb = function () {
+if (!localStorage) return;
+var bc = getCrumbs();
+bc.push(location.href);
+bc.splice(0, bc.length - 5);
+localStorage.setItem("site:bread", JSON.stringify(bc));
+};
+
+var getCrumbs = function () {
+if (!localStorage) return [];
+var bcStr = localStorage.getItem("site:bread");
+var bc = [];
+if (bcStr) bc = JSON.parse(bcStr);
+return bc;
+};
+
+dropCrumb();
+</script>
+
 </body></html>
