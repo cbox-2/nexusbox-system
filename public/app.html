@@ -6,113 +6,16 @@
 <title>NexusBox</title>
 <style>
 * { margin: 0; padding: 0; box-sizing: border-box; }
-body { font-family: Tahoma, Arial, sans-serif; background: #e8e8e8; }
-
-/* الشريط العلوي */
-.topbar {
-  background: #4a7fb5;
-  padding: 8px 15px;
-  display: flex;
-  align-items: center;
-  gap: 5px;
-  flex-wrap: wrap;
-  border-bottom: 2px solid #3a6a9a;
-}
-
-.topbar-title {
-  color: #fff;
-  font-weight: bold;
-  font-size: 16px;
-  margin-left: 15px;
-  padding: 5px 10px;
-}
-
-.nav-btn {
-  background: #fff;
-  color: #333;
-  border: 1px solid #ccc;
-  padding: 6px 14px;
-  cursor: pointer;
-  font-size: 13px;
-  border-radius: 3px;
-  transition: all 0.2s;
-}
-
-.nav-btn:hover {
-  background: #f0f0f0;
-}
-
-.nav-btn.active {
-  background: #fff;
-  color: #4a7fb5;
-  border-color: #4a7fb5;
-  font-weight: bold;
-  border-bottom: 2px solid #fff;
-}
-
-/* منطقة المحتوى */
-.content {
-  background: #fff;
-  margin: 10px;
-  border: 1px solid #ccc;
-  border-radius: 4px;
-  min-height: 600px;
-}
-
+html, body { height: 100%; }
 iframe {
   width: 100%;
-  height: 600px;
+  height: 100%;
   border: none;
-}
-
-/* شريط سفلي */
-.footer {
-  text-align: center;
-  padding: 10px;
-  color: #666;
-  font-size: 12px;
+  display: block;
 }
 </style>
 </head>
 <body>
-
-<!-- الشريط العلوي -->
-<div class="topbar">
-  <span class="topbar-title">NexusBox</span>
-  <button class="nav-btn active" onclick="load('dashboard/index.html', this)">لوحة التحكم</button>
-  <button class="nav-btn" onclick="load('messages/index.html', this)">رسائل</button>
-  <button class="nav-btn" onclick="load('publish/publish.html', this)">انشر</button>
-  <button class="nav-btn" onclick="load('registered-users/registered-users.html', this)">المستخدمون</button>
-  <button class="nav-btn" onclick="load('layout-options/layout-options.html', this)">مظهر</button>
-  <button class="nav-btn" onclick="load('Theme-editor/Theme-editor.html', this)">ملمس</button>
-  <button class="nav-btn" onclick="load('chat/chat.html', this)">دردشة</button>
-  <button class="nav-btn" onclick="load('channels/index.html', this)">قنوات</button>
-  <button class="nav-btn" onclick="load('emoticons/index.html', this)">رموز</button>
-  <button class="nav-btn" onclick="load('bans/index.html', this)">حظر</button>
-  <button class="nav-btn" onclick="load('archives/index.html', this)">أرشيف</button>
-  <button class="nav-btn" onclick="load('filtering/index.html', this)">فلترة</button>
-  <button class="nav-btn" onclick="load('sticky-message/index.html', this)">مثبتة</button>
-  <button class="nav-btn" onclick="load('posting-options/index.html', this)">خيارات النشر</button>
-  <button class="nav-btn" onclick="load('date-options/index.html', this)">تاريخ</button>
-  <button class="nav-btn" onclick="load('user-integration/user-integration.html', this)">تكامل</button>
-  <button class="nav-btn" onclick="load('webhook/index.html', this)">Webhook</button>
-  <button class="nav-btn" onclick="load('login/index.html', this)">دخول</button>
-</div>
-
-<!-- منطقة المحتوى -->
-<div class="content">
-  <iframe id="frame" src="dashboard/index.html"></iframe>
-</div>
-
-<div class="footer">NexusBox System v1.0</div>
-
-<script>
-function load(url, btn) {
-  document.getElementById('frame').src = url;
-  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
-  btn.classList.add('active');
-}
-</script>
-
+<iframe src="dashboard/index.html"></iframe>
 </body>
 </html>
