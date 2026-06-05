@@ -73,85 +73,55 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
 <div id="subbar" dir="ltr">
   <div class="wrap">
 
-    <!-- Dashboard -->
+    <!-- Dashboard (يفتح مباشرة) -->
     <div class="submenu-wrapper">
-      <a href="#" class="submenuitem active" data-menu="dashboard"><b>MSASDWEC2015HKARNO</b></a>
-      <div class="dropdown-menu" id="menu-dashboard">
-        <a href="/dashboard/index.html">Dashboard</a>
-      </div>
+      <a href="/dashboard/index.html" class="submenuitem active"><b>MSASDWEC2015HKARNO</b></a>
     </div>
 
-    <!-- Publish -->
+    <!-- Publish (يفتح مباشرة) -->
     <div class="submenu-wrapper">
-      <a href="#" class="submenuitem" data-menu="publish">Publish</a>
-      <div class="dropdown-menu" id="menu-publish">
-        <a href="/publish/publish.html">نشر الصندوق</a>
-        <a href="/posting-options/index.html">خيارات النشر</a>
-      </div>
+      <a href="/publish/publish.html" class="submenuitem">Publish</a>
     </div>
 
-    <!-- Look & Feel -->
+    <!-- Look & feel (يعرض 2 أزرار فرعية) -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="lookfeel">Look & feel</a>
       <div class="dropdown-menu" id="menu-lookfeel">
-        <a href="/layout-options/layout-options.html">خيارات التصميم</a>
-        <a href="/Theme-editor/Theme-editor.html">محرر الثيمات</a>
-        <a href="/emoticons/index.html">الرموز التعبيرية</a>
+        <a href="/Theme-editor/Theme-editor.html">تعديل الثيم</a>
+        <a href="/layout-options/layout-options.html">إعدادات التخطيط</a>
       </div>
     </div>
 
-    <!-- Options -->
+    <!-- Options (يعرض 4 أزرار فرعية) -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="options">Options</a>
       <div class="dropdown-menu" id="menu-options">
-        <a href="/filtering/index.html">الفلترة</a>
-        <a href="/date-options/index.html">خيارات التاريخ</a>
-        <a href="/sticky-message/index.html">الرسائل المثبتة</a>
-        <a href="/webhook/index.html">Webhook</a>
+        <a href="/posting-options/index.html">النشر</a>
+        <a href="/date-options/index.html">التاريخ</a>
+        <a href="/filtering/index.html">الحظر/الفلترة</a>
+        <a href="/webhook/index.html">الإعدادات العامة</a>
       </div>
     </div>
 
-    <!-- Users -->
+    <!-- Users (يعرض 3 أزرار فرعية) -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="users">Users</a>
       <div class="dropdown-menu" id="menu-users">
-        <a href="/registered-users/registered-users.html">المستخدمون المسجلون</a>
+        <a href="/registered-users/registered-users.html">المستخدمين المسجلين</a>
         <a href="/user-integration/user-integration.html">تكامل المستخدمين</a>
-        <a href="/bans/index.html">المحظورون</a>
+        <a href="/bans/index.html">الصلاحيات</a>
       </div>
     </div>
 
-    <!-- Messages -->
+    <!-- Messages (يعرض 5 أزرار فرعية) -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="messages">Messages</a>
       <div class="dropdown-menu" id="menu-messages">
-        <a href="/messages/index.html">الرسائل</a>
-      </div>
-    </div>
-
-    <!-- Chat -->
-    <div class="submenu-wrapper">
-      <a href="#" class="submenuitem" data-menu="chat">Chat</a>
-      <div class="dropdown-menu" id="menu-chat">
-        <a href="/chat/chat.html">الدردشة</a>
-        <a href="/channels/index.html">القنوات</a>
-      </div>
-    </div>
-
-    <!-- Archives -->
-    <div class="submenu-wrapper">
-      <a href="#" class="submenuitem" data-menu="archives">Archives</a>
-      <div class="dropdown-menu" id="menu-archives">
+        <a href="/messages/index.html">إدارة الرسائل</a>
+        <a href="/sticky-message/index.html">الرسائل المثبتة</a>
         <a href="/archives/index.html">الأرشيف</a>
-      </div>
-    </div>
-
-    <!-- Account -->
-    <div class="submenu-wrapper">
-      <a href="#" class="submenuitem" data-menu="account">Account</a>
-      <div class="dropdown-menu" id="menu-account">
-        <a href="/login/index.html">تسجيل الدخول</a>
-        <a href="/signup/signup.html">إنشاء حساب</a>
+        <a href="/filtering/index.html">إعدادات الرسائل</a>
+        <a href="/filtering/index.html">الفلاتر</a>
       </div>
     </div>
 
@@ -169,10 +139,12 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
 <script src="/shared/toolbar.js"></script>
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-  var mainButtons = document.querySelectorAll('#subbar .submenuitem');
+  var mainButtons = document.querySelectorAll('#subbar .submenuitem[data-menu]');
+  var directLinks = document.querySelectorAll('#subbar .submenuitem:not([data-menu])');
   var contentArea = document.getElementById('content-area');
   var contentFrame = document.getElementById('content-frame');
   
+  // إغلاق القوائم عند الضغط خارجها
   document.addEventListener('click', function(e) {
     if (!e.target.closest('.submenu-wrapper')) {
       document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
@@ -181,6 +153,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
   });
   
+  // الأزرار الرئيسية التي تعرض قوائم فرعية
   mainButtons.forEach(function(btn) {
     btn.addEventListener('click', function(e) {
       e.preventDefault();
@@ -190,16 +163,50 @@ document.addEventListener('DOMContentLoaded', function() {
       var menu = document.getElementById(menuId);
       var isOpen = menu.classList.contains('show');
       
+      // إغلاق كل القوائم
       document.querySelectorAll('.dropdown-menu').forEach(function(m) {
         m.classList.remove('show');
       });
       
+      // فتح القائمة الحالية إذا كانت مغلقة
       if (!isOpen) {
         menu.classList.add('show');
       }
     });
   });
   
+  // الأزرار التي تفتح صفحات مباشرة (Dashboard, Publish)
+  directLinks.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      
+      var href = this.getAttribute('href');
+      
+      // تحديث الزر النشط
+      document.querySelectorAll('.submenuitem').forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+      this.classList.add('active');
+      
+      // إغلاق أي قوائم مفتوحة
+      document.querySelectorAll('.dropdown-menu').forEach(function(m) {
+        m.classList.remove('show');
+      });
+      
+      // إذا كان Dashboard، اعرض المحتوى الأصلي
+      if (href === '/dashboard/index.html') {
+        contentFrame.style.display = 'none';
+        contentArea.style.display = 'block';
+      } else {
+        // افتح الصفحة في iframe
+        contentArea.style.display = 'none';
+        contentFrame.style.display = 'block';
+        contentFrame.src = href;
+      }
+    });
+  });
+  
+  // الأزرار الفرعية
   document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
     link.addEventListener('click', function(e) {
       e.preventDefault();
@@ -207,15 +214,18 @@ document.addEventListener('DOMContentLoaded', function() {
       
       var href = this.getAttribute('href');
       
+      // تحديث الزر النشط
       document.querySelectorAll('.dropdown-menu a').forEach(function(a) {
         a.classList.remove('active');
       });
       this.classList.add('active');
       
+      // إغلاق القائمة
       document.querySelectorAll('.dropdown-menu').forEach(function(m) {
         m.classList.remove('show');
       });
       
+      // فتح الصفحة في iframe
       contentArea.style.display = 'none';
       contentFrame.style.display = 'block';
       contentFrame.src = href;
