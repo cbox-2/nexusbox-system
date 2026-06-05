@@ -1,7 +1,6 @@
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 
-// User Model
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true, trim: true },
   email: { type: String, required: true, unique: true, lowercase: true },
@@ -11,27 +10,20 @@ const userSchema = new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   lastLogin: { type: Date }
 });
-
 userSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
-
 userSchema.methods.comparePassword = async function(pwd) {
   return await bcrypt.compare(pwd, this.password);
 };
-
 userSchema.methods.toJSON = function() {
   const obj = this.toObject();
   delete obj.password;
   return obj;
 };
-
 const User = mongoose.model('User', userSchema);
-
-// Message Model
 const Message = mongoose.model('Message', new mongoose.Schema({
   content: { type: String, required: true },
   author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
@@ -39,8 +31,6 @@ const Message = mongoose.model('Message', new mongoose.Schema({
   isSticky: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 }));
-
-// Ban Model
 const Ban = mongoose.model('Ban', new mongoose.Schema({
   target: { type: String, required: true },
   reason: { type: String, default: '' },
@@ -48,16 +38,12 @@ const Ban = mongoose.model('Ban', new mongoose.Schema({
   createdAt: { type: Date, default: Date.now },
   expiresAt: { type: Date }
 }));
-
-// Channel Model
 const Channel = mongoose.model('Channel', new mongoose.Schema({
   name: { type: String, required: true, unique: true },
   description: { type: String, default: '' },
   createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
   createdAt: { type: Date, default: Date.now }
 }));
-
-// Publish Settings
 const PublishSettings = mongoose.model('PublishSettings', new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
   siteUrl: { type: String, default: '' },
@@ -67,8 +53,6 @@ const PublishSettings = mongoose.model('PublishSettings', new mongoose.Schema({
   securityTag: { type: String, default: '' },
   updatedAt: { type: Date, default: Date.now }
 }));
-
-// Theme
 const Theme = mongoose.model('Theme', new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
   name: { type: String, default: 'My custom CSS' },
@@ -76,8 +60,6 @@ const Theme = mongoose.model('Theme', new mongoose.Schema({
   preset: { type: Number, default: -1000 },
   updatedAt: { type: Date, default: Date.now }
 }));
-
-// Layout Settings
 const LayoutSettings = mongoose.model('LayoutSettings', new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
   width: { type: Number, default: 400 },
@@ -92,8 +74,6 @@ const LayoutSettings = mongoose.model('LayoutSettings', new mongoose.Schema({
   sortDirection: { type: Number, default: 1 },
   updatedAt: { type: Date, default: Date.now }
 }));
-
-// Integration Settings
 const IntegrationSettings = mongoose.model('IntegrationSettings', new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
   privateKey: { type: String, required: true },
@@ -101,8 +81,6 @@ const IntegrationSettings = mongoose.model('IntegrationSettings', new mongoose.S
   autoRegister: { type: Boolean, default: false },
   updatedAt: { type: Date, default: Date.now }
 }));
-
-// Registered User Settings
 const RegUserSettings = mongoose.model('RegUserSettings', new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
   regOnly: { type: Boolean, default: false },
@@ -111,8 +89,6 @@ const RegUserSettings = mongoose.model('RegUserSettings', new mongoose.Schema({
   lastPostDel: { type: Boolean, default: false },
   updatedAt: { type: Date, default: Date.now }
 }));
-
-// Registered User
 const registeredUserSchema = new mongoose.Schema({
   owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
   name: { type: String, required: true },
@@ -123,24 +99,15 @@ const registeredUserSchema = new mongoose.Schema({
   lastIP: { type: String, default: '' },
   registeredAt: { type: Date, default: Date.now }
 });
-
 registeredUserSchema.pre('save', async function(next) {
-  if (!this.isModified('password')) return next();
   const salt = await bcrypt.genSalt(10);
   this.password = await bcrypt.hash(this.password, salt);
   next();
 });
-
 registeredUserSchema.methods.toJSON = function() {
   const obj = this.toObject();
   delete obj.password;
   return obj;
 };
-
 const RegisteredUser = mongoose.model('RegisteredUser', registeredUserSchema);
-
-module.exports = {
-  User, Message, Ban, Channel,
-  PublishSettings, Theme, LayoutSettings,
-  IntegrationSettings, RegUserSettings, RegisteredUser
-};
+module.exports = { User, Message, Ban, Channel, PublishSettings, Theme, LayoutSettings, IntegrationSettings, RegUserSettings, RegisteredUser };
