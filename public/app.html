@@ -1,15 +1,253 @@
 <!DOCTYPE html>
-<html>
+<html lang="ar" dir="rtl">
 <head>
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>NexusBox</title>
 <style>
-* { margin: 0; padding: 0; }
-html, body { height: 100%; overflow: hidden; }
-iframe { width: 100%; height: 100%; border: none; }
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { height: 100%; font-family: Tahoma, Arial, sans-serif; overflow: hidden; background: #e8e8e8; }
+
+.app { display: flex; height: 100vh; }
+
+/* القائمة الجانبية - نفس لون الشريط الأزرق السابق */
+.sidebar {
+  width: 200px;
+  background: #4a7fb5;
+  color: #fff;
+  overflow-y: auto;
+  flex-shrink: 0;
+  border-left: 2px solid #3a6a9a;
+}
+
+.sidebar-header {
+  padding: 12px 15px;
+  background: #3a6a9a;
+  text-align: center;
+  font-size: 16px;
+  font-weight: bold;
+  border-bottom: 1px solid #2a5a8a;
+}
+
+/* الأزرار الرئيسية */
+.nav-item { border-bottom: 1px solid #3a6a9a; }
+
+.nav-main {
+  width: 100%;
+  background: transparent;
+  color: #fff;
+  border: none;
+  padding: 10px 12px;
+  text-align: right;
+  cursor: pointer;
+  font-size: 13px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  transition: background 0.2s;
+  font-family: Tahoma, Arial, sans-serif;
+}
+
+.nav-main:hover { background: #5a8fc5; }
+.nav-main.active { background: #fff; color: #4a7fb5; font-weight: bold; }
+
+.nav-main .arrow {
+  transition: transform 0.3s ease;
+  font-size: 10px;
+}
+
+.nav-main.open .arrow { transform: rotate(180deg); }
+
+/* القوائم الفرعية */
+.nav-sub {
+  max-height: 0;
+  overflow: hidden;
+  background: #3a6a9a;
+  transition: max-height 0.3s ease;
+}
+
+.nav-sub.open { max-height: 500px; }
+
+.nav-sub-btn {
+  width: 100%;
+  background: transparent;
+  color: #fff;
+  border: none;
+  padding: 8px 25px;
+  text-align: right;
+  cursor: pointer;
+  font-size: 12px;
+  transition: all 0.2s;
+  font-family: Tahoma, Arial, sans-serif;
+}
+
+.nav-sub-btn:hover {
+  background: #4a7fb5;
+  padding-right: 30px;
+}
+
+.nav-sub-btn.active {
+  background: #fff;
+  color: #4a7fb5;
+  font-weight: bold;
+}
+
+/* منطقة المحتوى */
+.main-content {
+  flex: 1;
+  background: #fff;
+  overflow: hidden;
+}
+
+iframe {
+  width: 100%;
+  height: 100%;
+  border: none;
+  background: #fff;
+}
+
+/* Scrollbar */
+.sidebar::-webkit-scrollbar { width: 6px; }
+.sidebar::-webkit-scrollbar-track { background: #3a6a9a; }
+.sidebar::-webkit-scrollbar-thumb { background: #2a5a8a; border-radius: 3px; }
 </style>
 </head>
 <body>
-<iframe src="dashboard/index.html"></iframe>
+
+<div class="app">
+  <div class="sidebar">
+    <div class="sidebar-header">NexusBox</div>
+
+    <div class="nav-item">
+      <button class="nav-main active" onclick="loadPage('dashboard/index.html', this)">
+        <span>لوحة التحكم</span>
+      </button>
+    </div>
+
+    <div class="nav-item">
+      <button class="nav-main" onclick="toggleSub(this)">
+        <span>رسائل</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="nav-sub">
+        <button class="nav-sub-btn" onclick="loadPage('messages/index.html', this)">الرسائل</button>
+        <button class="nav-sub-btn" onclick="loadPage('sticky-message/index.html', this)">مثبتة</button>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <button class="nav-main" onclick="toggleSub(this)">
+        <span>انشر</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="nav-sub">
+        <button class="nav-sub-btn" onclick="loadPage('publish/publish.html', this)">نشر الصندوق</button>
+        <button class="nav-sub-btn" onclick="loadPage('posting-options/index.html', this)">خيارات النشر</button>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <button class="nav-main" onclick="toggleSub(this)">
+        <span>المستخدمون</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="nav-sub">
+        <button class="nav-sub-btn" onclick="loadPage('registered-users/registered-users.html', this)">المسجلون</button>
+        <button class="nav-sub-btn" onclick="loadPage('bans/index.html', this)">حظر</button>
+        <button class="nav-sub-btn" onclick="loadPage('user-integration/user-integration.html', this)">تكامل</button>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <button class="nav-main" onclick="toggleSub(this)">
+        <span>مظهر</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="nav-sub">
+        <button class="nav-sub-btn" onclick="loadPage('layout-options/layout-options.html', this)">خيارات التصميم</button>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <button class="nav-main" onclick="toggleSub(this)">
+        <span>ملمس</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="nav-sub">
+        <button class="nav-sub-btn" onclick="loadPage('Theme-editor/Theme-editor.html', this)">محرر الثيمات</button>
+        <button class="nav-sub-btn" onclick="loadPage('emoticons/index.html', this)">رموز</button>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <button class="nav-main" onclick="toggleSub(this)">
+        <span>دردشة</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="nav-sub">
+        <button class="nav-sub-btn" onclick="loadPage('chat/chat.html', this)">الدردشة</button>
+        <button class="nav-sub-btn" onclick="loadPage('channels/index.html', this)">قنوات</button>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <button class="nav-main" onclick="loadPage('archives/index.html', this)">
+        <span>أرشيف</span>
+      </button>
+    </div>
+
+    <div class="nav-item">
+      <button class="nav-main" onclick="toggleSub(this)">
+        <span>خيارات</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="nav-sub">
+        <button class="nav-sub-btn" onclick="loadPage('filtering/index.html', this)">فلترة</button>
+        <button class="nav-sub-btn" onclick="loadPage('date-options/index.html', this)">تاريخ</button>
+        <button class="nav-sub-btn" onclick="loadPage('webhook/index.html', this)">Webhook</button>
+      </div>
+    </div>
+
+    <div class="nav-item">
+      <button class="nav-main" onclick="toggleSub(this)">
+        <span>حساب</span>
+        <span class="arrow">▼</span>
+      </button>
+      <div class="nav-sub">
+        <button class="nav-sub-btn" onclick="loadPage('login/index.html', this)">دخول</button>
+        <button class="nav-sub-btn" onclick="loadPage('signup/signup.html', this)">تسجيل</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="main-content">
+    <iframe id="content-frame" src="dashboard/index.html"></iframe>
+  </div>
+</div>
+
+<script>
+function toggleSub(btn) {
+  const sub = btn.nextElementSibling;
+  const isOpen = sub.classList.contains('open');
+  
+  // إغلاق كل القوائم
+  document.querySelectorAll('.nav-sub').forEach(s => s.classList.remove('open'));
+  document.querySelectorAll('.nav-main').forEach(b => b.classList.remove('open'));
+  
+  // فتح القائمة الحالية إذا كانت مغلقة
+  if (!isOpen) {
+    sub.classList.add('open');
+    btn.classList.add('open');
+  }
+}
+
+function loadPage(url, btn) {
+  document.getElementById('content-frame').src = url;
+  
+  document.querySelectorAll('.nav-sub-btn, .nav-main').forEach(b => b.classList.remove('active'));
+  if (btn) btn.classList.add('active');
+}
+</script>
+
 </body>
 </html>
