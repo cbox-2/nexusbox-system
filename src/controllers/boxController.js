@@ -43,9 +43,27 @@ exports.createBox = async (req, res) => {
       userAgent: req.headers['user-agent']
     });
     
+    // Ensure all fields are present in response
+    const boxData = {
+      _id: box._id,
+      id: box._id,
+      name: box.name,
+      slug: box.slug,
+      embedKey: box.embedKey,
+      ownerId: box.ownerId,
+      status: box.status,
+      theme: box.theme || {},
+      layout: box.layout || {},
+      publish: box.publish || {},
+      settings: box.settings || {},
+      stats: box.stats || {},
+      createdAt: box.createdAt,
+      updatedAt: box.updatedAt
+    };
+    
     res.status(201).json({ 
       success: true, 
-      box: box.toJSON() 
+      box: boxData 
     });
   } catch (error) {
     if (error.code === 11000) {
@@ -272,7 +290,7 @@ exports.getBoxByEmbedKey = async (req, res) => {
       embedKey: req.params.embedKey,
       status: 'active',
       'publish.enabled': true
-    }).select('-__v');
+    });
     
     if (!box) {
       return res.status(404).json({ 
@@ -284,17 +302,28 @@ exports.getBoxByEmbedKey = async (req, res) => {
     // Increment views
     await Box.findByIdAndUpdate(box._id, { $inc: { 'stats.totalViews': 1 } });
     
+    // Return full box data with all fields
     res.json({ 
       success: true, 
       box: {
+        _id: box._id,
         id: box._id,
-        name: box.name,
-        theme: box.theme,
-        layout: box.layout,
-        settings: box.settings
+        name: box.name || 'Untitled Box',
+        slug: box.slug || 'no-slug',
+        embedKey: box.embedKey || 'no-key',
+        ownerId: box.ownerId,
+        status: box.status || 'unknown',
+        theme: box.theme || {},
+        layout: box.layout || {},
+        publish: box.publish || {},
+        settings: box.settings || {},
+        stats: box.stats || {},
+        createdAt: box.createdAt,
+        updatedAt: box.updatedAt
       }
     });
   } catch (error) {
+    console.error('getBoxByEmbedKey error:', error);
     res.status(500).json({ 
       success: false, 
       error: error.message 

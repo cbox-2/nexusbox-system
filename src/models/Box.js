@@ -5,7 +5,7 @@ const boxSchema = new mongoose.Schema({
   name: { type: String, required: true, trim: true, maxlength: 50 },
   slug: { type: String, unique: true, lowercase: true, match: /^[a-z0-9-]+$/ },
   ownerId: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, index: true },
-  embedKey: { type: String, unique: true, default: () => require('crypto').randomBytes(16).toString('hex') },
+  embedKey: { type: String, unique: true, default: () => require('crypto').randomBytes(16).toString('hex'), default: () => require('crypto').randomBytes(16).toString('hex') },
   status: { type: String, default: 'active', enum: ['active', 'disabled', 'archived'] },
   
   theme: {
@@ -57,19 +57,31 @@ boxSchema.index({ slug: 1 }, { unique: true });
 boxSchema.index({ embedKey: 1 }, { unique: true });
 boxSchema.index({ status: 1 });
 
-// Auto-generate slug and embedKey
+// Auto-generate slug and embedKey before saving
 boxSchema.pre('save', function(next) {
-  if (this.isNew || this.isModified('name')) {
+  // Generate slug from name if missing
+  if (!this.slug && this.name) {
+    this.slug = this.name
+      .toLowerCase()
+      .trim()
+      .replace(/[\s\u0600-\u06FF]+/g, '-')  // Handle Arabic spaces too
+      .replace(/[^a-z0-9\-]/g, '')
+      .replace(/-{2,}/g, '-')
+      .replace(/^-|-$/g, '');
+    
+    // Fallback if slug is empty after cleaning
     if (!this.slug) {
-      this.slug = this.name
-        .toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-')
-        .replace(/(^-|-$)/g, '');
+      this.slug = 'box-' + Date.now().toString(36);
     }
   }
+  
+  // Generate embedKey if missing
   if (!this.embedKey) {
-    this.embedKey = require('crypto').randomBytes(16).toString('hex');
+    const crypto = require('crypto');
+    this.embedKey = crypto.randomBytes(16).toString('hex');
   }
+  
+  // Set timestamps
   this.updatedAt = new Date();
   next();
 });
