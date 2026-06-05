@@ -619,3 +619,210 @@ app.post('/api/integration/regenerate-key', authMiddleware, async (req, res) => 
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// ===== REGISTERED USER SETTINGS API =====
+const regUserSettingsSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  regOnly: { type: Boolean, default: false },
+  selfReg: { type: Boolean, default: true },
+  authFacebook: { type: Boolean, default: false },
+  lastPostDel: { type: Boolean, default: false },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const RegUserSettings = mongoose.model('RegUserSettings', regUserSettingsSchema);
+
+app.get('/api/registered-users/settings', authMiddleware, async (req, res) => {
+  try {
+    let settings = await RegUserSettings.findOne({ user: req.userId });
+    if (!settings) {
+      settings = new RegUserSettings({ user: req.userId });
+      await settings.save();
+    }
+    res.json({ success: true, settings });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/registered-users/settings', authMiddleware, async (req, res) => {
+  try {
+    const { regOnly, selfReg, authFacebook, lastPostDel } = req.body;
+    let settings = await RegUserSettings.findOne({ user: req.userId });
+    if (!settings) settings = new RegUserSettings({ user: req.userId });
+    if (regOnly !== undefined) settings.regOnly = regOnly;
+    if (selfReg !== undefined) settings.selfReg = selfReg;
+    if (authFacebook !== undefined) settings.authFacebook = authFacebook;
+    if (lastPostDel !== undefined) settings.lastPostDel = lastPostDel;
+    settings.updatedAt = new Date();
+    await settings.save();
+    res.json({ success: true, settings });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ===== REGISTERED USERS LIST API =====
+const registeredUserSchema = new mongoose.Schema({
+  owner: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  name: { type: String, required: true },
+  password: { type: String, required: true },
+  level: { type: Number, default: 2, enum: [2, 3, 4, 5] }, // 2=Regular, 3=Mod, 4=Admin, 5=Bot
+  voiced: { type: Boolean, default: false },
+  lastUsed: { type: Date },
+  lastIP: { type: String, default: '' },
+  registeredAt: { type: Date, default: Date.now }
+});
+
+registeredUserSchema.pre('save', async function(next) {
+  if (!this.isModified('password')) return next();
+  const salt = await bcrypt.genSalt(10);
+  this.password = await bcrypt.hash(this.password, salt);
+  next();
+});
+
+registeredUserSchema.methods.comparePassword = async function(candidatePassword) {
+  return await bcrypt.compare(candidatePassword, this.password);
+};
+
+registeredUserSchema.methods.toJSON = function() {
+  const obj = this.toObject();
+  delete obj.password;
+  return obj;
+};
+
+const RegisteredUser = mongoose.model('RegisteredUser', registeredUserSchema);
+
+app.get('/api/registered-users', authMiddleware, async (req, res) => {
+  try {
+    const { srch, srchin } = req.query;
+    let query = { owner: req.userId };
+    
+    if (srch && srchin) {
+      if (srchin === 'nme') {
+        query.name = { $regex: srch, $options: 'i' };
+      } else if (srchin === 'lastip') {
+        query.lastIP = { $regex: srch, $options: 'i' };
+      }
+    }
+    
+    const users = await RegisteredUser.find(query).sort({ registeredAt: -1 });
+    res.json({ success: true, count: users.length, users });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/registered-users', authMiddleware, async (req, res) => {
+  try {
+    const { uname, pword, lvl } = req.body;
+    
+    if (!uname || !pword) {
+      return res.status(400).json({ success: false, error: 'Name and password are required' });
+    }
+    
+    const existing = await RegisteredUser.findOne({ owner: req.userId, name: uname });
+    if (existing) {
+      return res.status(400).json({ success: false, error: 'Username already exists' });
+    }
+    
+    const level = parseInt(lvl) || 2;
+    if (![2, 3, 4, 5].includes(level)) {
+      return res.status(400).json({ success: false, error: 'Invalid user level' });
+    }
+    
+    const user = new RegisteredUser({
+      owner: req.userId,
+      name: uname,
+      password: pword,
+      level: level
+    });
+    
+    await user.save();
+    res.status(201).json({ success: true, user: user.toJSON() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/registered-users/bulk', authMiddleware, async (req, res) => {
+  try {
+    const { action, ids } = req.body;
+    
+    if (!action || !ids || !Array.isArray(ids)) {
+      return res.status(400).json({ success: false, error: 'Invalid request' });
+    }
+    
+    let result;
+    
+    switch (action) {
+      case 'delete':
+        result = await RegisteredUser.deleteMany({ _id: { $in: ids }, owner: req.userId });
+        res.json({ success: true, message: `Deleted ${result.deletedCount} user(s)` });
+        break;
+        
+      case 'voice':
+        await RegisteredUser.updateMany(
+          { _id: { $in: ids }, owner: req.userId },
+          { $set: { voiced: true } }
+        );
+        res.json({ success: true, message: 'Voiced selected users' });
+        break;
+        
+      case 'unvoice':
+        await RegisteredUser.updateMany(
+          { _id: { $in: ids }, owner: req.userId },
+          { $set: { voiced: false } }
+        );
+        res.json({ success: true, message: 'Unvoiced selected users' });
+        break;
+        
+      case 'mod':
+        await RegisteredUser.updateMany(
+          { _id: { $in: ids }, owner: req.userId },
+          { $set: { level: 3 } }
+        );
+        res.json({ success: true, message: 'Mod status toggled' });
+        break;
+        
+      case 'unmod':
+        await RegisteredUser.updateMany(
+          { _id: { $in: ids }, owner: req.userId },
+          { $set: { level: 2 } }
+        );
+        res.json({ success: true, message: 'Mod status removed' });
+        break;
+        
+      case 'admin':
+        await RegisteredUser.updateMany(
+          { _id: { $in: ids }, owner: req.userId },
+          { $set: { level: 4 } }
+        );
+        res.json({ success: true, message: 'Admin status toggled' });
+        break;
+        
+      case 'unadmin':
+        await RegisteredUser.updateMany(
+          { _id: { $in: ids }, owner: req.userId },
+          { $set: { level: 2 } }
+        );
+        res.json({ success: true, message: 'Admin status removed' });
+        break;
+        
+      default:
+        res.status(400).json({ success: false, error: 'Invalid action' });
+    }
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/registered-users/:id', authMiddleware, async (req, res) => {
+  try {
+    const user = await RegisteredUser.findOneAndDelete({ _id: req.params.id, owner: req.userId });
+    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+    res.json({ success: true, message: 'User deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});

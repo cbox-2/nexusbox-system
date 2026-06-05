@@ -1,207 +1,626 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>المستخدمون المسجلون · NexusBox</title>
-<link rel="stylesheet" href="style.css">
+<html lang="en"><head>
+<title>Registered Users · NexusBox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta name="description" content="NexusBox Registered Users Management">
+<link rel="stylesheet" href="/shared/toolbar.css">
 <style>
-body { background-color: #1e1b4b !important; padding-top: 20px !important; color: white; }
-.user-list { margin-top: 20px; }
-.user-item {
-  background: rgba(255,255,255,0.1);
-  padding: 15px;
-  margin-bottom: 10px;
-  border-radius: 8px;
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-}
-.user-info { flex: 1; }
-.user-actions { display: flex; gap: 10px; }
-.btn {
-  padding: 8px 15px;
-  border: none;
-  border-radius: 5px;
-  cursor: pointer;
-  font-size: 13px;
-}
-.btn-edit { background: #4a7fb5; color: white; }
-.btn-delete { background: #dc3545; color: white; }
-.btn-ban { background: #ffc107; color: black; }
-.btn:hover { opacity: 0.8; }
-.add-user-form {
-  background: rgba(255,255,255,0.1);
-  padding: 20px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-.form-group { margin-bottom: 15px; }
-.form-group label { display: block; margin-bottom: 5px; }
-.form-group input, .form-group select {
-  width: 100%;
-  padding: 10px;
-  background: rgba(255,255,255,0.1);
-  border: 1px solid rgba(255,255,255,0.2);
-  border-radius: 5px;
-  color: white;
-}
+.user-row { padding: 8px; border-bottom: 1px solid #eee; display: flex; align-items: center; gap: 10px; }
+.user-row:hover { background: #f9f9f9; }
+.user-row input[type="checkbox"] { margin: 0; }
+.user-name { font-weight: bold; min-width: 120px; }
+.user-level { min-width: 100px; color: #666; }
+.user-date { color: #999; font-size: 11px; }
+.user-ip { color: #999; font-size: 11px; }
+.user-voiced { color: #a6d83f; font-weight: bold; }
+.user-list-container { max-height: 500px; overflow-y: auto; border: 1px solid #ddd; background: #fff; }
+.empty-list { padding: 20px; text-align: center; color: #999; }
 </style>
 </head>
-<body>
+<body id="mainbody">
 
-<div id="main">
-  <h1>المستخدمون المسجلون</h1>
-  <p>إدارة المستخدمين المسجلين في النظام</p>
-  
-  <div class="add-user-form">
-    <h3>إضافة مستخدم جديد</h3>
-    <form id="add-user-form">
-      <div class="form-group">
-        <label>اسم المستخدم</label>
-        <input type="text" id="new-username" required>
-      </div>
-      <div class="form-group">
-        <label>البريد الإلكتروني</label>
-        <input type="email" id="new-email" required>
-      </div>
-      <div class="form-group">
-        <label>الصلاحية</label>
-        <select id="new-role">
-          <option value="user">مستخدم</option>
-          <option value="moderator">مشرف</option>
-          <option value="admin">مدير</option>
-        </select>
-      </div>
-      <button type="submit" class="btn btn-edit">إضافة مستخدم</button>
-    </form>
-  </div>
-  
-  <div class="user-list" id="user-list">
-    <p>جاري تحميل المستخدمين...</p>
-  </div>
+<script>
+var rcvdformresponse = function () {};
+</script>
+
+<div id="mask"></div>
+
+<div id="popovr_box">
+<div class="wrap">
+<div style="padding: 20px; background-color: #fff">
+<div id="popovr_title"></div>
+<div id="popovr_text" style="text-align: left; clear:both"></div>
+<div id="popovr_t_login" style="display: none; text-align: left; clear:both">
+<p>Your session has expired. Please log back in to continue.</p>
+<form id="qlpop-form" onsubmit="return quickLogin(event)">
+<fieldset>
+<label>Username:</label>
+<input type="text" name="uname" id="ql-uname" maxlength="50" class="txtbox">
+<label>Password:</label>
+<input type="password" name="pword" id="ql-pword" maxlength="50" class="txtbox">
+<input type="submit" name="sub" value=" Log in ">
+<div id="m_qlpop" class="frmmsg1"></div>
+<div id="em_qlpop" class="frmmsg2"></div>
+</fieldset>
+</form>
+</div>
+</div>
+</div>
 </div>
 
-<script src="code.js"></script>
+<div id="bodywrap">
+<div id="header">
+<div class="wrap">
+<a id="logo" href="/dashboard/index.html">
+<span style="color:#fff;font-size:24px;font-weight:bold">NexusBox</span>
+</a>
+<div id="headerExtras">
+<span id="userWelcome">جاري التحميل...</span>
+<a href="/dashboard/index.html">My Cboxes</a>
+<a href="#" onclick="globalLogout(); return false;">Log out</a>
+</div>
+</div>
+</div>
+
+<div id="subbar">
+<div class="wrap">
+<a href="/dashboard/index.html" class="submenuitem"><b id="cbox-name">MSASDWEC2015HKARNO</b></a>
+<a href="/publish/publish.html" class="submenuitem">Publish</a>
+<a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+<a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options</a>
+<a href="#" id="hovmenu3" class="submenuitem active" onmousedown="return hovmenu(this, 3)">Users</a>
+<a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages</a>
+</div>
+</div>
+<div id="bar3">
+<div id="hovmenu" class="wrap"><a></a></div>
+</div>
+
+<div id="wideimg" style="position: relative; width: 100%; left: 0"></div>
+
+<div id="main" class="wrap">
+<div id="content">
+
+<h1>Registered users</h1>
+
+<p>
+Add or remove registered users and delegate moderator authority. 
+Users registered here log in with their names on your NexusBox. Mod and admin users are able to delete messages and ban users. 
+</p>
+
+<form id="fuseropt-form" onsubmit="return saveUserOptions(event)">
+
+<fieldset class="Short">
+<div class="fsInlineHelp"><a href="#" title="Get help on this section">?</a></div>
+<legend>User options</legend>
+
+<label for="i_regonly"> Users must be registered to post:</label>
+<div class="slideThree"><input type="checkbox" name="regonly" value="1" id="i_regonly"><label></label></div>
+
+<label for="i_selfreg"> Users can password-protect their names:</label>
+<div class="slideThree"><input type="checkbox" name="selfreg" value="1" id="i_selfreg" checked="checked"><label></label></div>
+
+<label for="i_auth_fb"> Users can authenticate via Facebook:</label>
+<div class="slideThree"><input type="checkbox" name="auth_fb" value="1" id="i_auth_fb"><label></label></div>
+
+<label for="i_lpdel"> Registered users can delete their own recent messages:</label>
+  <div class="slideThree"><input type="checkbox" name="lastpostdel" value="1" id="i_lpdel"><label></label></div>
+  
+  <input type="submit" name="sub" value=" Save ">
+  <div id="m_fuseropt" class="frmmsg1"></div>
+  <div id="em_fuseropt" class="frmmsg2"></div>
+  
+</fieldset>
+</form>
+
+
+<form id="fuseradd-form" onsubmit="return addNewUser(event)">
+
+<fieldset>
+<div class="fsInlineHelp"><a href="#" title="Get help on this section">?</a></div>
+<legend>Register a new user</legend>
+
+<label>Name:</label>
+<input type="text" name="uname" id="new-uname" maxlength="25" size="25" tabindex="100" class="txtbox">
+
+<label>Password:</label>
+<input type="password" name="pword" id="new-pword" maxlength="50" size="25" tabindex="101" class="txtbox">
+
+<label>User type:</label>
+<select class="txtbox" name="lvl" id="new-lvl">
+<option value="2" selected="selected">Regular user</option>
+<option value="3">Moderator</option>
+<option value="4">Administrator</option>
+<option value="5">Bot user</option>
+</select>
+
+  <input type="submit" name="sub" value=" Add " tabindex="102">
+
+  <div id="m_fuseradd" class="frmmsg1"></div>
+  <div id="em_fuseradd" class="frmmsg2"></div>
+
+</fieldset>
+</form>
+
+
+
+<fieldset>
+<legend>Registered users</legend>
+
+<table class="dHead">
+<tbody><tr>
+<td>
+<a href="javascript:selectAllUsers()">Select All</a> | 
+<a href="javascript:toggleSearch()">Search</a> | 
+<a href="javascript:loadRegisteredUsers()">Refresh</a>
+</td>
+<td>With selected: 
+<a href="javascript:bulkAction('delete')">Delete</a> | 
+<a href="javascript:bulkAction('voice')">(Un-)Voice</a> | 
+<a href="javascript:bulkAction('mod')">(Un-)Mod</a> | 
+<a href="javascript:bulkAction('admin')">(Un-)Admin</a>
+</td>
+</tr>
+<tr id="srchusers" style="display:none">
+<td colspan="2" align="center"><br>Search for: <input type="text" id="srch-input" maxlength="100" size="30" class="txtbox"> in <select id="srchin-select" class="txtbox"><option value="nme" selected="selected">Name</option><option value="status">Status</option><option value="lastused">Date Last Used</option><option value="regged">Date Registered</option><option value="lastip">Last IP</option></select>&nbsp;<input type="button" name="find" value=" Find " onclick="loadRegisteredUsers()"></td>
+</tr>
+</tbody></table>
+
+<div class="user-list-container" id="user-list">
+<div class="empty-list">Loading users...</div>
+</div>
+
+</fieldset>
+
+</div>
+<div style="clear: both"></div>
+</div>
+</div>
+
+<div id="siteErrorBar"><div class="wrap" id="siteErrorBarCont">Loading...</div></div>
+
+<div id="footer">
+<a href="#">About</a>
+<a href="#">Plans &amp; pricing</a>
+<a href="#">Terms &amp; conditions</a>
+<a href="#">Privacy policy</a>
+<a href="#">Notices</a>
+<a href="#">Contact us</a>
+<div class="verybottom">
+© 2004–2026 NexusBox Communications, all rights reserved.
+</div>
+</div>
+
+<script src="/shared/toolbar.js"></script>
+<script src="/shared/auth.js"></script>
 <script>
-const token = localStorage.getItem('token');
+var currentUser = null;
+var allUsers = [];
+var selectedUsers = [];
 
-// تحميل المستخدمين
-async function loadUsers() {
-  try {
-    const res = await fetch('/api/auth/users', {
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    const data = await res.json();
-    
-    if (data.success) {
-      const userList = document.getElementById('user-list');
-      userList.innerHTML = '';
-      
-      data.users.forEach(user => {
-        const userItem = document.createElement('div');
-        userItem.className = 'user-item';
-        userItem.innerHTML = `
-          <div class="user-info">
-            <strong>${user.username}</strong>
-            <br>
-            <small>${user.email} | ${user.role} | ${user.status}</small>
-          </div>
-          <div class="user-actions">
-            <button class="btn btn-ban" onclick="toggleBan('${user._id}', '${user.status}')">
-              ${user.status === 'active' ? 'حظر' : 'تفعيل'}
-            </button>
-            <button class="btn btn-delete" onclick="deleteUser('${user._id}')">حذف</button>
-          </div>
-        `;
-        userList.appendChild(userItem);
-      });
-    }
-  } catch (error) {
-    console.error('Error loading users:', error);
-  }
-}
+var hovmenu = function(btn, menuId) {
+var menus = {
+1: [
+{ text: 'Layout', href: '/layout-options/layout-options.html' },
+{ text: 'Theme', href: '/Theme-editor/Theme-editor.html' },
+{ text: 'Emoticons', href: '/emoticons/index.html' }
+],
+2: [
+{ text: 'Posting', href: '/posting-options/index.html' },
+{ text: 'Date', href: '/date-options/index.html' },
+{ text: 'Filtering', href: '/filtering/index.html' },
+{ text: 'Sticky Message', href: '/sticky-message/index.html' },
+{ text: 'Webhook', href: '/webhook/index.html' }
+],
+3: [
+{ text: 'Registered Users', href: '/registered-users/registered-users.html', active: true },
+{ text: 'User Integration', href: '/user-integration/user-integration.html' },
+{ text: 'Bans', href: '/bans/index.html' }
+],
+4: [
+{ text: 'Messages', href: '/messages/index.html' },
+{ text: 'Archives', href: '/archives/index.html' },
+{ text: 'Chat', href: '/chat/chat.html' },
+{ text: 'Channels', href: '/channels/index.html' }
+]
+};
 
-// إضافة مستخدم
-document.getElementById('add-user-form').addEventListener('submit', async function(e) {
-  e.preventDefault();
-  
-  const username = document.getElementById('new-username').value;
-  const email = document.getElementById('new-email').value;
-  const role = document.getElementById('new-role').value;
-  
-  try {
-    const res = await fetch('/api/auth/signup', {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({ username, email, password: 'TempPass123', role })
-    });
-    
-    const data = await res.json();
-    
-    if (data.success) {
-      alert('تم إضافة المستخدم بنجاح!');
-      loadUsers();
-      this.reset();
-    } else {
-      alert('خطأ: ' + data.error);
-    }
-  } catch (error) {
-    alert('خطأ في الاتصال');
-  }
+var hovmenuDiv = document.getElementById('hovmenu');
+var items = menus[menuId] || [];
+
+hovmenuDiv.innerHTML = '';
+items.forEach(function(item) {
+var a = document.createElement('a');
+a.href = item.href;
+a.className = 'submenuitem' + (item.active ? ' active' : '');
+a.textContent = item.text;
+hovmenuDiv.appendChild(a);
 });
 
-// حظر/تفعيل مستخدم
-async function toggleBan(userId, currentStatus) {
-  const newStatus = currentStatus === 'active' ? 'banned' : 'active';
-  
-  try {
-    const res = await fetch(`/api/auth/users/${userId}/status`, {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json',
-        'Authorization': 'Bearer ' + token
-      },
-      body: JSON.stringify({ status: newStatus })
-    });
-    
-    const data = await res.json();
-    
-    if (data.success) {
-      alert(newStatus === 'banned' ? 'تم حظر المستخدم' : 'تم تفعيل المستخدم');
-      loadUsers();
-    }
-  } catch (error) {
-    alert('خطأ في الاتصال');
-  }
+return false;
+};
+
+document.addEventListener('click', function(e) {
+if (!e.target.closest('#subbar') && !e.target.closest('#bar3')) {
+document.getElementById('hovmenu').innerHTML = '';
+}
+});
+
+function getLevelName(level) {
+switch(level) {
+case 2: return 'Regular user';
+case 3: return 'Moderator';
+case 4: return 'Administrator';
+case 5: return 'Bot user';
+default: return 'Unknown';
+}
 }
 
-// حذف مستخدم
-async function deleteUser(userId) {
-  if (!confirm('هل أنت متأكد من حذف هذا المستخدم؟')) return;
-  
-  try {
-    const res = await fetch(`/api/auth/users/${userId}`, {
-      method: 'DELETE',
-      headers: { 'Authorization': 'Bearer ' + token }
-    });
-    
-    const data = await res.json();
-    
-    if (data.success) {
-      alert('تم حذف المستخدم');
-      loadUsers();
-    }
-  } catch (error) {
-    alert('خطأ في الاتصال');
-  }
+function formatDate(dateStr) {
+if (!dateStr) return '-';
+var d = new Date(dateStr);
+return d.toLocaleDateString() + ' ' + d.toLocaleTimeString();
 }
 
-// تحميل المستخدمين عند فتح الصفحة
-loadUsers();
+// ===== Load User Info =====
+async function loadUserInfo() {
+const token = localStorage.getItem('token');
+if (!token) {
+window.location.href = '/login/index.html';
+return;
+}
+
+try {
+const res = await fetch('/api/auth/me', {
+headers: { 'Authorization': 'Bearer ' + token }
+});
+const data = await res.json();
+
+if (!data.success) {
+localStorage.removeItem('token');
+window.location.href = '/login/index.html';
+return;
+}
+
+currentUser = data.user;
+document.getElementById('userWelcome').textContent = data.user.email || data.user.username;
+document.getElementById('cbox-name').textContent = data.user.username.toUpperCase();
+
+loadUserOptions();
+loadRegisteredUsers();
+} catch (error) {
+console.error('Error loading user:', error);
+}
+}
+
+// ===== Load User Options =====
+async function loadUserOptions() {
+const token = localStorage.getItem('token');
+
+try {
+const res = await fetch('/api/registered-users/settings', {
+headers: { 'Authorization': 'Bearer ' + token }
+});
+const data = await res.json();
+
+if (data.success) {
+var s = data.settings;
+document.getElementById('i_regonly').checked = s.regOnly || false;
+document.getElementById('i_selfreg').checked = s.selfReg !== false;
+document.getElementById('i_auth_fb').checked = s.authFacebook || false;
+document.getElementById('i_lpdel').checked = s.lastPostDel || false;
+}
+} catch (error) {
+console.error('Error loading user options:', error);
+}
+}
+
+// ===== Save User Options =====
+async function saveUserOptions(event) {
+if (event) event.preventDefault();
+
+const token = localStorage.getItem('token');
+const msgDiv = document.getElementById('m_fuseropt');
+const errDiv = document.getElementById('em_fuseropt');
+
+msgDiv.textContent = '';
+errDiv.innerHTML = '';
+msgDiv.className = 'frmmsg1';
+errDiv.className = 'frmmsg2';
+
+try {
+const res = await fetch('/api/registered-users/settings', {
+method: 'PUT',
+headers: {
+'Content-Type': 'application/json',
+'Authorization': 'Bearer ' + token
+},
+body: JSON.stringify({
+regOnly: document.getElementById('i_regonly').checked,
+selfReg: document.getElementById('i_selfreg').checked,
+authFacebook: document.getElementById('i_auth_fb').checked,
+lastPostDel: document.getElementById('i_lpdel').checked
+})
+});
+
+const data = await res.json();
+
+if (data.success) {
+msgDiv.textContent = 'Saved successfully!';
+msgDiv.className = 'frmmsg1 Okay';
+} else {
+errDiv.innerHTML = '<ul><li>' + data.error + '</li></ul>';
+errDiv.className = 'frmmsg2 Error';
+}
+} catch (error) {
+errDiv.innerHTML = '<ul><li>Connection error</li></ul>';
+errDiv.className = 'frmmsg2 Error';
+}
+
+return false;
+}
+
+// ===== Add New User =====
+async function addNewUser(event) {
+if (event) event.preventDefault();
+
+const token = localStorage.getItem('token');
+const msgDiv = document.getElementById('m_fuseradd');
+const errDiv = document.getElementById('em_fuseradd');
+
+msgDiv.textContent = '';
+errDiv.innerHTML = '';
+msgDiv.className = 'frmmsg1';
+errDiv.className = 'frmmsg2';
+
+var uname = document.getElementById('new-uname').value.trim();
+var pword = document.getElementById('new-pword').value;
+var lvl = document.getElementById('new-lvl').value;
+
+if (!uname || !pword) {
+errDiv.innerHTML = '<ul><li>Name and password are required</li></ul>';
+errDiv.className = 'frmmsg2 Error';
+return false;
+}
+
+try {
+const res = await fetch('/api/registered-users', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+'Authorization': 'Bearer ' + token
+},
+body: JSON.stringify({ uname, pword, lvl })
+});
+
+const data = await res.json();
+
+if (data.success) {
+msgDiv.textContent = 'User added successfully!';
+msgDiv.className = 'frmmsg1 Okay';
+document.getElementById('new-uname').value = '';
+document.getElementById('new-pword').value = '';
+loadRegisteredUsers();
+} else {
+errDiv.innerHTML = '<ul><li>' + data.error + '</li></ul>';
+errDiv.className = 'frmmsg2 Error';
+}
+} catch (error) {
+errDiv.innerHTML = '<ul><li>Connection error</li></ul>';
+errDiv.className = 'frmmsg2 Error';
+}
+
+return false;
+}
+
+// ===== Load Registered Users =====
+async function loadRegisteredUsers() {
+const token = localStorage.getItem('token');
+const userList = document.getElementById('user-list');
+
+var srch = document.getElementById('srch-input').value.trim();
+var srchin = document.getElementById('srchin-select').value;
+
+var url = '/api/registered-users';
+if (srch) {
+url += '?srch=' + encodeURIComponent(srch) + '&srchin=' + encodeURIComponent(srchin);
+}
+
+try {
+const res = await fetch(url, {
+headers: { 'Authorization': 'Bearer ' + token }
+});
+const data = await res.json();
+
+if (data.success) {
+allUsers = data.users;
+selectedUsers = [];
+renderUserList();
+} else {
+userList.innerHTML = '<div class="empty-list">Error loading users</div>';
+}
+} catch (error) {
+userList.innerHTML = '<div class="empty-list">Connection error</div>';
+}
+}
+
+// ===== Render User List =====
+function renderUserList() {
+var userList = document.getElementById('user-list');
+
+if (allUsers.length === 0) {
+userList.innerHTML = '<div class="empty-list">No registered users yet</div>';
+return;
+}
+
+userList.innerHTML = '';
+
+allUsers.forEach(function(user) {
+var row = document.createElement('div');
+row.className = 'user-row';
+
+var levelName = getLevelName(user.level);
+var levelColor = user.level === 4 ? '#E50913' : (user.level === 3 ? '#339966' : '#666');
+
+row.innerHTML = 
+'<input type="checkbox" class="user-checkbox" data-id="' + user._id + '" onchange="updateSelection()">' +
+'<span class="user-name">' + user.name + '</span>' +
+'<span class="user-level" style="color:' + levelColor + '">' + levelName + '</span>' +
+(user.voiced ? '<span class="user-voiced">Voiced</span>' : '') +
+'<span class="user-date">Registered: ' + formatDate(user.registeredAt) + '</span>' +
+'<span class="user-ip">Last IP: ' + (user.lastIP || '-') + '</span>';
+
+userList.appendChild(row);
+});
+}
+
+// ===== Update Selection =====
+function updateSelection() {
+selectedUsers = [];
+document.querySelectorAll('.user-checkbox:checked').forEach(function(cb) {
+selectedUsers.push(cb.getAttribute('data-id'));
+});
+}
+
+// ===== Select All Users =====
+function selectAllUsers() {
+var checkboxes = document.querySelectorAll('.user-checkbox');
+var allChecked = true;
+
+checkboxes.forEach(function(cb) {
+if (!cb.checked) allChecked = false;
+});
+
+checkboxes.forEach(function(cb) {
+cb.checked = !allChecked;
+});
+
+updateSelection();
+}
+
+// ===== Toggle Search =====
+function toggleSearch() {
+var d = document.getElementById('srchusers');
+if (d.style.display === 'none') {
+d.style.display = '';
+} else {
+d.style.display = 'none';
+}
+}
+
+// ===== Bulk Action =====
+async function bulkAction(action) {
+if (selectedUsers.length === 0) {
+alert('Please select at least one user');
+return;
+}
+
+var confirmMsg = '';
+switch(action) {
+case 'delete':
+confirmMsg = 'Are you sure you want to delete the selected user(s)?';
+break;
+case 'voice':
+confirmMsg = 'Toggle voice status for selected user(s)?';
+break;
+case 'mod':
+confirmMsg = 'Toggle moderator status for selected user(s)?';
+break;
+case 'admin':
+confirmMsg = 'Toggle admin status for selected user(s)?';
+break;
+}
+
+if (!confirm(confirmMsg)) return;
+
+const token = localStorage.getItem('token');
+
+try {
+const res = await fetch('/api/registered-users/bulk', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+'Authorization': 'Bearer ' + token
+},
+body: JSON.stringify({ action: action, ids: selectedUsers })
+});
+
+const data = await res.json();
+
+if (data.success) {
+alert(data.message);
+loadRegisteredUsers();
+} else {
+alert('Error: ' + data.error);
+}
+} catch (error) {
+alert('Connection error');
+}
+}
+
+// ===== Quick Login =====
+async function quickLogin(e) {
+e.preventDefault();
+var uname = document.getElementById('ql-uname').value;
+var pword = document.getElementById('ql-pword').value;
+
+try {
+const res = await fetch('/api/auth/login', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ username: uname, password: pword })
+});
+
+const data = await res.json();
+
+if (data.success) {
+localStorage.setItem('token', data.token);
+localStorage.setItem('user', JSON.stringify(data.user));
+document.getElementById('popovr_box').style.display = 'none';
+location.reload();
+} else {
+document.getElementById('em_qlpop').innerHTML = '<ul><li>' + data.error + '</li></ul>';
+document.getElementById('em_qlpop').className = 'frmmsg2 Error';
+}
+} catch (error) {
+document.getElementById('em_qlpop').innerHTML = '<ul><li>Connection error</li></ul>';
+}
+
+return false;
+}
+
+function logout() {
+globalLogout();
+return false;
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+loadUserInfo();
+});
+
+if (window.isPopup) {
+document.body.className = "Popped";
+}
+
+var dropCrumb = function () {
+if (!localStorage) return;
+var bc = getCrumbs();
+bc.push(location.href);
+bc.splice(0, bc.length - 5);
+localStorage.setItem("site:bread", JSON.stringify(bc));
+};
+
+var getCrumbs = function () {
+if (!localStorage) return [];
+var bcStr = localStorage.getItem("site:bread");
+var bc = [];
+if (bcStr) bc = JSON.parse(bcStr);
+return bc;
+};
+
+dropCrumb();
 </script>
-</body>
-</html>
+
+</body></html>
