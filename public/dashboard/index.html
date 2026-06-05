@@ -18,7 +18,7 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
   background: #323232;
   border: 1px solid #444;
   border-radius: 4px;
-  min-width: 180px;
+  min-width: 200px;
   z-index: 1000;
   box-shadow: 0 4px 8px rgba(0,0,0,0.3);
   padding: 5px 0;
@@ -49,7 +49,7 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
 #content-frame {
   display: none;
   width: 100%;
-  height: 600px;
+  height: 700px;
   border: none;
   background: #fff;
   border-radius: 4px;
@@ -72,6 +72,8 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
 
 <div id="subbar" dir="ltr">
   <div class="wrap">
+
+    <!-- Dashboard -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem active" data-menu="dashboard"><b>MSASDWEC2015HKARNO</b></a>
       <div class="dropdown-menu" id="menu-dashboard">
@@ -79,6 +81,7 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
       </div>
     </div>
 
+    <!-- Publish -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="publish">Publish</a>
       <div class="dropdown-menu" id="menu-publish">
@@ -87,6 +90,7 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
       </div>
     </div>
 
+    <!-- Look & Feel -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="lookfeel">Look & feel</a>
       <div class="dropdown-menu" id="menu-lookfeel">
@@ -96,32 +100,36 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
       </div>
     </div>
 
+    <!-- Options -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="options">Options</a>
       <div class="dropdown-menu" id="menu-options">
         <a href="/filtering/index.html">الفلترة</a>
         <a href="/date-options/index.html">خيارات التاريخ</a>
+        <a href="/sticky-message/index.html">الرسائل المثبتة</a>
         <a href="/webhook/index.html">Webhook</a>
       </div>
     </div>
 
+    <!-- Users -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="users">Users</a>
       <div class="dropdown-menu" id="menu-users">
         <a href="/registered-users/registered-users.html">المستخدمون المسجلون</a>
+        <a href="/user-integration/user-integration.html">تكامل المستخدمين</a>
         <a href="/bans/index.html">المحظورون</a>
-        <a href="/user-integration/user-integration.html">التكامل</a>
       </div>
     </div>
 
+    <!-- Messages -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="messages">Messages</a>
       <div class="dropdown-menu" id="menu-messages">
         <a href="/messages/index.html">الرسائل</a>
-        <a href="/sticky-message/index.html">الرسائل المثبتة</a>
       </div>
     </div>
 
+    <!-- Chat -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="chat">Chat</a>
       <div class="dropdown-menu" id="menu-chat">
@@ -130,6 +138,7 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
       </div>
     </div>
 
+    <!-- Archives -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="archives">Archives</a>
       <div class="dropdown-menu" id="menu-archives">
@@ -137,6 +146,7 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
       </div>
     </div>
 
+    <!-- Account -->
     <div class="submenu-wrapper">
       <a href="#" class="submenuitem" data-menu="account">Account</a>
       <div class="dropdown-menu" id="menu-account">
@@ -144,6 +154,7 @@ body { background-color: #1e1b4b !important; padding-top: 120px !important; }
         <a href="/signup/signup.html">إنشاء حساب</a>
       </div>
     </div>
+
   </div>
 </div>
 
