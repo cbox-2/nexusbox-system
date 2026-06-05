@@ -1,4 +1,4 @@
-// ===== NexusBox Navigation System v4 - Fixed =====
+// ===== NexusBox Navigation System - Production Ready =====
 (function() {
   'use strict';
   
@@ -36,21 +36,15 @@
     if (!items) return false;
     
     container.innerHTML = '';
-    container.style.display = 'block';
+    container.style.display = 'flex';
     
-    items.forEach(function(item) {
+    for (var i = 0; i < items.length; i++) {
       var link = document.createElement('a');
-      link.href = item.href;
+      link.href = items[i].href;
       link.className = 'submenuitem';
-      link.textContent = item.text;
-      // Prevent default and navigate
-      link.onclick = function(e) {
-        e.preventDefault();
-        window.location.href = item.href;
-        return false;
-      };
+      link.textContent = items[i].text;
       container.appendChild(link);
-    });
+    }
     
     return false;
   }
@@ -64,50 +58,37 @@
   }
 
   function init() {
-    console.log('🚀 Navigation system v4 initializing...');
-    
     var subbar = document.getElementById('subbar');
-    if (!subbar) {
-      console.error('❌ subbar not found');
-      return;
-    }
+    if (!subbar) return;
 
-    // Get current page path
-    var currentPath = window.location.pathname;
-    console.log('Current path:', currentPath);
-
-    // Handle all clicks in subbar
+    // Event delegation - handle ALL clicks
     subbar.addEventListener('click', function(e) {
       var target = e.target;
       
       // Find closest submenuitem
       while (target && target !== subbar) {
-        if (target.classList && target.classList.contains('submenuitem')) {
-          break;
-        }
+        if (target.classList && target.classList.contains('submenuitem')) break;
         target = target.parentElement;
       }
       
       if (!target || target === subbar) return;
       
-      // Check if it's a dropdown button (hovmenu1-4)
-      var btnId = target.id;
-      if (btnId && btnId.startsWith('hovmenu')) {
-        var menuId = parseInt(btnId.replace('hovmenu', ''));
-        if (menuId >= 1 && menuId <= 4) {
-          e.preventDefault();
-          e.stopPropagation();
-          console.log('Opening menu', menuId);
-          showMenu(menuId);
-          return false;
-        }
+      // Check if it's a dropdown button
+      var id = target.id || '';
+      var match = id.match(/^hovmenu(\d)$/);
+      
+      if (match) {
+        e.preventDefault();
+        e.stopPropagation();
+        var menuId = parseInt(match[1]);
+        showMenu(menuId);
+        return false;
       }
       
-      // For regular links (Publish, Dashboard, etc), let them navigate
+      // Regular links - let them navigate naturally
       var href = target.getAttribute('href');
-      if (href && href !== '#' && !href.startsWith('javascript')) {
-        console.log('Navigating to:', href);
-        // Don't prevent default - let the link work normally
+      if (href && href !== '#' && href.indexOf('javascript') !== 0) {
+        // Let browser handle navigation
         return true;
       }
       
@@ -115,7 +96,7 @@
       return false;
     });
 
-    // Close menu when clicking outside
+    // Close menu on outside click
     document.addEventListener('click', function(e) {
       var subbar = document.getElementById('subbar');
       var bar3 = document.getElementById('bar3');
@@ -125,17 +106,15 @@
     });
 
     // Set active state
+    var currentPath = window.location.pathname;
     var allLinks = subbar.querySelectorAll('.submenuitem');
-    allLinks.forEach(function(link) {
-      link.classList.remove('active');
+    for (var i = 0; i < allLinks.length; i++) {
+      var link = allLinks[i];
       var href = link.getAttribute('href');
-      if (href && currentPath.includes(href)) {
+      if (href && currentPath.indexOf(href) !== -1 && href !== '#') {
         link.classList.add('active');
-        console.log('Active:', href);
       }
-    });
-
-    console.log('✅ Navigation system v4 ready');
+    }
   }
 
   if (document.readyState === 'loading') {
@@ -175,7 +154,7 @@ async function loadUserInfo() {
     if (cn) cn.textContent = data.user.username.toUpperCase();
     return data.user;
   } catch(e) {
-    console.error('Error loading user:', e);
+    console.error('Error:', e);
     return null;
   }
 }

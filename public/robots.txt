@@ -3,5 +3,6 @@ Allow: /
 Disallow: /api/
 Disallow: /login/
 Disallow: /signup/
+Disallow: /dashboard/
 
 Sitemap: https://nexusbox-system-production-c290.up.railway.app/sitemap.xml
