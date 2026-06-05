@@ -1,0 +1,209 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusBox Embed</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { 
+  font-family: 'Segoe UI', Tahoma, sans-serif; 
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); 
+  min-height: 100vh; 
+  display: flex; 
+  align-items: center; 
+  justify-content: center;
+  padding: 20px;
+}
+.box-container {
+  background: white;
+  border-radius: 15px;
+  box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+  width: 100%;
+  max-width: 500px;
+  overflow: hidden;
+}
+.box-header {
+  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+  color: white;
+  padding: 20px;
+  text-align: center;
+}
+.box-header h1 {
+  font-size: 24px;
+  margin-bottom: 5px;
+}
+.box-header p {
+  font-size: 14px;
+  opacity: 0.9;
+}
+.box-content {
+  padding: 30px;
+}
+.error {
+  background: #fee;
+  border: 2px solid #f88;
+  color: #c00;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+}
+.success {
+  background: #efe;
+  border: 2px solid #8f8;
+  color: #080;
+  padding: 20px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+}
+.box-info {
+  background: #f8f9fa;
+  padding: 15px;
+  border-radius: 8px;
+  margin: 15px 0;
+}
+.box-info label {
+  display: block;
+  font-weight: bold;
+  margin-bottom: 5px;
+  color: #555;
+}
+.box-info .value {
+  color: #333;
+  font-family: monospace;
+  word-break: break-all;
+}
+.loading {
+  text-align: center;
+  padding: 40px;
+  color: #666;
+}
+.spinner {
+  border: 4px solid #f3f3f3;
+  border-top: 4px solid #667eea;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+  margin: 0 auto 20px;
+}
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+</style>
+</head>
+<body>
+
+<div class="box-container">
+  <div class="box-header">
+    <h1 id="box-title">جاري التحميل...</h1>
+    <p id="box-subtitle">NexusBox Embed System</p>
+  </div>
+  
+  <div class="box-content" id="box-content">
+    <div class="loading">
+      <div class="spinner"></div>
+      <p>جاري تحميل Box...</p>
+    </div>
+  </div>
+</div>
+
+<script>
+async function loadBox() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const embedKey = urlParams.get('key');
+  
+  if (!embedKey) {
+    showError('مفتاح Box غير موجود في الرابط');
+    return;
+  }
+  
+  try {
+    const response = await fetch('/api/embed/' + embedKey);
+    const data = await response.json();
+    
+    if (!data.success) {
+      showError(data.error || 'Box غير موجود');
+      return;
+    }
+    
+    displayBox(data.box);
+  } catch (error) {
+    showError('خطأ في الاتصال: ' + error.message);
+  }
+}
+
+function displayBox(box) {
+  document.getElementById('box-title').textContent = box.name;
+  document.getElementById('box-subtitle').textContent = 'Box ID: ' + box.slug;
+  
+  const content = document.getElementById('box-content');
+  content.innerHTML = `
+    <div class="success">
+      ✅ تم تحميل Box بنجاح!
+    </div>
+    
+    <div class="box-info">
+      <label>اسم Box:</label>
+      <div class="value">${box.name}</div>
+    </div>
+    
+    <div class="box-info">
+      <label>Slug:</label>
+      <div class="value">${box.slug}</div>
+    </div>
+    
+    <div class="box-info">
+      <label>Embed Key:</label>
+      <div class="value">${box.embedKey}</div>
+    </div>
+    
+    <div class="box-info">
+      <label>الحالة:</label>
+      <div class="value">${box.status === 'active' ? '✅ نشط' : '❌ معطل'}</div>
+    </div>
+    
+    <div class="box-info">
+      <label>اللون الأساسي:</label>
+      <div class="value" style="display: flex; align-items: center; gap: 10px;">
+        <span style="display: inline-block; width: 30px; height: 30px; background: ${box.theme.primaryColor}; border-radius: 5px;"></span>
+        ${box.theme.primaryColor}
+      </div>
+    </div>
+    
+    <div class="box-info">
+      <label>الأبعاد:</label>
+      <div class="value">${box.layout.width} × ${box.layout.height} بكسل</div>
+    </div>
+  `;
+  
+  // تغيير لون الهيدر
+  document.querySelector('.box-header').style.background = 
+    `linear-gradient(135deg, ${box.theme.primaryColor} 0%, ${adjustColor(box.theme.primaryColor, -30)} 100%)`;
+}
+
+function showError(message) {
+  document.getElementById('box-title').textContent = 'خطأ';
+  document.getElementById('box-subtitle').textContent = 'NexusBox Embed';
+  document.getElementById('box-content').innerHTML = `
+    <div class="error">
+      ❌ ${message}
+    </div>
+  `;
+}
+
+function adjustColor(color, amount) {
+  const hex = color.replace('#', '');
+  const r = Math.max(0, Math.min(255, parseInt(hex.substr(0, 2), 16) + amount));
+  const g = Math.max(0, Math.min(255, parseInt(hex.substr(2, 2), 16) + amount));
+  const b = Math.max(0, Math.min(255, parseInt(hex.substr(4, 2), 16) + amount));
+  return '#' + [r, g, b].map(x => x.toString(16).padStart(2, '0')).join('');
+}
+
+// تحميل Box عند فتح الصفحة
+loadBox();
+</script>
+
+</body>
+</html>
