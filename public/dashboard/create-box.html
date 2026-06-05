@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>إنشاء صندوق تحكم - NexusBox</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); min-height: 100vh; padding: 20px; }
+.container { max-width: 800px; margin: 0 auto; }
+.card { background: white; border-radius: 15px; padding: 40px; margin-bottom: 20px; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+h1 { color: #333; margin-bottom: 10px; font-size: 32px; }
+.subtitle { color: #666; margin-bottom: 30px; }
+.form-group { margin-bottom: 25px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #555; font-size: 14px; }
+.form-group input, .form-group select, .form-group textarea { width: 100%; padding: 12px; border: 2px solid #ddd; border-radius: 8px; font-size: 14px; transition: border-color 0.3s; }
+.form-group input:focus, .form-group select:focus, .form-group textarea:focus { border-color: #667eea; outline: none; }
+.form-group small { color: #888; display: block; margin-top: 5px; font-size: 12px; }
+.section-title { font-size: 20px; color: #667eea; margin: 30px 0 20px 0; padding-bottom: 10px; border-bottom: 2px solid #667eea; }
+.color-picker { display: flex; gap: 15px; align-items: center; }
+.color-picker input[type="color"] { width: 60px; height: 40px; border: none; cursor: pointer; border-radius: 5px; }
+.color-picker input[type="text"] { flex: 1; }
+.btn { padding: 15px 40px; border: none; border-radius: 8px; cursor: pointer; font-size: 16px; font-weight: bold; transition: transform 0.2s; }
+.btn:hover { transform: translateY(-2px); }
+.btn-primary { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; width: 100%; }
+.btn-success { background: linear-gradient(135deg, #48bb78 0%, #38a169 100%); color: white; }
+.btn-secondary { background: #6c757d; color: white; }
+.success-box { background: #d4edda; border: 2px solid #c3e6cb; border-radius: 8px; padding: 20px; margin: 20px 0; display: none; }
+.success-box h3 { color: #155724; margin-bottom: 10px; }
+.success-box p { color: #155724; margin: 5px 0; }
+.back-link { display: inline-block; margin-bottom: 20px; color: white; text-decoration: none; }
+.back-link:hover { text-decoration: underline; }
+.toggle-group { display: flex; justify-content: space-between; align-items: center; padding: 15px; background: #f8f9fa; border-radius: 8px; margin-bottom: 15px; }
+.toggle { position: relative; display: inline-block; width: 60px; height: 34px; }
+.toggle input { opacity: 0; width: 0; height: 0; }
+.slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 34px; }
+.slider:before { position: absolute; content: ""; height: 26px; width: 26px; left: 4px; bottom: 4px; background-color: white; transition: .4s; border-radius: 50%; }
+input:checked + .slider { background-color: #667eea; }
+input:checked + .slider:before { transform: translateX(26px); }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <a href="/dashboard/index.html" class="back-link">← العودة للصناديق</a>
+  
+  <div class="card">
+    <h1>📦 إنشاء صندوق تحكم جديد</h1>
+    <p class="subtitle">املأ المعلومات التالية لإنشاء صندوق بريد إلكتروني مخصص</p>
+
+    <form id="createForm" onsubmit="createBox(event)">
+      
+      <!-- المعلومات الأساسية -->
+      <div class="section-title">📋 المعلومات الأساسية</div>
+      
+      <div class="form-group">
+        <label>اسم الصندوق:</label>
+        <input type="text" id="boxName" required placeholder="مثال: صندوق الدعم الفني">
+        <small>اختر اسماً واضحاً ومميزاً للصندوق</small>
+      </div>
+
+      <div class="form-group">
+        <label>الوصف (اختياري):</label>
+        <textarea id="boxDesc" rows="3" placeholder="وصف مختصر للصندوق..."></textarea>
+      </div>
+
+      <!-- المظهر -->
+      <div class="section-title">🎨 المظهر والتصميم</div>
+
+      <div class="form-group">
+        <label>اللون الأساسي:</label>
+        <div class="color-picker">
+          <input type="color" id="primaryColor" value="#667eea" onchange="document.getElementById('colorText').value = this.value">
+          <input type="text" id="colorText" value="#667eea" onchange="document.getElementById('primaryColor').value = this.value">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>لون الخلفية:</label>
+        <div class="color-picker">
+          <input type="color" id="bgColor" value="#ffffff" onchange="document.getElementById('bgText').value = this.value">
+          <input type="text" id="bgText" value="#ffffff" onchange="document.getElementById('bgColor').value = this.value">
+        </div>
+      </div>
+
+      <div class="form-group">
+        <label>لون النص:</label>
+        <div class="color-picker">
+          <input type="color" id="textColor" value="#333333" onchange="document.getElementById('textText').value = this.value">
+          <input type="text" id="textText" value="#333333" onchange="document.getElementById('textColor').value = this.value">
+        </div>
+      </div>
+
+      <!-- الأبعاد -->
+      <div class="section-title">📐 الأبعاد</div>
+
+      <div class="form-group">
+        <label>العرض (px):</label>
+        <input type="number" id="width" value="400" min="200" max="800">
+      </div>
+
+      <div class="form-group">
+        <label>الارتفاع (px):</label>
+        <input type="number" id="height" value="500" min="300" max="1000">
+      </div>
+
+      <!-- الإعدادات -->
+      <div class="section-title">⚙️ الإعدادات</div>
+
+      <div class="toggle-group">
+        <div>
+          <strong>السماح للزوار</strong><br>
+          <small>السماح للزوار غير المسجلين بإرسال رسائل</small>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="allowGuest" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-group">
+        <div>
+          <strong>التسجيل الذاتي</strong><br>
+          <small>السماح للمستخدمين بالتسجيل بأنفسهم</small>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="selfRegister" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="toggle-group">
+        <div>
+          <strong>Auto-Resize</strong><br>
+          <small>تعديل الارتفاع تلقائياً</small>
+        </div>
+        <label class="toggle">
+          <input type="checkbox" id="autoResize" checked>
+          <span class="slider"></span>
+        </label>
+      </div>
+
+      <div class="form-group">
+        <label>اللغة:</label>
+        <select id="language">
+          <option value="ar">العربية</option>
+          <option value="en">English</option>
+        </select>
+      </div>
+
+      <div class="form-group">
+        <label>عدد الرسائل في الصفحة:</label>
+        <input type="number" id="msgsPerPage" value="20" min="10" max="100">
+      </div>
+
+      <button type="submit" class="btn btn-primary">🚀 إنشاء الصندوق الآن</button>
+    </form>
+
+    <div class="success-box" id="successBox">
+      <h3>✅ تم إنشاء الصندوق بنجاح!</h3>
+      <p id="successName"></p>
+      <p id="successSlug"></p>
+      <p id="successKey"></p>
+      <div style="margin-top:20px">
+        <button class="btn btn-success" onclick="goToEmbed()" style="margin-left:10px">📝 الحصول على كود التضمين</button>
+        <button class="btn btn-secondary" onclick="goToDashboard()">العودة للصناديق</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+const TOKEN = localStorage.getItem('token');
+let newBoxId = null;
+let newBoxSlug = null;
+
+async function createBox(event) {
+  event.preventDefault();
+  
+  if (!TOKEN) {
+    alert('الرجاء تسجيل الدخول أولاً');
+    window.location.href = '/test.html';
+    return;
+  }
+
+  const boxData = {
+    name: document.getElementById('boxName').value,
+    theme: {
+      primaryColor: document.getElementById('primaryColor').value,
+      backgroundColor: document.getElementById('bgColor').value,
+      textColor: document.getElementById('textColor').value
+    },
+    layout: {
+      width: parseInt(document.getElementById('width').value),
+      height: parseInt(document.getElementById('height').value)
+    },
+    settings: {
+      allowGuestPost: document.getElementById('allowGuest').checked,
+      selfRegistration: document.getElementById('selfRegister').checked,
+      language: document.getElementById('language').value,
+      messagesPerPage: parseInt(document.getElementById('msgsPerPage').value)
+    }
+  };
+
+  try {
+    const res = await fetch(API + '/api/boxes', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'Authorization': 'Bearer ' + TOKEN
+      },
+      body: JSON.stringify(boxData)
+    });
+
+    const data = await res.json();
+
+    if (data.success) {
+      // Hide form
+      document.getElementById('createForm').style.display = 'none';
+      
+      // Show success
+      document.getElementById('successBox').style.display = 'block';
+      document.getElementById('successName').innerHTML = '<strong>الاسم:</strong> ' + data.box.name;
+      document.getElementById('successSlug').innerHTML = '<strong>Slug:</strong> ' + data.box.slug;
+      document.getElementById('successKey').innerHTML = '<strong>Embed Key:</strong> ' + data.box.embedKey;
+      
+      // Save for later
+      newBoxId = data.box._id;
+      newBoxSlug = data.box.slug;
+      newBoxEmbedKey = data.box.embedKey;
+      
+      // Save to localStorage
+      localStorage.setItem('lastCreatedBox', JSON.stringify(data.box));
+    } else {
+      alert('خطأ: ' + data.error);
+    }
+  } catch (error) {
+    console.error('Error:', error);
+    alert('حدث خطأ أثناء الإنشاء: ' + error.message);
+  }
+}
+
+function goToEmbed() {
+  if (newBoxEmbedKey) {
+    window.location.href = '/dashboard/index.html?key=' + newBoxEmbedKey;
+  }
+}
+
+function goToDashboard() {
+  window.location.href = '/dashboard/index.html';
+}
+
+// Check if user is logged in
+if (!TOKEN) {
+  alert('الرجاء تسجيل الدخول أولاً');
+  window.location.href = '/test.html';
+}
+</script>
+
+</body>
+</html>
