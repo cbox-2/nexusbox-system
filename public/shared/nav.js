@@ -1,4 +1,4 @@
-// ===== NexusBox Navigation System =====
+// ===== NexusBox Navigation System - Event Delegation =====
 (function() {
   var menus = {
     1: [
@@ -25,14 +25,25 @@
       {text:'Channels', href:'/channels/index.html'}
     ]
   };
-  
+
+  // Mapping by text content
+  var textToMenu = {
+    'Look & feel': 1,
+    'Look &amp; feel': 1,
+    'Look and feel': 1,
+    'Options': 2,
+    'Users': 3,
+    'Messages': 4
+  };
+
   function openMenu(menuId) {
     var hovmenuDiv = document.getElementById('hovmenu');
-    
+      console.warn('hovmenu div not found');
+      return false;
+    }
     var items = menus[menuId] || [];
     hovmenuDiv.innerHTML = '';
     hovmenuDiv.style.display = 'block';
-    
     for (var i = 0; i < items.length; i++) {
       var a = document.createElement('a');
       a.href = items[i].href;
@@ -40,10 +51,9 @@
       a.textContent = items[i].text;
       hovmenuDiv.appendChild(a);
     }
-    
     return false;
   }
-  
+
   function closeMenu() {
     var hovmenuDiv = document.getElementById('hovmenu');
     if (hovmenuDiv) {
@@ -51,40 +61,76 @@
       hovmenuDiv.style.display = 'none';
     }
   }
-  
-  // Initialize
+
+  // Event delegation on subbar
   function init() {
-    for (var i = 1; i <= 4; i++) {
-      var btn = document.getElementById('hovmenu' + i);
-      if (btn) {
-        btn.onclick = function(e) {
-          e.preventDefault();
-          e.stopPropagation();
-          openMenu(i);
-          return false;
-        };
-        btn.onmousedown = function(e) {
-          e.preventDefault();
-          openMenu(i);
-          return false;
-        };
-      }
+    var subbar = document.getElementById('subbar');
+      console.warn('subbar not found');
+      return;
     }
-    
+
+    subbar.addEventListener('mousedown', function(e) {
+      var target = e.target;
+      // Find the closest submenuitem
+      while (target && target !== subbar) {
+        if (target.classList && target.classList.contains('submenuitem')) break;
+        target = target.parentElement;
+      }
+
+      var text = target.textContent.trim();
+      var menuId = textToMenu[text];
+
+      // Also check by ID
+        var m = target.id.match(/hovmenu(\d)/);
+        if (m) menuId = parseInt(m[1]);
+      }
+
+      if (menuId) {
+        e.preventDefault();
+        e.stopPropagation();
+        openMenu(menuId);
+        return false;
+      }
+    });
+
+    subbar.addEventListener('click', function(e) {
+      var target = e.target;
+      while (target && target !== subbar) {
+        if (target.classList && target.classList.contains('submenuitem')) break;
+        target = target.parentElement;
+      }
+
+      var text = target.textContent.trim();
+      var menuId = textToMenu[text];
+
+        var m = target.id.match(/hovmenu(\d)/);
+        if (m) menuId = parseInt(m[1]);
+      }
+
+      if (menuId) {
+        e.preventDefault();
+        e.stopPropagation();
+        return false;
+      }
+    });
+
+    // Close menu when clicking outside
     document.addEventListener('click', function(e) {
-      var subbar = document.getElementById('subbar');
       var bar3 = document.getElementById('bar3');
         closeMenu();
       }
     });
+
+    console.log('✅ Navigation system initialized');
   }
-  
+
   if (document.readyState === 'loading') {
     document.addEventListener('DOMContentLoaded', init);
   } else {
     init();
   }
-  
+
+  // Global function
   window.hovmenu = openMenu;
 })();
 
