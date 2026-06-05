@@ -569,3 +569,65 @@ app.post('/api/publish/generate-tag', authMiddleware, async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// ===== PUBLISH API =====
+const publishSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  siteUrl: { type: String, default: '' },
+  whitelistEnabled: { type: Boolean, default: false },
+  whitelist: { type: String, default: '' },
+  useSSL: { type: Boolean, default: false },
+  securityTag: { type: String, default: '' },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const PublishSettings = mongoose.model('PublishSettings', publishSchema);
+
+app.get('/api/publish', authMiddleware, async (req, res) => {
+  try {
+    let settings = await PublishSettings.findOne({ user: req.userId });
+    if (!settings) {
+      settings = new PublishSettings({
+        user: req.userId,
+        securityTag: Math.random().toString(36).substring(2, 8).replace(/[uio]/g, 'x')
+      });
+      await settings.save();
+    }
+    res.json({ success: true, settings });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/publish', authMiddleware, async (req, res) => {
+  try {
+    const { siteUrl, whitelistEnabled, whitelist, useSSL, securityTag } = req.body;
+    
+    let settings = await PublishSettings.findOne({ user: req.userId });
+    if (!settings) {
+      settings = new PublishSettings({ user: req.userId });
+    }
+    
+    if (siteUrl !== undefined) settings.siteUrl = siteUrl;
+    if (whitelistEnabled !== undefined) settings.whitelistEnabled = whitelistEnabled;
+    if (whitelist !== undefined) settings.whitelist = whitelist;
+    if (useSSL !== undefined) settings.useSSL = useSSL;
+    if (securityTag !== undefined) settings.securityTag = securityTag;
+    settings.updatedAt = new Date();
+    
+    await settings.save();
+    res.json({ success: true, settings });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/publish/generate-tag', authMiddleware, async (req, res) => {
+  try {
+    const tag = Math.round(Math.random() * 1838265624).toString(35)
+      .replace('u', 'z').replace('i', '5').replace('o', 'w');
+    res.json({ success: true, tag });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
