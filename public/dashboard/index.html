@@ -1,284 +1,438 @@
 <!DOCTYPE html>
-<html lang="en">
-<head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Dashboard · NexusBox</title>
+<html lang="en"><head>
+<title>Control Panel · NexusBox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta name="description" content="NexusBox live chat is an embeddable chat app for online communities, groups, and live-streaming events.">
+<link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
 <link rel="stylesheet" href="/shared/toolbar.css">
-<style>
-body { background-color: #1e1b4b !important; padding-top: 120px !important; }
-
-.submenu-wrapper { position: relative; display: inline-block; }
-
-.dropdown-menu {
-  display: none;
-  position: absolute;
-  top: 100%;
-  right: 0;
-  background: #323232;
-  border: 1px solid #444;
-  border-radius: 4px;
-  min-width: 200px;
-  z-index: 1000;
-  box-shadow: 0 4px 8px rgba(0,0,0,0.3);
-  padding: 5px 0;
-}
-
-.dropdown-menu.show { display: block; }
-
-.dropdown-menu a {
-  display: block;
-  padding: 8px 15px;
-  color: #ddd;
-  text-decoration: none;
-  font-size: 13px;
-  transition: background 0.2s;
-}
-
-.dropdown-menu a:hover {
-  background: #444;
-  color: #fff;
-}
-
-.dropdown-menu a.active {
-  background: #059ad0;
-  color: #fff;
-}
-
-#content-area { padding: 20px; color: white; }
-#content-frame {
-  display: none;
-  width: 100%;
-  height: 700px;
-  border: none;
-  background: #fff;
-  border-radius: 4px;
-}
-
-.user-info {
-  background: rgba(255,255,255,0.1);
-  padding: 15px;
-  border-radius: 8px;
-  margin-bottom: 20px;
-}
-
-.stats {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 15px;
-  margin-top: 20px;
-}
-
-.stat-card {
-  background: rgba(255,255,255,0.1);
-  padding: 20px;
-  border-radius: 8px;
-  text-align: center;
-}
-
-.stat-card h3 {
-  font-size: 2em;
-  color: #4a7fb5;
-  margin-bottom: 10px;
-}
-</style>
 </head>
-<body dir="ltr">
-<div id="header" dir="ltr">
-  <div class="wrap">
-    <a id="logo" href="/dashboard/index.html">NexusBox</a>
-    <div id="headerExtras">
-      <span id="userWelcome">جاري التحميل...</span>
-      <a href="/dashboard/index.html">My Cboxes</a>
-      <a href="#" onclick="globalLogout()">Log out</a>
-    </div>
-  </div>
+<body id="mainbody">
+
+<div id="mask"></div>
+
+<div id="popovr_box">
+<div class="wrap">
+<div style="padding: 20px; background-color: #fff">
+<div id="popovr_title"></div>
+<div id="popovr_text" style="text-align: left; clear:both"></div>
+
+<div id="popovr_t_login" style="display: none; text-align: left; clear:both">
+<p>Your session has expired. Please log back in to continue.</p>
+<form id="qlpop-form" onsubmit="return quickLogin(event)">
+<fieldset>
+<label>Username:</label>
+<input type="text" name="uname" id="ql-uname" maxlength="50" class="txtbox">
+<label>Password:</label>
+<input type="password" name="pword" id="ql-pword" maxlength="50" class="txtbox">
+<input type="submit" name="sub" value=" Log in ">
+<div id="m_qlpop" class="frmmsg1"></div>
+<div id="em_qlpop" class="frmmsg2"></div>
+</fieldset>
+</form>
+</div>
+</div>
+</div>
 </div>
 
-<div id="subbar" dir="ltr">
-  <div class="wrap">
-    <div class="submenu-wrapper">
-      <a href="#" class="submenuitem active" data-menu="dashboard"><b>MSASDWEC2015HKARNO</b></a>
-      <div class="dropdown-menu" id="menu-dashboard">
-        <a href="/dashboard/index.html">Dashboard</a>
-      </div>
-    </div>
+<div id="bodywrap">
+<div id="header">
+<div class="wrap">
+<a id="logo" href="/dashboard/index.html">
+<img src="/shared/logo400.png" alt="NexusBox" width="200" height="86" border="0" onerror="this.outerHTML='<span style=\'color:#fff;font-size:24px;font-weight:bold\'>NexusBox</span>'">
+</a>
 
-    <div class="submenu-wrapper">
-      <a href="#" class="submenuitem" data-menu="publish">Publish</a>
-      <div class="dropdown-menu" id="menu-publish">
-        <a href="/publish/publish.html">نشر الصندوق</a>
-        <a href="/posting-options/index.html">خيارات النشر</a>
-      </div>
-    </div>
-
-    <div class="submenu-wrapper">
-      <a href="#" class="submenuitem" data-menu="lookfeel">Look & feel</a>
-      <div class="dropdown-menu" id="menu-lookfeel">
-        <a href="/layout-options/layout-options.html">خيارات التصميم</a>
-        <a href="/Theme-editor/Theme-editor.html">محرر الثيمات</a>
-        <a href="/emoticons/index.html">الرموز التعبيرية</a>
-      </div>
-    </div>
-
-    <div class="submenu-wrapper">
-      <a href="#" class="submenuitem" data-menu="options">Options</a>
-      <div class="dropdown-menu" id="menu-options">
-        <a href="/filtering/index.html">الفلترة</a>
-        <a href="/date-options/index.html">خيارات التاريخ</a>
-        <a href="/sticky-message/index.html">الرسائل المثبتة</a>
-        <a href="/webhook/index.html">Webhook</a>
-      </div>
-    </div>
-
-    <div class="submenu-wrapper">
-      <a href="#" class="submenuitem" data-menu="users">Users</a>
-      <div class="dropdown-menu" id="menu-users">
-        <a href="/registered-users/registered-users.html">المستخدمون المسجلون</a>
-        <a href="/user-integration/user-integration.html">تكامل المستخدمين</a>
-        <a href="/bans/index.html">المحظورون</a>
-      </div>
-    </div>
-
-    <div class="submenu-wrapper">
-      <a href="#" class="submenuitem" data-menu="messages">Messages</a>
-      <div class="dropdown-menu" id="menu-messages">
-        <a href="/messages/index.html">الرسائل</a>
-      </div>
-    </div>
-
-    <div class="submenu-wrapper">
-      <a href="#" class="submenuitem" data-menu="chat">Chat</a>
-      <div class="dropdown-menu" id="menu-chat">
-        <a href="/chat/chat.html">الدردشة</a>
-        <a href="/channels/index.html">القنوات</a>
-      </div>
-    </div>
-
-    <div class="submenu-wrapper">
-      <a href="#" class="submenuitem" data-menu="archives">Archives</a>
-      <div class="dropdown-menu" id="menu-archives">
-        <a href="/archives/index.html">الأرشيف</a>
-      </div>
-    </div>
-  </div>
+<div id="headerExtras">
+<span id="userWelcome">جاري التحميل...</span>
+<a href="/dashboard/index.html">My Cboxes</a>
+<a href="#" onclick="globalLogout(); return false;">Log out</a>
+</div>
+</div>
 </div>
 
-<div id="main">
-  <div id="content-area">
-    <div class="user-info">
-      <h2>مرحباً، <span id="display-username">admin</span>!</h2>
-      <p>الصلاحية: <span id="display-role">admin</span></p>
-    </div>
-    
-    <div class="stats">
-      <div class="stat-card">
-        <h3 id="stat-users">0</h3>
-        <p>المستخدمون</p>
-      </div>
-      <div class="stat-card">
-        <h3 id="stat-messages">0</h3>
-        <p>الرسائل</p>
-      </div>
-      <div class="stat-card">
-        <h3 id="stat-channels">0</h3>
-        <p>القنوات</p>
-      </div>
-    </div>
-  </div>
-  <iframe id="content-frame"></iframe>
+<div id="subbar">
+<div class="wrap">
+<a href="/dashboard/index.html" class="submenuitem active"><b id="cbox-name">MSASDWEC2015HKARNO</b></a>
+<a href="/publish/publish.html" class="submenuitem">Publish</a>
+<a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+<a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options</a>
+<a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users</a>
+<a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages</a>
+</div>
+</div>
+<div id="bar3">
+<div id="hovmenu" class="wrap"><a></a></div>
+</div>
+
+<div id="wideimg" style="position: relative; width: 100%; left: 0"></div>
+
+<div id="main" class="wrap">
+<div id="content">
+
+<script type="text/javascript">
+var noticetogorig = "";
+function noticetoggle(xo, v) {
+  var xo = document.getElementById(xo);
+  z = document.getElementById('notice-more');
+  if (z.style.display == 'none') {
+    z.style.display = '';
+    noticetogorig = xo.innerHTML;
+    xo.innerHTML = v;
+  }
+  else {
+    z.style.display = 'none';
+    xo.innerHTML = noticetogorig;
+  }
+}
+
+function noticeclose(x) {
+  z = document.getElementById('notice');
+  z.style.display = "none";
+  document.cookie = "rnot="+x+";";
+}
+
+function highlighthelp(sec, para, on) {
+var ico = document.getElementById("hlpico-"+sec+"-"+para);
+  if (!ico) return;
+  if (!on) {
+  ico.style.filter = "alpha(opacity=60)";
+  ico.style.opacity = 0.6;
+  }
+  else {
+  ico.style.filter = "";
+  ico.style.opacity = 1;
+  }
+}
+
+var createBar = function ($elem, isLog, showLimit) {
+var $bar = document.createElement("div");
+$bar.className = "barFill";
+var $text = document.createElement("div");
+$text.className = "barText";
+$elem.appendChild($bar);
+$elem.appendChild($text);
+var minWidth = 5;
+var format = function (n) {
+return (n+'').split('').reverse().join('').replace(/([0-9]{3})(?=[0-9])/g, "$1,").split('').reverse().join('');
+}
+$bar.style.width = "0%";
+return {
+setBarSize: function (val, max) {
+var over = false;
+if (val > max) over = true;
+var val = Math.min(max, Math.max(0, val));
+var prop = val / max;
+$text.innerHTML = format(val) + (over ? "+" : "") + (showLimit ? "/" + max : "");
+var w = (isLog ? (Math.log((prop*1.718 + 1))) : prop) * 100;
+var r = prop/0.7 * 255 + 50;
+var g = 255 - prop*0.6*255;
+var b = 80;
+var comp = (255 / (r*0.9 + g * 1.1)) * 1.4;
+r = r / comp; g = g / comp; b = b / comp;
+window.setTimeout(function () {
+$bar.style.width = Math.max(w, minWidth) + "%";
+$bar.style.backgroundColor = "rgb("+(r|0)+", "+(g|0)+", "+(b|0)+")";
+}, 100);
+}
+}
+};
+</script>
+
+<h1>Select a Cbox</h1>
+
+<a href="#" onclick="createNewCbox(); return false;">
+<div class="card Transparent">
+<div style="text-align: center; font-size: 300%; line-height: 66%; font-weight: 100; margin-bottom: 0em;">+</div>
+<p style="text-align: center;">Create new Cbox</p>
+</div>
+</a>
+
+<div id="cbox-list">
+<!-- سيتم تحميل الصناديق هنا من قاعدة البيانات -->
+</div>
+
+<div id="newCards" style=""></div>
+<div id="loadMarker" style="float: left; width:1px; height: 1px;"></div>
+<div class="colclear"></div>
+
+</div>
+<div style="clear: both"></div>
+</div>
+</div>
+
+<div id="siteErrorBar"><div class="wrap" id="siteErrorBarCont">Loading...</div></div>
+
+<div id="footer">
+<a href="#">About</a>
+<a href="#">Plans &amp; pricing</a>
+<a href="#">Terms &amp; conditions</a>
+<a href="#">Privacy policy</a>
+<a href="#">Notices</a>
+<a href="#">Contact us</a>
+<div class="verybottom">
+© 2004–2026 NexusBox Communications, all rights reserved.
+</div>
 </div>
 
 <script src="/shared/toolbar.js"></script>
 <script src="/shared/auth.js"></script>
 <script>
-// تحميل الإحصائيات
-async function loadStats() {
-  const token = localStorage.getItem('token');
-  
-  try {
-    const [usersRes, messagesRes, channelsRes] = await Promise.all([
-      fetch('/api/auth/users', { headers: { 'Authorization': 'Bearer ' + token } }),
-      fetch('/api/messages', { headers: { 'Authorization': 'Bearer ' + token } }),
-      fetch('/api/channels', { headers: { 'Authorization': 'Bearer ' + token } })
-    ]);
-    
-    const users = await usersRes.json();
-    const messages = await messagesRes.json();
-    const channels = await channelsRes.json();
-    
-    if (users.success) document.getElementById('stat-users').textContent = users.count;
-    if (messages.success) document.getElementById('stat-messages').textContent = messages.count;
-    if (channels.success) document.getElementById('stat-channels').textContent = channels.count;
-  } catch (error) {
-    console.error('Error loading stats:', error);
-  }
-}
+// ===== Hovmenu System (مثل Cbox الأصلي) =====
+var hovmenu = function(btn, menuId) {
+var menus = {
+1: [
+{ text: 'Layout', href: '/layout-options/layout-options.html' },
+{ text: 'Theme', href: '/Theme-editor/Theme-editor.html' },
+{ text: 'Emoticons', href: '/emoticons/index.html' }
+],
+2: [
+{ text: 'Posting', href: '/posting-options/index.html' },
+{ text: 'Date', href: '/date-options/index.html' },
+{ text: 'Filtering', href: '/filtering/index.html' },
+{ text: 'Sticky Message', href: '/sticky-message/index.html' },
+{ text: 'Webhook', href: '/webhook/index.html' }
+],
+3: [
+{ text: 'Registered Users', href: '/registered-users/registered-users.html' },
+{ text: 'User Integration', href: '/user-integration/user-integration.html' },
+{ text: 'Bans', href: '/bans/index.html' }
+],
+4: [
+{ text: 'Messages', href: '/messages/index.html' },
+{ text: 'Archives', href: '/archives/index.html' },
+{ text: 'Chat', href: '/chat/chat.html' },
+{ text: 'Channels', href: '/channels/index.html' }
+]
+};
 
-// تحميل البيانات عند فتح الصفحة
-const user = JSON.parse(localStorage.getItem('user') || 'null');
-if (user) {
-  document.getElementById('display-username').textContent = user.username;
-  document.getElementById('display-role').textContent = user.role;
-}
+var hovmenuDiv = document.getElementById('hovmenu');
+var items = menus[menuId] || [];
 
-loadStats();
-
-// نظام القوائم المنسدلة
-document.addEventListener('DOMContentLoaded', function() {
-  var mainButtons = document.querySelectorAll('#subbar .submenuitem[data-menu]');
-  var contentArea = document.getElementById('content-area');
-  var contentFrame = document.getElementById('content-frame');
-  
-  document.addEventListener('click', function(e) {
-    if (!e.target.closest('.submenu-wrapper')) {
-      document.querySelectorAll('.dropdown-menu').forEach(function(menu) {
-        menu.classList.remove('show');
-      });
-    }
-  });
-  
-  mainButtons.forEach(function(btn) {
-    btn.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      var menuId = 'menu-' + this.getAttribute('data-menu');
-      var menu = document.getElementById(menuId);
-      var isOpen = menu.classList.contains('show');
-      
-      document.querySelectorAll('.dropdown-menu').forEach(function(m) {
-        m.classList.remove('show');
-      });
-      
-      if (!isOpen) {
-        menu.classList.add('show');
-      }
-    });
-  });
-  
-  document.querySelectorAll('.dropdown-menu a').forEach(function(link) {
-    link.addEventListener('click', function(e) {
-      e.preventDefault();
-      e.stopPropagation();
-      
-      var href = this.getAttribute('href');
-      
-      document.querySelectorAll('.dropdown-menu a').forEach(function(a) {
-        a.classList.remove('active');
-      });
-      this.classList.add('active');
-      
-      document.querySelectorAll('.dropdown-menu').forEach(function(m) {
-        m.classList.remove('show');
-      });
-      
-      contentArea.style.display = 'none';
-      contentFrame.style.display = 'block';
-      contentFrame.src = href;
-    });
-  });
+hovmenuDiv.innerHTML = '';
+items.forEach(function(item) {
+var a = document.createElement('a');
+a.href = item.href;
+a.className = 'submenuitem';
+a.textContent = item.text;
+hovmenuDiv.appendChild(a);
 });
+
+return false;
+};
+
+// إغلاق القائمة عند الضغط خارجها
+document.addEventListener('click', function(e) {
+if (!e.target.closest('#subbar') && !e.target.closest('#bar3')) {
+document.getElementById('hovmenu').innerHTML = '';
+}
+});
+
+// ===== تحميل معلومات المستخدم =====
+async function loadUserInfo() {
+const token = localStorage.getItem('token');
+if (!token) {
+window.location.href = '/login/index.html';
+return;
+}
+
+try {
+const res = await fetch('/api/auth/me', {
+headers: { 'Authorization': 'Bearer ' + token }
+});
+const data = await res.json();
+
+if (!data.success) {
+localStorage.removeItem('token');
+window.location.href = '/login/index.html';
+return;
+}
+
+document.getElementById('userWelcome').textContent = data.user.email || data.user.username;
+document.getElementById('cbox-name').textContent = data.user.username.toUpperCase();
+} catch (error) {
+console.error('Error loading user:', error);
+}
+}
+
+// ===== تحميل قائمة الصناديق (Cboxes) =====
+async function loadCboxes() {
+const token = localStorage.getItem('token');
+const cboxList = document.getElementById('cbox-list');
+
+try {
+const res = await fetch('/api/channels', {
+headers: { 'Authorization': 'Bearer ' + token }
+});
+const data = await res.json();
+
+cboxList.innerHTML = '';
+
+if (!data.success || data.channels.length === 0) {
+cboxList.innerHTML = '<p style="color:#999; padding:20px;">No Cboxes yet. Create your first one!</p>';
+return;
+}
+
+data.channels.forEach(function(channel, index) {
+var cardClass = index % 2 === 0 ? 'Premium' : 'Free';
+var planName = index % 2 === 0 ? 'NexusBox Premium' : 'NexusBox Free';
+var lastUsed = channel.createdAt ? relTime(Math.floor(new Date(channel.createdAt).getTime()/1000)) : '-';
+
+var card = document.createElement('a');
+card.href = '/chat/chat.html?channel=' + channel._id;
+card.innerHTML = '<div class="card ' + cardClass + '">' +
+'<h2>' + channel.name + '</h2>' +
+'<p>' + planName + '</p>' +
+'<small class="boxstats">Last used ' + lastUsed + '</small>' +
+'<button onclick="event.preventDefault(); event.stopPropagation(); deleteCbox(\'' + channel._id + '\')" style="position:absolute;top:10px;left:10px;background:#dc3545;color:#fff;border:none;padding:5px 10px;border-radius:3px;cursor:pointer;font-size:11px;">Delete</button>' +
+'</div>';
+cboxList.appendChild(card);
+});
+} catch (error) {
+console.error('Error loading cboxes:', error);
+cboxList.innerHTML = '<p style="color:#ff6b6b; padding:20px;">Error loading Cboxes</p>';
+}
+}
+
+// ===== حساب الوقت النسبي =====
+var relTime = function (unixTime) {
+if (!unixTime) return '-';
+var dTime = ((new Date().getTime()/1000) - unixTime)|0;
+if (!dTime || dTime < 0) return 'never';
+var days = (dTime/86400)|0;
+if (days < 1) return 'today';
+if (days < 2) return 'yesterday';
+if (days > 365) {
+var years = (dTime/(86400*365))|0;
+if (years < 2) return 'last year';
+return years + " years ago";
+}
+return days + " days ago";
+};
+
+// ===== إنشاء Cbox جديد =====
+async function createNewCbox() {
+var name = prompt('Enter Cbox name:');
+if (!name || !name.trim()) return;
+
+var description = prompt('Enter description (optional):') || '';
+
+const token = localStorage.getItem('token');
+
+try {
+const res = await fetch('/api/channels', {
+method: 'POST',
+headers: {
+'Content-Type': 'application/json',
+'Authorization': 'Bearer ' + token
+},
+body: JSON.stringify({ name: name.trim(), description: description.trim() })
+});
+
+const data = await res.json();
+
+if (data.success) {
+alert('Cbox created successfully!');
+loadCboxes();
+} else {
+alert('Error: ' + data.error);
+}
+} catch (error) {
+alert('Connection error');
+}
+}
+
+// ===== حذف Cbox =====
+async function deleteCbox(id) {
+if (!confirm('Are you sure you want to delete this Cbox?')) return;
+
+const token = localStorage.getItem('token');
+
+try {
+const res = await fetch('/api/channels/' + id, {
+method: 'DELETE',
+headers: { 'Authorization': 'Bearer ' + token }
+});
+
+const data = await res.json();
+
+if (data.success) {
+alert('Cbox deleted!');
+loadCboxes();
+} else {
+alert('Error: ' + data.error);
+}
+} catch (error) {
+alert('Connection error');
+}
+}
+
+// ===== تسجيل الدخول السريع =====
+async function quickLogin(e) {
+e.preventDefault();
+var uname = document.getElementById('ql-uname').value;
+var pword = document.getElementById('ql-pword').value;
+
+try {
+const res = await fetch('/api/auth/login', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ username: uname, password: pword })
+});
+
+const data = await res.json();
+
+if (data.success) {
+localStorage.setItem('token', data.token);
+localStorage.setItem('user', JSON.stringify(data.user));
+document.getElementById('popovr_box').style.display = 'none';
+location.reload();
+} else {
+document.getElementById('em_qlpop').innerHTML = '<ul><li>' + data.error + '</li></ul>';
+document.getElementById('em_qlpop').className = 'frmmsg2 Error';
+}
+} catch (error) {
+document.getElementById('em_qlpop').innerHTML = '<ul><li>Connection error</li></ul>';
+}
+
+return false;
+}
+
+// ===== تسجيل الخروج =====
+function logout() {
+globalLogout();
+return false;
+}
+
+// ===== تهيئة الصفحة =====
+document.addEventListener('DOMContentLoaded', function() {
+loadUserInfo();
+loadCboxes();
+});
+
+// Modal / naked mode
+if (window.isPopup) {
+document.body.className = "Popped";
+}
+
+// Breadcrumbs
+var dropCrumb = function () {
+if (!localStorage) return;
+var bc = getCrumbs();
+bc.push(location.href);
+bc.splice(0, bc.length - 5);
+localStorage.setItem("site:bread", JSON.stringify(bc));
+};
+
+var getCrumbs = function () {
+if (!localStorage) return [];
+var bcStr = localStorage.getItem("site:bread");
+var bc = [];
+if (bcStr) bc = JSON.parse(bcStr);
+return bc;
+};
+
+dropCrumb();
 </script>
-</body>
-</html>
+
+</body></html>
