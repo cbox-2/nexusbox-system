@@ -1,0 +1,167 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Embed Code Generator - NexusBox</title>
+<style>
+body { background: #f5f5f5; font-family: 'Segoe UI', Tahoma, sans-serif; margin: 0; padding: 20px; }
+.container { max-width: 900px; margin: 0 auto; }
+.header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 30px; border-radius: 10px; margin-bottom: 30px; }
+.header h1 { margin: 0; font-size: 28px; }
+.section { background: white; padding: 25px; border-radius: 10px; margin-bottom: 20px; box-shadow: 0 2px 10px rgba(0,0,0,0.1); }
+.section h2 { color: #333; margin-bottom: 20px; font-size: 20px; border-bottom: 2px solid #667eea; padding-bottom: 10px; }
+.form-group { margin-bottom: 20px; }
+.form-group label { display: block; margin-bottom: 8px; font-weight: bold; color: #333; }
+.form-group input, .form-group select { width: 100%; padding: 10px; border: 1px solid #ddd; border-radius: 5px; font-size: 14px; box-sizing: border-box; }
+.code-box { background: #f4f4f4; padding: 15px; border-radius: 5px; font-family: 'Courier New', monospace; overflow-x: auto; direction: ltr; text-align: left; white-space: pre-wrap; word-break: break-all; border: 2px solid #ddd; margin: 10px 0; }
+.btn { padding: 12px 24px; border: none; border-radius: 5px; cursor: pointer; font-size: 14px; font-weight: bold; }
+.btn-primary { background: #667eea; color: white; }
+.btn-success { background: #48bb78; color: white; }
+.success-msg { background: #d4edda; border: 1px solid #c3e6cb; color: #155724; padding: 15px; border-radius: 5px; margin-bottom: 20px; display: none; }
+</style>
+</head>
+<body>
+
+<div class="container">
+  <div class="header">
+    <h1>🔧 Embed Code Generator</h1>
+    <p>Generate custom embed code for your website</p>
+  </div>
+
+  <div class="success-msg" id="success-msg">✅ Code copied to clipboard!</div>
+
+  <div class="section">
+    <h2>📦 Select Your Box</h2>
+    <div class="form-group">
+      <label>Choose Box:</label>
+      <select id="box-select">
+        <option value="">Loading boxes...</option>
+      </select>
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>⚙️ Embed Options</h2>
+    <div class="form-group">
+      <label>Width (px):</label>
+      <input type="number" id="width-input" value="400" min="200" max="800">
+    </div>
+    <div class="form-group">
+      <label>Height (px):</label>
+      <input type="number" id="height-input" value="500" min="300" max="1000">
+    </div>
+  </div>
+
+  <div class="section">
+    <h2>📝 Generated Code</h2>
+    <label>Your Embed Code:</label>
+    <div class="code-box" id="code-output">Select a box to generate code...</div>
+    <button class="btn btn-success" onclick="copyCode()" style="margin-top:10px;">📋 Copy to Clipboard</button>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+const TOKEN = localStorage.getItem('token');
+let boxes = [];
+
+async function loadBoxes() {
+  if (!TOKEN) {
+    alert('Please login first');
+    window.location.href = '/test.html';
+    return;
+  }
+
+  try {
+    const res = await fetch(API + '/api/boxes', {
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    });
+    const data = await res.json();
+    
+    if (data.success) {
+      boxes = data.boxes;
+      populateBoxSelect(boxes);
+      
+      const urlParams = new URLSearchParams(window.location.search);
+      const key = urlParams.get('key');
+      if (key) {
+        const box = boxes.find(b => b.embedKey === key);
+        if (box) {
+          document.getElementById('box-select').value = box.embedKey;
+          generateCode();
+        }
+      }
+    }
+  } catch (error) {
+    console.error('Error:', error);
+  }
+}
+
+function populateBoxSelect(boxes) {
+  const select = document.getElementById('box-select');
+  
+  if (boxes.length === 0) {
+    select.innerHTML = '<option value="">No boxes found</option>';
+    return;
+  }
+  
+  select.innerHTML = '<option value="">-- Select a Box --</option>' +
+    boxes.map(box => `<option value="${box.embedKey}">${box.name} (${box.slug})</option>`).join('');
+  
+  select.addEventListener('change', generateCode);
+}
+
+function generateCode() {
+  const embedKey = document.getElementById('box-select').value;
+  const box = boxes.find(b => b.embedKey === embedKey);
+  
+  if (!box) {
+    document.getElementById('code-output').textContent = 'Select a box to generate code...';
+    return;
+  }
+
+  const width = document.getElementById('width-input').value || 400;
+  const height = document.getElementById('height-input').value || 500;
+  const baseUrl = 'https://nexusbox-system-production-c290.up.railway.app';
+  
+  const code = `<!-- BEGIN NEXUSBOX -->
+<iframe 
+  src="${baseUrl}/embed.html?key=${box.embedKey}" 
+  width="${width}" 
+  height="${height}"
+  style="border:none; border-radius:10px; box-shadow:0 4px 20px rgba(0,0,0,0.1);"
+  allowfullscreen
+  loading="lazy">
+</iframe>
+<!-- END NEXUSBOX -->`;
+  
+  document.getElementById('code-output').textContent = code;
+}
+
+function copyCode() {
+  const code = document.getElementById('code-output').textContent;
+  
+  if (code === 'Select a box to generate code...') {
+    alert('Please select a box first');
+    return;
+  }
+  
+  navigator.clipboard.writeText(code).then(() => {
+    const msg = document.getElementById('success-msg');
+    msg.style.display = 'block';
+    setTimeout(() => { msg.style.display = 'none'; }, 3000);
+  }).catch(err => {
+    console.error('Copy error:', err);
+    alert('Failed to copy code');
+  });
+}
+
+document.getElementById('width-input').addEventListener('input', generateCode);
+document.getElementById('height-input').addEventListener('input', generateCode);
+
+loadBoxes();
+</script>
+
+</body>
+</html>
