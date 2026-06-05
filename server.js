@@ -89,6 +89,19 @@ const channelSchema = new mongoose.Schema({
 
 const Channel = mongoose.model('Channel', channelSchema);
 
+// ===== Publish Settings Model =====
+const publishSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  siteUrl: { type: String, default: '' },
+  whitelistEnabled: { type: Boolean, default: false },
+  whitelist: { type: String, default: '' },
+  useSSL: { type: Boolean, default: false },
+  securityTag: { type: String, default: '' },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const PublishSettings = mongoose.model('PublishSettings', publishSchema);
+
 // ===== Auth Middleware =====
 const authMiddleware = async (req, res, next) => {
   try {
@@ -123,29 +136,20 @@ const moderatorMiddleware = (req, res, next) => {
 };
 
 // ===== Database Connection =====
-let connectionInfo = { status: 'connecting', attempts: 0, lastError: null };
-
 async function connectToMongo() {
-  connectionInfo.attempts++;
   try {
     await mongoose.connect(process.env.MONGODB_URI, {
       serverSelectionTimeoutMS: 10000,
       socketTimeoutMS: 45000
     });
-    connectionInfo.status = 'connected';
-    connectionInfo.lastError = null;
     console.log('✅ Connected to MongoDB Atlas');
   } catch (error) {
-    connectionInfo.status = 'disconnected';
-    connectionInfo.lastError = error.message;
     console.log('❌ MongoDB connection error:', error.message);
     setTimeout(connectToMongo, 5000);
   }
 }
 
-// ===== API Routes =====
-
-// Health Check
+// ===== Health Check =====
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
@@ -160,33 +164,21 @@ app.get('/api/health', (req, res) => {
 app.post('/api/auth/signup', async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    
     if (!username || !email || !password) {
       return res.status(400).json({ success: false, error: 'All fields are required' });
     }
-    
     if (password.length < 6) {
       return res.status(400).json({ success: false, error: 'Password must be at least 6 characters' });
     }
-    
     const existingUser = await User.findOne({ $or: [{ email }, { username }] });
     if (existingUser) {
       return res.status(400).json({ success: false, error: 'Username or email already exists' });
     }
-    
     const user = new User({ username, email, password });
     await user.save();
-    
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    
-    res.status(201).json({
-      success: true,
-      message: 'User created successfully',
-      user: user.toJSON(),
-      token
-    });
+    res.status(201).json({ success: true, message: 'User created successfully', user: user.toJSON(), token });
   } catch (error) {
-    console.error('Signup error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -194,38 +186,19 @@ app.post('/api/auth/signup', async (req, res) => {
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
-    
     if (!username || !password) {
       return res.status(400).json({ success: false, error: 'Username and password are required' });
     }
-    
     const user = await User.findOne({ $or: [{ username }, { email: username }] });
-    if (!user) {
-      return res.status(401).json({ success: false, error: 'Invalid credentials' });
-    }
-    
+    if (!user) return res.status(401).json({ success: false, error: 'Invalid credentials' });
     const isMatch = await user.comparePassword(password);
-    if (!isMatch) {
-      return res.status(401).json({ success: false, error: 'Invalid credentials' });
-    }
-    
-    if (user.status !== 'active') {
-      return res.status(403).json({ success: false, error: 'Account is not active' });
-    }
-    
+    if (!isMatch) return res.status(401).json({ success: false, error: 'Invalid credentials' });
+    if (user.status !== 'active') return res.status(403).json({ success: false, error: 'Account is not active' });
     user.lastLogin = new Date();
     await user.save();
-    
     const token = jwt.sign({ userId: user._id }, process.env.JWT_SECRET, { expiresIn: '7d' });
-    
-    res.json({
-      success: true,
-      message: 'Login successful',
-      user: user.toJSON(),
-      token
-    });
+    res.json({ success: true, message: 'Login successful', user: user.toJSON(), token });
   } catch (error) {
-    console.error('Login error:', error);
     res.status(500).json({ success: false, error: error.message });
   }
 });
@@ -249,10 +222,8 @@ app.put('/api/auth/users/:id/role', authMiddleware, adminMiddleware, async (req,
     if (!['user', 'moderator', 'admin'].includes(role)) {
       return res.status(400).json({ success: false, error: 'Invalid role' });
     }
-    
     const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true });
     if (!user) return res.status(404).json({ success: false, error: 'User not found' });
-    
     res.json({ success: true, user: user.toJSON() });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -265,10 +236,8 @@ app.put('/api/auth/users/:id/status', authMiddleware, adminMiddleware, async (re
     if (!['active', 'banned', 'suspended'].includes(status)) {
       return res.status(400).json({ success: false, error: 'Invalid status' });
     }
-    
     const user = await User.findByIdAndUpdate(req.params.id, { status }, { new: true });
     if (!user) return res.status(404).json({ success: false, error: 'User not found' });
-    
     res.json({ success: true, user: user.toJSON() });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -279,7 +248,6 @@ app.delete('/api/auth/users/:id', authMiddleware, adminMiddleware, async (req, r
   try {
     const user = await User.findByIdAndDelete(req.params.id);
     if (!user) return res.status(404).json({ success: false, error: 'User not found' });
-    
     res.json({ success: true, message: 'User deleted' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -289,10 +257,7 @@ app.delete('/api/auth/users/:id', authMiddleware, adminMiddleware, async (req, r
 // ===== MESSAGES API =====
 app.get('/api/messages', authMiddleware, async (req, res) => {
   try {
-    const messages = await Message.find()
-      .populate('author', 'username role')
-      .sort({ createdAt: -1 })
-      .limit(100);
+    const messages = await Message.find().populate('author', 'username role').sort({ createdAt: -1 }).limit(100);
     res.json({ success: true, count: messages.length, messages });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -302,21 +267,10 @@ app.get('/api/messages', authMiddleware, async (req, res) => {
 app.post('/api/messages', authMiddleware, async (req, res) => {
   try {
     const { content, channel, isSticky } = req.body;
-    
-    if (!content) {
-      return res.status(400).json({ success: false, error: 'Content is required' });
-    }
-    
-    const message = new Message({
-      content,
-      author: req.userId,
-      channel: channel || 'general',
-      isSticky: isSticky || false
-    });
-    
+    if (!content) return res.status(400).json({ success: false, error: 'Content is required' });
+    const message = new Message({ content, author: req.userId, channel: channel || 'general', isSticky: isSticky || false });
     await message.save();
     await message.populate('author', 'username role');
-    
     res.status(201).json({ success: true, message });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -327,7 +281,6 @@ app.delete('/api/messages/:id', authMiddleware, moderatorMiddleware, async (req,
   try {
     const message = await Message.findByIdAndDelete(req.params.id);
     if (!message) return res.status(404).json({ success: false, error: 'Message not found' });
-    
     res.json({ success: true, message: 'Message deleted' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -347,21 +300,10 @@ app.get('/api/bans', authMiddleware, moderatorMiddleware, async (req, res) => {
 app.post('/api/bans', authMiddleware, moderatorMiddleware, async (req, res) => {
   try {
     const { target, reason, expiresAt } = req.body;
-    
-    if (!target) {
-      return res.status(400).json({ success: false, error: 'Target is required' });
-    }
-    
-    const ban = new Ban({
-      target,
-      reason: reason || '',
-      bannedBy: req.userId,
-      expiresAt: expiresAt ? new Date(expiresAt) : null
-    });
-    
+    if (!target) return res.status(400).json({ success: false, error: 'Target is required' });
+    const ban = new Ban({ target, reason: reason || '', bannedBy: req.userId, expiresAt: expiresAt ? new Date(expiresAt) : null });
     await ban.save();
     await ban.populate('bannedBy', 'username');
-    
     res.status(201).json({ success: true, ban });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -372,7 +314,6 @@ app.delete('/api/bans/:id', authMiddleware, moderatorMiddleware, async (req, res
   try {
     const ban = await Ban.findByIdAndDelete(req.params.id);
     if (!ban) return res.status(404).json({ success: false, error: 'Ban not found' });
-    
     res.json({ success: true, message: 'Ban removed' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -392,25 +333,12 @@ app.get('/api/channels', authMiddleware, async (req, res) => {
 app.post('/api/channels', authMiddleware, moderatorMiddleware, async (req, res) => {
   try {
     const { name, description } = req.body;
-    
-    if (!name) {
-      return res.status(400).json({ success: false, error: 'Channel name is required' });
-    }
-    
+    if (!name) return res.status(400).json({ success: false, error: 'Channel name is required' });
     const existing = await Channel.findOne({ name });
-    if (existing) {
-      return res.status(400).json({ success: false, error: 'Channel already exists' });
-    }
-    
-    const channel = new Channel({
-      name,
-      description: description || '',
-      createdBy: req.userId
-    });
-    
+    if (existing) return res.status(400).json({ success: false, error: 'Channel already exists' });
+    const channel = new Channel({ name, description: description || '', createdBy: req.userId });
     await channel.save();
     await channel.populate('createdBy', 'username');
-    
     res.status(201).json({ success: true, channel });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
@@ -421,41 +349,51 @@ app.delete('/api/channels/:id', authMiddleware, adminMiddleware, async (req, res
   try {
     const channel = await Channel.findByIdAndDelete(req.params.id);
     if (!channel) return res.status(404).json({ success: false, error: 'Channel not found' });
-    
     res.json({ success: true, message: 'Channel deleted' });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-// ===== SETTINGS API =====
-const settingsSchema = new mongoose.Schema({
-  key: { type: String, required: true, unique: true },
-  value: { type: mongoose.Schema.Types.Mixed, required: true }
-});
-
-const Settings = mongoose.model('Settings', settingsSchema);
-
-app.get('/api/settings', authMiddleware, async (req, res) => {
+// ===== PUBLISH API =====
+app.get('/api/publish', authMiddleware, async (req, res) => {
   try {
-    const settings = await Settings.find();
-    const settingsObj = {};
-    settings.forEach(s => { settingsObj[s.key] = s.value; });
-    res.json({ success: true, settings: settingsObj });
+    let settings = await PublishSettings.findOne({ user: req.userId });
+    if (!settings) {
+      settings = new PublishSettings({
+        user: req.userId,
+        securityTag: Math.random().toString(36).substring(2, 8).replace(/[uio]/g, 'x')
+      });
+      await settings.save();
+    }
+    res.json({ success: true, settings });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
 });
 
-app.put('/api/settings/:key', authMiddleware, adminMiddleware, async (req, res) => {
+app.put('/api/publish', authMiddleware, async (req, res) => {
   try {
-    const { value } = req.body;
-    const setting = await Settings.findOneAndUpdate(
-      { key: req.params.key },
-      { key: req.params.key, value },
-      { upsert: true, new: true }
-    );
-    res.json({ success: true, setting });
+    const { siteUrl, whitelistEnabled, whitelist, useSSL, securityTag } = req.body;
+    let settings = await PublishSettings.findOne({ user: req.userId });
+    if (!settings) settings = new PublishSettings({ user: req.userId });
+    if (siteUrl !== undefined) settings.siteUrl = siteUrl;
+    if (whitelistEnabled !== undefined) settings.whitelistEnabled = whitelistEnabled;
+    if (whitelist !== undefined) settings.whitelist = whitelist;
+    if (useSSL !== undefined) settings.useSSL = useSSL;
+    if (securityTag !== undefined) settings.securityTag = securityTag;
+    settings.updatedAt = new Date();
+    await settings.save();
+    res.json({ success: true, settings });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/publish/generate-tag', authMiddleware, async (req, res) => {
+  try {
+    const tag = Math.round(Math.random() * 1838265624).toString(35).replace('u', 'z').replace('i', '5').replace('o', 'w');
+    res.json({ success: true, tag });
   } catch (error) {
     res.status(500).json({ success: false, error: error.message });
   }
@@ -490,7 +428,6 @@ app.use((err, req, res, next) => {
   res.status(500).json({ success: false, error: 'Internal server error' });
 });
 
-// 404 Handler
 app.use((req, res) => {
   res.status(404).json({ success: false, error: 'Endpoint not found' });
 });
@@ -506,130 +443,4 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(`📡 Port: ${PORT}`);
   console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log('═══════════════════════════════════════');
-});
-
-// ===== PUBLISH API =====
-const publishSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
-  siteUrl: { type: String, default: '' },
-  whitelistEnabled: { type: Boolean, default: false },
-  whitelist: { type: String, default: '' },
-  useSSL: { type: Boolean, default: false },
-  securityTag: { type: String, default: '' },
-  updatedAt: { type: Date, default: Date.now }
-});
-
-const PublishSettings = mongoose.model('PublishSettings', publishSchema);
-
-app.get('/api/publish', authMiddleware, async (req, res) => {
-  try {
-    let settings = await PublishSettings.findOne({ user: req.userId });
-    if (!settings) {
-      settings = new PublishSettings({
-        user: req.userId,
-        securityTag: Math.random().toString(36).substring(2, 8).replace(/[uio]/g, 'x')
-      });
-      await settings.save();
-    }
-    res.json({ success: true, settings });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-app.put('/api/publish', authMiddleware, async (req, res) => {
-  try {
-    const { siteUrl, whitelistEnabled, whitelist, useSSL, securityTag } = req.body;
-    
-    let settings = await PublishSettings.findOne({ user: req.userId });
-    if (!settings) {
-      settings = new PublishSettings({ user: req.userId });
-    }
-    
-    if (siteUrl !== undefined) settings.siteUrl = siteUrl;
-    if (whitelistEnabled !== undefined) settings.whitelistEnabled = whitelistEnabled;
-    if (whitelist !== undefined) settings.whitelist = whitelist;
-    if (useSSL !== undefined) settings.useSSL = useSSL;
-    if (securityTag !== undefined) settings.securityTag = securityTag;
-    settings.updatedAt = new Date();
-    
-    await settings.save();
-    res.json({ success: true, settings });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-app.post('/api/publish/generate-tag', authMiddleware, async (req, res) => {
-  try {
-    const tag = Math.round(Math.random() * 1838265624).toString(35)
-      .replace('u', 'z').replace('i', '5').replace('o', 'w');
-    res.json({ success: true, tag });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-// ===== PUBLISH API =====
-
-// ===== PUBLISH API =====
-const publishSchema = new mongoose.Schema({
-  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
-  siteUrl: { type: String, default: '' },
-  whitelistEnabled: { type: Boolean, default: false },
-  whitelist: { type: String, default: '' },
-  useSSL: { type: Boolean, default: false },
-  securityTag: { type: String, default: '' },
-  updatedAt: { type: Date, default: Date.now }
-});
-
-const PublishSettings = mongoose.model('PublishSettings', publishSchema);
-
-app.get('/api/publish', authMiddleware, async (req, res) => {
-  try {
-    let settings = await PublishSettings.findOne({ user: req.userId });
-    if (!settings) {
-      settings = new PublishSettings({
-        user: req.userId,
-        securityTag: Math.random().toString(36).substring(2, 8).replace(/[uio]/g, 'x')
-      });
-      await settings.save();
-    }
-    res.json({ success: true, settings });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-app.put('/api/publish', authMiddleware, async (req, res) => {
-  try {
-    const { siteUrl, whitelistEnabled, whitelist, useSSL, securityTag } = req.body;
-    
-    let settings = await PublishSettings.findOne({ user: req.userId });
-    if (!settings) {
-      settings = new PublishSettings({ user: req.userId });
-    }
-    
-    if (siteUrl !== undefined) settings.siteUrl = siteUrl;
-    if (whitelistEnabled !== undefined) settings.whitelistEnabled = whitelistEnabled;
-    if (whitelist !== undefined) settings.whitelist = whitelist;
-    if (useSSL !== undefined) settings.useSSL = useSSL;
-    if (securityTag !== undefined) settings.securityTag = securityTag;
-    settings.updatedAt = new Date();
-    
-    await settings.save();
-    res.json({ success: true, settings });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-app.post('/api/publish/generate-tag', authMiddleware, async (req, res) => {
-  try {
-    const tag = Math.round(Math.random() * 1838265624).toString(35)
-      .replace('u', 'z').replace('i', '5').replace('o', 'w');
-    res.json({ success: true, tag });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
 });
