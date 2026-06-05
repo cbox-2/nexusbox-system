@@ -1,5 +1,7 @@
-// ===== NexusBox Navigation System =====
-var hovmenu = function(btn, menuId) {
+// ===== NexusBox Navigation System - Fixed =====
+(function() {
+  'use strict';
+  
   var menus = {
     1: [
       {text:'Layout', href:'/layout-options/layout-options.html'},
@@ -26,29 +28,67 @@ var hovmenu = function(btn, menuId) {
     ]
   };
   
-  var hovmenuDiv = document.getElementById('hovmenu');
+  function openMenu(menuId) {
+    var hovmenuDiv = document.getElementById('hovmenu');
+    
+    var items = menus[menuId] || [];
+    hovmenuDiv.innerHTML = '';
+    hovmenuDiv.style.display = 'block';
+    
+    items.forEach(function(item) {
+      var a = document.createElement('a');
+      a.href = item.href;
+      a.className = 'submenuitem';
+      a.textContent = item.text;
+      hovmenuDiv.appendChild(a);
+    });
+    
+    return false;
+  }
   
-  var items = menus[menuId] || [];
-  hovmenuDiv.innerHTML = '';
-  hovmenuDiv.style.display = 'block';
+  function closeMenu() {
+    var hovmenuDiv = document.getElementById('hovmenu');
+    if (hovmenuDiv) {
+      hovmenuDiv.innerHTML = '';
+      hovmenuDiv.style.display = 'none';
+    }
+  }
   
-  items.forEach(function(item) {
-    var a = document.createElement('a');
-    a.href = item.href;
-    a.className = 'submenuitem' + (item.active ? ' active' : '');
-    a.textContent = item.text;
-    hovmenuDiv.appendChild(a);
+  // Initialize on DOM load
+  document.addEventListener('DOMContentLoaded', function() {
+    // Attach click handlers to all hovmenu buttons
+    for (var i = 1; i <= 4; i++) {
+      var btn = document.getElementById('hovmenu' + i);
+      if (btn) {
+        btn.addEventListener('click', function(e) {
+          e.preventDefault();
+          e.stopPropagation();
+          openMenu(i);
+          return false;
+        });
+        
+        btn.addEventListener('mousedown', function(e) {
+          e.preventDefault();
+          openMenu(i);
+          return false;
+        });
+      }
+    }
+    
+    // Close menu when clicking outside
+    document.addEventListener('click', function(e) {
+      var subbar = document.getElementById('subbar');
+      var bar3 = document.getElementById('bar3');
+        closeMenu();
+      }
+    });
   });
   
-  return false;
-};
+  // Make hovmenu globally available
+  window.hovmenu = openMenu;
+})();
 
-document.addEventListener('click', function(e) {
-  var hovmenuDiv = document.getElementById('hovmenu');
-    hovmenuDiv.innerHTML = '';
-  }
-});
-
+// Global functions
 function globalLogout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');
