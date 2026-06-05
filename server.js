@@ -444,3 +444,60 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log('═══════════════════════════════════════');
 });
+
+// ===== THEME API =====
+const themeSchema = new mongoose.Schema({
+  user: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true, unique: true },
+  name: { type: String, default: 'My custom CSS' },
+  css: { type: String, default: '' },
+  preset: { type: Number, default: -1000 },
+  updatedAt: { type: Date, default: Date.now }
+});
+
+const Theme = mongoose.model('Theme', themeSchema);
+
+app.get('/api/theme', authMiddleware, async (req, res) => {
+  try {
+    let theme = await Theme.findOne({ user: req.userId });
+    if (!theme) {
+      theme = new Theme({ user: req.userId, css: 'body { text-align: left; }' });
+      await theme.save();
+    }
+    res.json({ success: true, theme });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/theme', authMiddleware, async (req, res) => {
+  try {
+    const { css, preset, name } = req.body;
+    let theme = await Theme.findOne({ user: req.userId });
+    if (!theme) theme = new Theme({ user: req.userId });
+    if (css !== undefined) theme.css = css;
+    if (preset !== undefined) theme.preset = preset;
+    if (name !== undefined) theme.name = name;
+    theme.updatedAt = new Date();
+    await theme.save();
+    res.json({ success: true, theme });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.get('/api/theme/presets', authMiddleware, async (req, res) => {
+  try {
+    const presets = [
+      { id: 13, name: 'Default blue', css: 'body { background: #f0f8ff; }' },
+      { id: 11, name: 'Basic transparent', css: 'body { background: transparent; }' },
+      { id: 1, name: 'Classic blue', css: 'body { background: #0066cc; color: white; }' },
+      { id: 2, name: 'Classic red', css: 'body { background: #cc0000; color: white; }' },
+      { id: 3, name: 'Classic yellow', css: 'body { background: #ffcc00; }' },
+      { id: 4, name: 'Classic light', css: 'body { background: #ffffff; }' },
+      { id: 5, name: 'Classic dark', css: 'body { background: #333333; color: white; }' }
+    ];
+    res.json({ success: true, presets });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});

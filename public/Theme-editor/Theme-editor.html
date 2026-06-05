@@ -1,6 +1,679 @@
-<html><body>Page under construction<script>
-if (window.self !== window.top) {
-  document.body.classList.add('in-iframe');
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>Theme Editor · NexusBox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta name="description" content="NexusBox Theme Editor - Customize your chat appearance">
+<link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
+<link rel="stylesheet" href="/shared/toolbar.css">
+</head>
+<body id="mainbody">
+
+<script>
+var rcvdformresponse = function () {};
+</script>
+
+<div id="mask"></div>
+
+<div id="popovr_box">
+<div class="wrap">
+<div style="padding: 20px; background-color: #fff">
+<div id="popovr_title"></div>
+<div id="popovr_text" style="text-align: left; clear:both"></div>
+<div id="popovr_t_login" style="display: none; text-align: left; clear:both">
+<p>Your session has expired. Please log back in to continue.</p>
+<form id="qlpop-form" onsubmit="return quickLogin(event)">
+<fieldset>
+<label>Username:</label>
+<input type="text" name="uname" id="ql-uname" maxlength="50" class="txtbox">
+<label>Password:</label>
+<input type="password" name="pword" id="ql-pword" maxlength="50" class="txtbox">
+<input type="submit" name="sub" value=" Log in ">
+<div id="m_qlpop" class="frmmsg1"></div>
+<div id="em_qlpop" class="frmmsg2"></div>
+</fieldset>
+</form>
+</div>
+</div>
+</div>
+</div>
+
+<div id="bodywrap">
+<div id="header">
+<div class="wrap">
+<a id="logo" href="/dashboard/index.html">
+<img src="/shared/logo400.png" alt="NexusBox" width="200" height="86" border="0" onerror="this.outerHTML='<span style=\'color:#fff;font-size:24px;font-weight:bold\'>NexusBox</span>'">
+</a>
+<div id="headerExtras">
+<span id="userWelcome">جاري التحميل...</span>
+<a href="/dashboard/index.html">My Cboxes</a>
+<a href="#" onclick="globalLogout(); return false;">Log out</a>
+</div>
+</div>
+</div>
+
+<div id="subbar">
+<div class="wrap">
+<a href="/dashboard/index.html" class="submenuitem"><b id="cbox-name">MSASDWEC2015HKARNO</b></a>
+<a href="/publish/publish.html" class="submenuitem">Publish</a>
+<a href="#" id="hovmenu1" class="submenuitem active" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+<a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options</a>
+<a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users</a>
+<a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages</a>
+</div>
+</div>
+<div id="bar3">
+<div id="hovmenu" class="wrap"><a></a></div>
+</div>
+
+<div id="wideimg" style="position: relative; width: 100%; left: 0"></div>
+
+<div id="main" class="wrap">
+<div id="content">
+
+<script type="text/javascript">
+var noticetogorig = "";
+function noticetoggle(xo, v) {
+  var xo = document.getElementById(xo);
+  z = document.getElementById('notice-more');
+  if (z.style.display == 'none') {
+    z.style.display = '';
+    noticetogorig = xo.innerHTML;
+    xo.innerHTML = v;
+  }
+  else {
+    z.style.display = 'none';
+    xo.innerHTML = noticetogorig;
+  }
+}
+
+function noticeclose(x) {
+  z = document.getElementById('notice');
+  z.style.display = "none";
+  document.cookie = "rnot="+x+";";
+}
+
+function highlighthelp(sec, para, on) {
+var ico = document.getElementById("hlpico-"+sec+"-"+para);
+  if (!ico) return;
+  if (!on) {
+  ico.style.filter = "alpha(opacity=60)";
+  ico.style.opacity = 0.6;
+  }
+  else {
+  ico.style.filter = "";
+  ico.style.opacity = 1;
+  }
+}
+
+var createBar = function ($elem, isLog, showLimit) {
+var $bar = document.createElement("div");
+$bar.className = "barFill";
+var $text = document.createElement("div");
+$text.className = "barText";
+$elem.appendChild($bar);
+$elem.appendChild($text);
+var minWidth = 5;
+var format = function (n) {
+return (n+'').split('').reverse().join('').replace(/([0-9]{3})(?=[0-9])/g, "$1,").split('').reverse().join('');
+}
+$bar.style.width = "0%";
+return {
+setBarSize: function (val, max) {
+var over = false;
+if (val > max) over = true;
+var val = Math.min(max, Math.max(0, val));
+var prop = val / max;
+$text.innerHTML = format(val) + (over ? "+" : "") + (showLimit ? "/" + max : "");
+var w = (isLog ? (Math.log((prop*1.718 + 1))) : prop) * 100;
+var r = prop/0.7 * 255 + 50;
+var g = 255 - prop*0.6*255;
+var b = 80;
+var comp = (255 / (r*0.9 + g * 1.1)) * 1.4;
+r = r / comp; g = g / comp; b = b / comp;
+window.setTimeout(function () {
+$bar.style.width = Math.max(w, minWidth) + "%";
+$bar.style.backgroundColor = "rgb("+(r|0)+", "+(g|0)+", "+(b|0)+")";
+}, 100);
+}
+}
+};
+</script>
+
+<h1>Theme Editor</h1>
+
+<p>
+The live preview shows your actual NexusBox with your changes applied. 
+Only you see your edits, until you Save.
+</p>
+
+<script>
+var changesMade = false;
+
+var doWarnThen = function (thenDo) {
+if (changesMade && !confirm("You have unsaved changes. Continue and discard?")) {
+return false;
+}
+if (thenDo) thenDo();
+return true;
 }
 </script>
+
+<form id="theme-select-form">
+<fieldset>
+<label>Load a theme: </label>
+<select name="style" id="theme-select" class="txtbox" onchange="loadThemePreset(this.value)">
+<optgroup label="Custom">
+<option value="-1000" selected="selected">My custom CSS</option>
+</optgroup>
+<optgroup label="Presets">
+<option value="13">Default blue</option>
+<option value="11">Basic transparent</option>
+<option value="1">Classic blue</option>
+<option value="2">Classic red</option>
+<option value="3">Classic yellow</option>
+<option value="4">Classic light</option>
+<option value="5">Classic dark</option>
+</optgroup>
+</select>
+</fieldset>
+</form>
+
+<div class="col1_2">
+<fieldset>
+<legend>Live preview</legend>
+<div id="preview-container" style="background: #fff; border: 1px solid #ccc; padding: 10px;">
+<iframe id="cboxmain" width="100%" height="305" frameborder="0" style="border: 0; padding: 0; margin: 0 auto;"></iframe>
+<iframe id="cboxform" width="100%" height="107" frameborder="0" style="border: 0; padding: 0; margin: 0 auto;"></iframe>
+</div>
+</fieldset>
+</div>
+
+<div class="col2_2">
+<form id="theme-editor-form" onsubmit="return saveTheme(event)">
+<fieldset>
+<legend>Editor</legend>
+<textarea id="advancedcss" name="advancedcss" spellcheck="false" cols="75" rows="40" class="txtarea" oninput="markChanged(); updatePreview();">body {
+text-align: left;
+}
+
+html,body {
+}
+
+td {
+font-family:tahoma, sans-serif;
+font-size:13pt;
+color:#000000;
+}
+
+.mnbdy {
+-moz-user-select: none;
+-khtml-user-select: none;
+-webkit-user-select: none;
+-ms-user-select: none;
+user-select: none;
+background-color:#FFE4E1;
+overflow:auto;
+padding:0px;
+margin:0px;
+}
+
+fmbdy {
+-moz-user-select: none;
+-khtml-user-select: none;
+-webkit-user-select: none;
+-ms-user-select: none;
+user-select: none;
+}
+
+A:link {
+font-size:14pt;
+text-decoration:none;
+color:Deeppink;
+float: right;
+margin: 0px 0px 0px 3px;
+}
+
+A:visited {
+text-decoration:none;
+color:#D80000;
+}
+
+A:active {
+text-decoration:underline;
+color:#000000;
+}
+
+A:hover {
+text-decoration:underline;
+color:#000000;
+}
+
+.hbtbl {
+table-layout:fixed;
+word-wrap:break-word;
+overflow:hidden;
+}
+
+.stxt {
+text-align: right;
+background-color: #FFFAFA;
+}
+
+.stxt2 {
+text-align: right;
+background-color: #FFE4E1;
+}
+
+.dtxt {
+font-size:8pt;
+text-align:right;
+}
+
+.dtxt2 {
+color:Fuchsia;
+font-size:8pt;
+text-align:right;
+}
+
+.pn_std {
+text-align: right;
+color:#339966;
+}
+
+.pn_reg {
+text-align: right;
+color:#141CEE;
+}
+
+.pn_mod {
+text-align: right;
+color:#E50913;
+}
+
+.pn_adm {
+text-align: right;
+color:#EF4AB2;
+}
+
+.cfrm {
+margin-bottom:0px;
+}
+
+.frmtb {
+width:85px;
+height:55px;
+padding-left:0px;
+background-color:Whitesmoke;
+border:#0000FF 2px solid;
+padding-right:0px;
+font-family:Arial, sans-serif;
+font-size:15pt;
+border-radius:15px;
+margin: 1px 1px 5px 1px;
+}
+
+.frmbtn {
+border:black 1px solid;
+border-radius:9px;
+width:30px;
+height:50px;
+font-size:15pt;
+background-color:#FF0000;
+color:#000000;
+vertical-align:top;
+margin: 1px 1px 1px 1px;
+}
+
+.lnk {
+color:#D8BFD8;
+}
+
+.pic {
+width:65px;
+height:65px;
+border-radius:15px;
+border:#0000FF 1px solid;
+margin-right:0px;
+padding-right:0px;
+float:left;
+}
+
+.status {
+float: right;
+}</textarea>
+<input type="submit" name="sub" value=" Save ">
+<div id="m_styleadv" class="frmmsg1"></div>
+<div id="em_styleadv" class="frmmsg2" style="text-align: left;"></div>
+</fieldset>
+</form>
+</div>
+
+<div class="colclear"></div>
+
+</div>
+<div style="clear: both"></div>
+</div>
+</div>
+
+<div id="siteErrorBar"><div class="wrap" id="siteErrorBarCont">Loading...</div></div>
+
+<div id="footer">
+<a href="#">About</a>
+<a href="#">Plans &amp; pricing</a>
+<a href="#">Terms &amp; conditions</a>
+<a href="#">Privacy policy</a>
+<a href="#">Notices</a>
+<a href="#">Contact us</a>
+<div class="verybottom">
+© 2004–2026 NexusBox Communications, all rights reserved.
+</div>
+</div>
+
+<script src="/shared/toolbar.js"></script>
+<script src="/shared/auth.js"></script>
+<script>
+// ===== Global Variables =====
+var currentUser = null;
+var currentTheme = null;
+var themePresets = {};
+
+// ===== Hovmenu System =====
+var hovmenu = function(btn, menuId) {
+var menus = {
+1: [
+{ text: 'Layout', href: '/layout-options/layout-options.html' },
+{ text: 'Theme', href: '/Theme-editor/Theme-editor.html', active: true },
+{ text: 'Emoticons', href: '/emoticons/index.html' }
+],
+2: [
+{ text: 'Posting', href: '/posting-options/index.html' },
+{ text: 'Date', href: '/date-options/index.html' },
+{ text: 'Filtering', href: '/filtering/index.html' },
+{ text: 'Sticky Message', href: '/sticky-message/index.html' },
+{ text: 'Webhook', href: '/webhook/index.html' }
+],
+3: [
+{ text: 'Registered Users', href: '/registered-users/registered-users.html' },
+{ text: 'User Integration', href: '/user-integration/user-integration.html' },
+{ text: 'Bans', href: '/bans/index.html' }
+],
+4: [
+{ text: 'Messages', href: '/messages/index.html' },
+{ text: 'Archives', href: '/archives/index.html' },
+{ text: 'Chat', href: '/chat/chat.html' },
+{ text: 'Channels', href: '/channels/index.html' }
+]
+};
+
+var hovmenuDiv = document.getElementById('hovmenu');
+var items = menus[menuId] || [];
+
+hovmenuDiv.innerHTML = '';
+items.forEach(function(item) {
+var a = document.createElement('a');
+a.href = item.href;
+a.className = 'submenuitem' + (item.active ? ' active' : '');
+a.textContent = item.text;
+hovmenuDiv.appendChild(a);
+});
+
+return false;
+};
+
+document.addEventListener('click', function(e) {
+if (!e.target.closest('#subbar') && !e.target.closest('#bar3')) {
+document.getElementById('hovmenu').innerHTML = '';
+}
+});
+
+// ===== Load User Info =====
+async function loadUserInfo() {
+const token = localStorage.getItem('token');
+if (!token) {
+window.location.href = '/login/index.html';
+return;
+}
+
+try {
+const res = await fetch('/api/auth/me', {
+headers: { 'Authorization': 'Bearer ' + token }
+});
+const data = await res.json();
+
+if (!data.success) {
+localStorage.removeItem('token');
+window.location.href = '/login/index.html';
+return;
+}
+
+currentUser = data.user;
+document.getElementById('userWelcome').textContent = data.user.email || data.user.username;
+document.getElementById('cbox-name').textContent = data.user.username.toUpperCase();
+
+loadThemePresets();
+loadUserTheme();
+} catch (error) {
+console.error('Error loading user:', error);
+}
+}
+
+// ===== Load Theme Presets =====
+async function loadThemePresets() {
+const token = localStorage.getItem('token');
+
+try {
+const res = await fetch('/api/theme/presets', {
+headers: { 'Authorization': 'Bearer ' + token }
+});
+const data = await res.json();
+
+if (data.success) {
+data.presets.forEach(preset => {
+themePresets[preset.id] = preset;
+});
+}
+} catch (error) {
+console.error('Error loading presets:', error);
+}
+}
+
+// ===== Load User Theme =====
+async function loadUserTheme() {
+const token = localStorage.getItem('token');
+
+try {
+const res = await fetch('/api/theme', {
+headers: { 'Authorization': 'Bearer ' + token }
+});
+const data = await res.json();
+
+if (data.success) {
+currentTheme = data.theme;
+document.getElementById('advancedcss').value = data.theme.css || '';
+
+if (data.theme.preset && data.theme.preset !== -1000) {
+document.getElementById('theme-select').value = data.theme.preset;
+}
+
+updatePreview();
+}
+} catch (error) {
+console.error('Error loading theme:', error);
+}
+}
+
+// ===== Load Theme Preset =====
+function loadThemePreset(presetId) {
+if (!doWarnThen()) {
+return false;
+}
+
+presetId = parseInt(presetId);
+
+if (presetId === -1000) {
+if (currentTheme) {
+document.getElementById('advancedcss').value = currentTheme.css || '';
+}
+} else if (themePresets[presetId]) {
+document.getElementById('advancedcss').value = themePresets[presetId].css;
+}
+
+changesMade = false;
+updatePreview();
+return true;
+}
+
+// ===== Mark Changes =====
+function markChanged() {
+changesMade = true;
+}
+
+// ===== Update Preview =====
+function updatePreview() {
+var css = document.getElementById('advancedcss').value;
+
+var previewHTML = '<!DOCTYPE html><html><head><style>' + css + '</style></head><body>';
+previewHTML += '<div style="padding: 20px;">';
+previewHTML += '<h2>NexusBox Preview</h2>';
+previewHTML += '<div class="mnbdy" style="padding: 10px;">';
+previewHTML += '<div class="stxt">Sample message 1</div>';
+previewHTML += '<div class="stxt2">Sample message 2</div>';
+previewHTML += '<div class="dtxt">12:00 PM</div>';
+previewHTML += '</div>';
+previewHTML += '<div class="cfrm" style="margin-top: 10px;">';
+previewHTML += '<input type="text" class="frmtb" placeholder="Name">';
+previewHTML += '<input type="text" class="frmtb" placeholder="Message">';
+previewHTML += '<input type="button" class="frmbtn" value="»">';
+previewHTML += '</div>';
+previewHTML += '</div></body></html>';
+
+var mainFrame = document.getElementById('cboxmain');
+mainFrame.srcdoc = previewHTML;
+
+var formHTML = '<!DOCTYPE html><html><head><style>' + css + '</style></head><body>';
+formHTML += '<div class="cfrm" style="padding: 10px;">';
+formHTML += '<input type="text" class="frmtb" placeholder="Name">';
+formHTML += '<input type="text" class="frmtb" placeholder="Message">';
+formHTML += '<input type="button" class="frmbtn" value="»">';
+formHTML += '</div></body></html>';
+
+var formFrame = document.getElementById('cboxform');
+formFrame.srcdoc = formHTML;
+}
+
+// ===== Save Theme =====
+async function saveTheme(event) {
+if (event) event.preventDefault();
+
+const token = localStorage.getItem('token');
+const msgDiv = document.getElementById('m_styleadv');
+const errDiv = document.getElementById('em_styleadv');
+
+msgDiv.textContent = '';
+errDiv.innerHTML = '';
+msgDiv.className = 'frmmsg1';
+errDiv.className = 'frmmsg2';
+
+var css = document.getElementById('advancedcss').value;
+var preset = parseInt(document.getElementById('theme-select').value);
+
+try {
+const res = await fetch('/api/theme', {
+method: 'PUT',
+headers: {
+'Content-Type': 'application/json',
+'Authorization': 'Bearer ' + token
+},
+body: JSON.stringify({ css: css, preset: preset })
+});
+
+const data = await res.json();
+
+if (data.success) {
+currentTheme = data.theme;
+changesMade = false;
+
+msgDiv.textContent = 'Saved successfully!';
+msgDiv.className = 'frmmsg1 Okay';
+} else {
+errDiv.innerHTML = '<ul><li>' + data.error + '</li></ul>';
+errDiv.className = 'frmmsg2 Error';
+}
+} catch (error) {
+errDiv.innerHTML = '<ul><li>Connection error</li></ul>';
+errDiv.className = 'frmmsg2 Error';
+}
+
+return false;
+}
+
+// ===== Quick Login =====
+async function quickLogin(e) {
+e.preventDefault();
+var uname = document.getElementById('ql-uname').value;
+var pword = document.getElementById('ql-pword').value;
+
+try {
+const res = await fetch('/api/auth/login', {
+method: 'POST',
+headers: { 'Content-Type': 'application/json' },
+body: JSON.stringify({ username: uname, password: pword })
+});
+
+const data = await res.json();
+
+if (data.success) {
+localStorage.setItem('token', data.token);
+localStorage.setItem('user', JSON.stringify(data.user));
+document.getElementById('popovr_box').style.display = 'none';
+location.reload();
+} else {
+document.getElementById('em_qlpop').innerHTML = '<ul><li>' + data.error + '</li></ul>';
+document.getElementById('em_qlpop').className = 'frmmsg2 Error';
+}
+} catch (error) {
+document.getElementById('em_qlpop').innerHTML = '<ul><li>Connection error</li></ul>';
+}
+
+return false;
+}
+
+// ===== Logout =====
+function logout() {
+globalLogout();
+return false;
+}
+
+// ===== Initialize =====
+document.addEventListener('DOMContentLoaded', function() {
+loadUserInfo();
+});
+
+// Modal / naked mode
+if (window.isPopup) {
+document.body.className = "Popped";
+}
+
+// Breadcrumbs
+var dropCrumb = function () {
+if (!localStorage) return;
+var bc = getCrumbs();
+bc.push(location.href);
+bc.splice(0, bc.length - 5);
+localStorage.setItem("site:bread", JSON.stringify(bc));
+};
+
+var getCrumbs = function () {
+if (!localStorage) return [];
+var bcStr = localStorage.getItem("site:bread");
+var bc = [];
+if (bcStr) bc = JSON.parse(bcStr);
+return bc;
+};
+
+dropCrumb();
+</script>
+
 </body></html>
