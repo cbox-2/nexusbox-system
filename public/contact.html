@@ -1,0 +1,126 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta property="og:title" content="Contact · NexusBox">
+<meta property="og:description" content="Contact · NexusBox - Professional chat platform">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nexusbox-system-production-c290.up.railway.app/">
+
+<link rel="canonical" href="https://nexusbox-system-production-c290.up.railway.app/contact.html">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Contact · NexusBox</title>
+<meta name="description" content="Contact · NexusBox - NexusBox professional chat platform">
+<link rel="icon" type="image/svg+xml" href="/shared/favicon.svg">
+<link rel="stylesheet" href="/shared/toolbar.css">
+<link rel="stylesheet" href="/shared/buttons.css">
+</head>
+<body id="mainbody">
+
+<div id="bodywrap">
+<div id="header">
+<div class="wrap">
+<a id="logo" href="/dashboard/index.html">
+<span style="color:#fff;font-size:24px;font-weight:bold">NexusBox</span>
+</a>
+<div id="headerExtras">
+<span id="userWelcome">Loading...</span>
+<a href="/dashboard/index.html">My Cboxes</a>
+<a href="#" onclick="globalLogout(); return false;">Log out</a>
+</div>
+</div>
+</div>
+
+<div id="subbar">
+<div class="wrap">
+<a href="/dashboard/index.html" class="submenuitem"><b id="cbox-name">DASHBOARD</b></a>
+<a href="/publish/publish.html" class="submenuitem">Publish</a>
+<a href="#" id="hovmenu1" class="submenuitem">Look &amp; feel</a>
+<a href="#" id="hovmenu2" class="submenuitem">Options</a>
+<a href="#" id="hovmenu3" class="submenuitem">Users</a>
+<a href="#" id="hovmenu4" class="submenuitem">Messages</a>
+</div>
+</div>
+
+<div id="bar3">
+<div id="hovmenu" class="wrap" style="display:none"></div>
+</div>
+
+<div id="main">
+<div id="content">
+<h1>Contact Us</h1>
+
+            <h2>Get in Touch</h2>
+            <p>We'd love to hear from you. Use the form below or reach out directly.</p>
+            
+            <form id="contact-form" onsubmit="return submitContact(event)" style="max-width:500px;margin-top:20px;">
+                <fieldset>
+                    <label>Name:</label>
+                    <input type="text" id="contact-name" class="txtbox" required style="width:100%;">
+                    
+                    <label>Email:</label>
+                    <input type="email" id="contact-email" class="txtbox" required style="width:100%;">
+                    
+                    <label>Subject:</label>
+                    <input type="text" id="contact-subject" class="txtbox" required style="width:100%;">
+                    
+                    <label>Message:</label>
+                    <textarea id="contact-message" class="txtarea" rows="5" required style="width:100%;"></textarea>
+                    
+                    <button type="submit" style="margin-top:15px;">Send Message</button>
+                    
+                    <div id="contact-msg" class="frmmsg1"></div>
+                    <div id="contact-err" class="frmmsg2"></div>
+                </fieldset>
+            </form>
+            
+            <h2 style="margin-top:30px;">Other Ways to Reach Us</h2>
+            <p>📧 Email: support@nexusbox.app</p>
+            <p>⏰ Support Hours: 24/7</p>
+        
+</div>
+</div>
+</div>
+
+<div id="footer">
+<a href="/about.html">About</a>
+<a href="/pricing.html">Plans &amp; pricing</a>
+<a href="/terms.html">Terms &amp; conditions</a>
+<a href="/privacy.html">Privacy policy</a>
+<a href="/notices.html">Notices</a>
+<a href="/contact.html">Contact us</a>
+<div class="verybottom">© 2004–2026 NexusBox Communications</div>
+</div>
+
+<script src="/shared/toolbar.js"></script>
+<script src="/shared/auth.js"></script>
+<script src="/shared/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+loadUserInfo();
+});
+
+function submitContact(e) {
+e.preventDefault();
+var msg = document.getElementById('contact-msg');
+var err = document.getElementById('contact-err');
+msg.textContent = ''; err.innerHTML = '';
+
+var name = document.getElementById('contact-name').value;
+var email = document.getElementById('contact-email').value;
+var subject = document.getElementById('contact-subject').value;
+var message = document.getElementById('contact-message').value;
+
+if (!name || !email || !subject || !message) {
+err.innerHTML = '<ul><li>All fields required</li></ul>';
+return false;
+}
+
+msg.textContent = 'Message sent successfully!';
+document.getElementById('contact-form').reset();
+return false;
+}
+</script>
+
+</body>
+</html>

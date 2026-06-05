@@ -1,0 +1,124 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta property="og:title" content="Terms & Conditions · NexusBox">
+<meta property="og:description" content="Terms & Conditions · NexusBox - Professional chat platform">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nexusbox-system-production-c290.up.railway.app/">
+
+<link rel="canonical" href="https://nexusbox-system-production-c290.up.railway.app/terms.html">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Terms & Conditions · NexusBox</title>
+<meta name="description" content="Terms & Conditions · NexusBox - NexusBox professional chat platform">
+<link rel="icon" type="image/svg+xml" href="/shared/favicon.svg">
+<link rel="stylesheet" href="/shared/toolbar.css">
+<link rel="stylesheet" href="/shared/buttons.css">
+</head>
+<body id="mainbody">
+
+<div id="bodywrap">
+<div id="header">
+<div class="wrap">
+<a id="logo" href="/dashboard/index.html">
+<span style="color:#fff;font-size:24px;font-weight:bold">NexusBox</span>
+</a>
+<div id="headerExtras">
+<span id="userWelcome">Loading...</span>
+<a href="/dashboard/index.html">My Cboxes</a>
+<a href="#" onclick="globalLogout(); return false;">Log out</a>
+</div>
+</div>
+</div>
+
+<div id="subbar">
+<div class="wrap">
+<a href="/dashboard/index.html" class="submenuitem"><b id="cbox-name">DASHBOARD</b></a>
+<a href="/publish/publish.html" class="submenuitem">Publish</a>
+<a href="#" id="hovmenu1" class="submenuitem">Look &amp; feel</a>
+<a href="#" id="hovmenu2" class="submenuitem">Options</a>
+<a href="#" id="hovmenu3" class="submenuitem">Users</a>
+<a href="#" id="hovmenu4" class="submenuitem">Messages</a>
+</div>
+</div>
+
+<div id="bar3">
+<div id="hovmenu" class="wrap" style="display:none"></div>
+</div>
+
+<div id="main">
+<div id="content">
+<h1>Terms & Conditions</h1>
+
+            <h2>1. Acceptance of Terms</h2>
+            <p>By accessing and using NexusBox, you agree to be bound by these Terms and Conditions.</p>
+            
+            <h2>2. Use of Service</h2>
+            <p>You agree to use NexusBox only for lawful purposes and in accordance with these Terms.</p>
+            
+            <h2>3. User Accounts</h2>
+            <p>You are responsible for maintaining the confidentiality of your account credentials.</p>
+            
+            <h2>4. Content</h2>
+            <p>You retain ownership of content you post. By posting, you grant us a license to display and distribute your content.</p>
+            
+            <h2>5. Prohibited Conduct</h2>
+            <ul>
+                <li>Posting illegal or harmful content</li>
+                <li>Harassing other users</li>
+                <li>Attempting to breach security</li>
+                <li>Using the service for spam</li>
+            </ul>
+            
+            <h2>6. Termination</h2>
+            <p>We reserve the right to terminate accounts that violate these Terms.</p>
+            
+            <h2>7. Contact</h2>
+            <p>For questions about these Terms, please <a href="/contact.html">contact us</a>.</p>
+        
+</div>
+</div>
+</div>
+
+<div id="footer">
+<a href="/about.html">About</a>
+<a href="/pricing.html">Plans &amp; pricing</a>
+<a href="/terms.html">Terms &amp; conditions</a>
+<a href="/privacy.html">Privacy policy</a>
+<a href="/notices.html">Notices</a>
+<a href="/contact.html">Contact us</a>
+<div class="verybottom">© 2004–2026 NexusBox Communications</div>
+</div>
+
+<script src="/shared/toolbar.js"></script>
+<script src="/shared/auth.js"></script>
+<script src="/shared/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+loadUserInfo();
+});
+
+function submitContact(e) {
+e.preventDefault();
+var msg = document.getElementById('contact-msg');
+var err = document.getElementById('contact-err');
+msg.textContent = ''; err.innerHTML = '';
+
+var name = document.getElementById('contact-name').value;
+var email = document.getElementById('contact-email').value;
+var subject = document.getElementById('contact-subject').value;
+var message = document.getElementById('contact-message').value;
+
+if (!name || !email || !subject || !message) {
+err.innerHTML = '<ul><li>All fields required</li></ul>';
+return false;
+}
+
+msg.textContent = 'Message sent successfully!';
+document.getElementById('contact-form').reset();
+return false;
+}
+</script>
+
+</body>
+</html>

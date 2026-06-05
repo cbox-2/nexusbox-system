@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta property="og:title" content="About · NexusBox">
+<meta property="og:description" content="About · NexusBox - Professional chat platform">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://nexusbox-system-production-c290.up.railway.app/">
+
+<link rel="canonical" href="https://nexusbox-system-production-c290.up.railway.app/about.html">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>About · NexusBox</title>
+<meta name="description" content="About · NexusBox - NexusBox professional chat platform">
+<link rel="icon" type="image/svg+xml" href="/shared/favicon.svg">
+<link rel="stylesheet" href="/shared/toolbar.css">
+<link rel="stylesheet" href="/shared/buttons.css">
+</head>
+<body id="mainbody">
+
+<div id="bodywrap">
+<div id="header">
+<div class="wrap">
+<a id="logo" href="/dashboard/index.html">
+<span style="color:#fff;font-size:24px;font-weight:bold">NexusBox</span>
+</a>
+<div id="headerExtras">
+<span id="userWelcome">Loading...</span>
+<a href="/dashboard/index.html">My Cboxes</a>
+<a href="#" onclick="globalLogout(); return false;">Log out</a>
+</div>
+</div>
+</div>
+
+<div id="subbar">
+<div class="wrap">
+<a href="/dashboard/index.html" class="submenuitem"><b id="cbox-name">DASHBOARD</b></a>
+<a href="/publish/publish.html" class="submenuitem">Publish</a>
+<a href="#" id="hovmenu1" class="submenuitem">Look &amp; feel</a>
+<a href="#" id="hovmenu2" class="submenuitem">Options</a>
+<a href="#" id="hovmenu3" class="submenuitem">Users</a>
+<a href="#" id="hovmenu4" class="submenuitem">Messages</a>
+</div>
+</div>
+
+<div id="bar3">
+<div id="hovmenu" class="wrap" style="display:none"></div>
+</div>
+
+<div id="main">
+<div id="content">
+<h1>About NexusBox</h1>
+
+            <h2>What is NexusBox?</h2>
+            <p>NexusBox is a professional live chat solution for online communities, groups, and live-streaming events. Our platform provides real-time communication tools that help you engage with your audience effectively.</p>
+            
+            <h2>Our Mission</h2>
+            <p>We believe in providing powerful, easy-to-use communication tools that help communities grow and thrive. Our platform is built with modern technologies and designed for reliability.</p>
+            
+            <h2>Features</h2>
+            <ul>
+                <li>Real-time chat with multiple channels</li>
+                <li>Advanced user management system</li>
+                <li>Customizable themes and layouts</li>
+                <li>Robust moderation tools</li>
+                <li>Mobile-responsive design</li>
+                <li>Secure authentication</li>
+            </ul>
+            
+            <h2>Contact Us</h2>
+            <p>Have questions? Visit our <a href="/contact.html">contact page</a> to get in touch.</p>
+        
+</div>
+</div>
+</div>
+
+<div id="footer">
+<a href="/about.html">About</a>
+<a href="/pricing.html">Plans &amp; pricing</a>
+<a href="/terms.html">Terms &amp; conditions</a>
+<a href="/privacy.html">Privacy policy</a>
+<a href="/notices.html">Notices</a>
+<a href="/contact.html">Contact us</a>
+<div class="verybottom">© 2004–2026 NexusBox Communications</div>
+</div>
+
+<script src="/shared/toolbar.js"></script>
+<script src="/shared/auth.js"></script>
+<script src="/shared/nav.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+loadUserInfo();
+});
+
+function submitContact(e) {
+e.preventDefault();
+var msg = document.getElementById('contact-msg');
+var err = document.getElementById('contact-err');
+msg.textContent = ''; err.innerHTML = '';
+
+var name = document.getElementById('contact-name').value;
+var email = document.getElementById('contact-email').value;
+var subject = document.getElementById('contact-subject').value;
+var message = document.getElementById('contact-message').value;
+
+if (!name || !email || !subject || !message) {
+err.innerHTML = '<ul><li>All fields required</li></ul>';
+return false;
+}
+
+msg.textContent = 'Message sent successfully!';
+document.getElementById('contact-form').reset();
+return false;
+}
+</script>
+
+</body>
+</html>
