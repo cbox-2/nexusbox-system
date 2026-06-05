@@ -31,9 +31,48 @@
   </div>
 </div>
 <div id="main" style="padding: 20px; color: white;">
-  <h1>Dashboard</h1>
-  <p>Welcome to NexusBox Dashboard</p>
+  <div id="content-area">
+    <h1>Dashboard</h1>
+    <p>Welcome to NexusBox Dashboard</p>
+  </div>
+  <iframe id="content-frame" style="display:none; width:100%; height:600px; border:none; background:#fff;"></iframe>
 </div>
 <script src="/shared/toolbar.js"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+  var links = document.querySelectorAll('#subbar a.submenuitem, #headerExtras a');
+  var contentArea = document.getElementById('content-area');
+  var contentFrame = document.getElementById('content-frame');
+  
+  links.forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      var href = this.getAttribute('href');
+      
+      // تجاهل الروابط الفارغة أو #
+      if (!href || href === '#') return;
+      
+      e.preventDefault();
+      
+      // تحديث الزر النشط
+      document.querySelectorAll('.submenuitem').forEach(function(btn) {
+        btn.classList.remove('active');
+      });
+      this.classList.add('active');
+      
+      // إذا كان الرابط dashboard، اعرض المحتوى الأصلي
+      if (href === '/dashboard/index.html' || href === '#') {
+        contentFrame.style.display = 'none';
+        contentArea.style.display = 'block';
+        contentArea.innerHTML = '<h1>Dashboard</h1><p>Welcome to NexusBox Dashboard</p>';
+      } else {
+        // افتح الصفحة في iframe
+        contentArea.style.display = 'none';
+        contentFrame.style.display = 'block';
+        contentFrame.src = href;
+      }
+    });
+  });
+});
+</script>
 </body>
 </html>
