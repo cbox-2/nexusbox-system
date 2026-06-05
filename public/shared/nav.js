@@ -1,7 +1,5 @@
-// ===== NexusBox Navigation System - Fixed =====
+// ===== NexusBox Navigation System =====
 (function() {
-  'use strict';
-  
   var menus = {
     1: [
       {text:'Layout', href:'/layout-options/layout-options.html'},
@@ -35,13 +33,13 @@
     hovmenuDiv.innerHTML = '';
     hovmenuDiv.style.display = 'block';
     
-    items.forEach(function(item) {
+    for (var i = 0; i < items.length; i++) {
       var a = document.createElement('a');
-      a.href = item.href;
+      a.href = items[i].href;
       a.className = 'submenuitem';
-      a.textContent = item.text;
+      a.textContent = items[i].text;
       hovmenuDiv.appendChild(a);
-    });
+    }
     
     return false;
   }
@@ -54,41 +52,42 @@
     }
   }
   
-  // Initialize on DOM load
-  document.addEventListener('DOMContentLoaded', function() {
-    // Attach click handlers to all hovmenu buttons
+  // Initialize
+  function init() {
     for (var i = 1; i <= 4; i++) {
       var btn = document.getElementById('hovmenu' + i);
       if (btn) {
-        btn.addEventListener('click', function(e) {
+        btn.onclick = function(e) {
           e.preventDefault();
           e.stopPropagation();
           openMenu(i);
           return false;
-        });
-        
-        btn.addEventListener('mousedown', function(e) {
+        };
+        btn.onmousedown = function(e) {
           e.preventDefault();
           openMenu(i);
           return false;
-        });
+        };
       }
     }
     
-    // Close menu when clicking outside
     document.addEventListener('click', function(e) {
       var subbar = document.getElementById('subbar');
       var bar3 = document.getElementById('bar3');
         closeMenu();
       }
     });
-  });
+  }
   
-  // Make hovmenu globally available
+  if (document.readyState === 'loading') {
+    document.addEventListener('DOMContentLoaded', init);
+  } else {
+    init();
+  }
+  
   window.hovmenu = openMenu;
 })();
 
-// Global functions
 function globalLogout() {
   localStorage.removeItem('token');
   localStorage.removeItem('user');

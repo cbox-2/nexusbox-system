@@ -1,7 +1,6 @@
 /* ===== NexusBox Toolbar CSS ===== */
 * { box-sizing: border-box; }
 body { margin: 0; padding: 0; font-family: Tahoma, Verdana, sans-serif; font-size: 13px; background: #1e1b4b; color: #fff; }
-body#mainbody { padding-top: 0; }
 
 #bodywrap { min-height: 100vh; }
 
@@ -21,7 +20,8 @@ body#mainbody { padding-top: 0; }
 
 #bar3 { background: #2d2a5e; min-height: 32px; border-bottom: 1px solid #444; }
 #bar3 .wrap { max-width: 1200px; margin: 0 auto; padding: 0 20px; display: flex; gap: 5px; flex-wrap: wrap; }
-#hovmenu { display: block; }
+
+/* إخفاء hovmenu افتراضياً */
 #hovmenu a { color: #ddd; text-decoration: none; padding: 6px 12px; font-size: 12px; display: inline-block; }
 #hovmenu a:hover { background: #4a4780; color: #fff; }
 #hovmenu a.active { background: #059ad0; color: #fff; }
@@ -64,9 +64,6 @@ input[type="submit"]:hover, input[type="button"]:hover, button:hover { backgroun
 .col2_2 { float: left; width: 48%; }
 .colclear { clear: both; }
 
-.Short fieldset { min-height: auto; }
-.Med fieldset { min-height: auto; }
-
 .dHead { width: 100%; border-collapse: collapse; margin-bottom: 10px; }
 .dHead td { padding: 8px; background: #3a3770; border: 1px solid #444; }
 .dHead a { color: #4a7fb5; text-decoration: none; font-size: 12px; }
@@ -80,7 +77,6 @@ input[type="submit"]:hover, input[type="button"]:hover, button:hover { backgroun
 #popovr_box .wrap { max-width: 400px; margin: 100px auto; }
 
 #mask { display: none; }
-
 .notice { background: #3a3770; border-left: 4px solid #059ad0; padding: 10px 15px; margin: 15px 0; color: #ddd; }
 
 @media (max-width: 768px) {
