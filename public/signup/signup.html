@@ -1,176 +1,171 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-<title>Control Panel · NexusBox</title>
-<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-<meta http-equiv="X-UA-Compatible" content="IE=edge">
-<meta content="width=device-width, initial-scale=1" name="viewport">
-<meta name="description" content="NexusBox live chat is an embeddable chat app for online communities, groups, and live-streaming events.">
-<link rel="stylesheet" href="css/style.css">
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>إنشاء حساب · NexusBox</title>
 <style>
-/* تصغير حجم كتابة الأزرار */
-.submenuitem {
-  font-size: 85% !important;
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  font-family: Tahoma, Arial, sans-serif;
+  background: linear-gradient(135deg, #1e1b4b, #312e81);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: #fff;
 }
-#headerExtras a, #headerExtras span {
-  font-size: 85% !important;
-  padding: 5px 8px !important;
+.signup-container {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(10px);
+  padding: 40px;
+  border-radius: 15px;
+  width: 100%;
+  max-width: 400px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.3);
 }
-#headerExtras #userWelcome {
-  font-size: 90% !important;
+h1 {
+  text-align: center;
+  margin-bottom: 30px;
+  color: #fff;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+label {
+  display: block;
+  margin-bottom: 8px;
+  color: #ddd;
+  font-size: 14px;
+}
+input {
+  width: 100%;
+  padding: 12px;
+  background: rgba(255,255,255,0.1);
+  border: 1px solid rgba(255,255,255,0.2);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 14px;
+}
+input:focus {
+  outline: none;
+  border-color: #4a7fb5;
+}
+button {
+  width: 100%;
+  padding: 12px;
+  background: #4a7fb5;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+button:hover {
+  background: #3a6a9a;
+}
+.error {
+  background: rgba(255,0,0,0.2);
+  color: #ff6b6b;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: none;
+}
+.success {
+  background: rgba(0,255,0,0.2);
+  color: #6bff6b;
+  padding: 10px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+  display: none;
+}
+.links {
+  text-align: center;
+  margin-top: 20px;
+}
+.links a {
+  color: #4a7fb5;
+  text-decoration: none;
+}
+.links a:hover {
+  text-decoration: underline;
 }
 </style>
 </head>
-<body id="mainbody">
-
-<script type="text/javascript">
-var rcvdformresponse = function () {};
-</script>
-
-<div id="mask"></div>
-
-<div id="popovr_box">
-  <div class="wrap">
-    <div style="padding: 20px; background-color: #fff">
-      <div id="popovr_title"></div>
-      <div id="popovr_text" style="text-align: left; clear:both"></div>
-      <div id="popovr_t_login" style="display: none; text-align: left; clear:both">
-        <p>Your session has expired. Please log back in to continue.</p>
-        <iframe src="javascript:false" name="t_qlpop" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
-        <form name="qlpop" action="/admin_d_login?f=qlpop" target="t_qlpop" method="post" onsubmit="return subsaving(this.name, 'sub', 'logging in...');">
-        <fieldset>
-          <label>Username:</label>
-          <input type="text" name="uname" value="" maxlength="50" class="txtbox">
-          <label>Password:</label>
-          <input type="password" name="pword" value="" maxlength="50" class="txtbox">
-          <input type="submit" name="sub" value=" Log in ">
-          <div id="m_qlpop" class="frmmsg1"></div>
-          <div id="em_qlpop" class="frmmsg2"></div>
-        </fieldset>
-        </form>
-      </div>
+<body>
+<div class="signup-container">
+  <h1>📝 إنشاء حساب جديد</h1>
+  
+  <div class="error" id="error-msg"></div>
+  <div class="success" id="success-msg"></div>
+  
+  <form id="signup-form">
+    <div class="form-group">
+      <label>اسم المستخدم</label>
+      <input type="text" id="username" required minlength="3">
     </div>
+    
+    <div class="form-group">
+      <label>البريد الإلكتروني</label>
+      <input type="email" id="email" required>
+    </div>
+    
+    <div class="form-group">
+      <label>كلمة المرور</label>
+      <input type="password" id="password" required minlength="6">
+    </div>
+    
+    <button type="submit">تسجيل</button>
+  </form>
+  
+  <div class="links">
+    <p>لديك حساب بالفعل؟ <a href="/login/index.html">سجل دخول</a></p>
   </div>
 </div>
 
-<div id="bodywrap">
-  <div id="header">
-    <div class="wrap">
-      <a id="logo" href="/signup/signup.html">
-        <img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mP8z8DwHwAFBQIAX8jx0gAAAABJRU5ErkJggg==" alt="NexusBox" width="200" height="86" border="0" style="background:#059ad0">
-      </a>
-      <div id="headerExtras">
-        <span id="userWelcome">msmsas55@yahoo.com</span>
-        <a href="/dashboard/dashboard.html">My Cboxes</a>
-        <a href="#">My Account</a>
-        <a href="#">Support</a>
-        <a href="#" onclick="logout()">Log out</a>
-      </div>
-    </div>
-  </div>
-
-  <div id="subbar">
-    <div class="wrap">
-      <a href="#" class="submenuitem"><b>MSASDWEC2015HKARNO</b></a>
-      <a href="#" class="submenuitem">Publish</a>
-      <a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
-      <a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options</a>
-      <a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users</a>
-      <a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages</a>
-    </div>
-  </div>
-  
-  <div id="bar3">
-    <div id="hovmenu" class="wrap"><a></a></div>
-  </div>
-  
-  <div id="wideimg" style="position: relative; width: 100%; left: 0"></div>
-  
-  <div id="main" class="wrap">
-    <div id="content">
-      <h1>Welcome to NexusBox</h1>
-      <div class="block_grey">
-        <form name="fsignup" onsubmit="return false;">
-          <fieldset>
-            <legend>Create your Account</legend>
-            <label>Email:</label>
-            <input type="email" name="email" class="txtbox" placeholder="your@email.com">
-            <label>Password:</label>
-            <input type="password" name="pword" class="txtbox" placeholder="********">
-            <input type="submit" name="sub" value="Create & Log in">
-            <div id="m_fsignup" class="frmmsg1"></div>
-            <div id="em_fsignup" class="frmmsg2"></div>
-          </fieldset>
-        </form>
-      </div>
-    </div>
-  </div>
-</div>
-
-<div id="footer">
-  <a href="#">About</a>
-  <a href="#">Plans & pricing</a>
-  <a href="#">Terms & conditions</a>
-  <a href="#">Privacy policy</a>
-  <a href="#">Contact us</a>
-  <div class="verybottom">© 2004–2026 NexusBox System, all rights reserved.</div>
-</div>
-
-<script src="js/code.js"></script>
 <script>
-// تحديث الإيميل
-if(localStorage.getItem('nb_user_email')) {
-  document.getElementById('userWelcome').textContent = localStorage.getItem('nb_user_email');
-}
-
-// ربط النموذج بالسيرفر
-document.querySelector('form[name="fsignup"]').addEventListener('submit', async e => {
+document.getElementById('signup-form').addEventListener('submit', async function(e) {
   e.preventDefault();
-  const email = e.target.email.value.trim();
-  const pass = e.target.pword.value;
-  if(!email||!pass) return setmsg('fsignup','Fill all fields',2);
-  try{
-    const r = await fetch('/api/register', {method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email,password:pass})});
-    const d = await r.json();
-    if(!r.ok) return setmsg('fsignup', d.error||'Failed',2);
-    localStorage.setItem('nb_token', d.token);
-    localStorage.setItem('nb_user_email', email);
-    document.getElementById('userWelcome').textContent = email;
-    setmsg('fsignup','✅ Success! Redirecting...',1);
-    setTimeout(()=>window.location.href='/dashboard/dashboard.html', 800);
-  }catch{ setmsg('fsignup','Connection error',2); }
+  
+  const username = document.getElementById('username').value;
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const errorDiv = document.getElementById('error-msg');
+  const successDiv = document.getElementById('success-msg');
+  
+  errorDiv.style.display = 'none';
+  successDiv.style.display = 'none';
+  
+  try {
+    const res = await fetch('/api/auth/signup', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, email, password })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      localStorage.setItem('token', data.token);
+      localStorage.setItem('user', JSON.stringify(data.user));
+      
+      successDiv.textContent = 'تم إنشاء الحساب بنجاح! جاري التحويل...';
+      successDiv.style.display = 'block';
+      
+      setTimeout(() => {
+        window.location.href = '/dashboard/index.html';
+      }, 1000);
+    } else {
+      errorDiv.textContent = data.error || 'خطأ في إنشاء الحساب';
+      errorDiv.style.display = 'block';
+    }
+  } catch (error) {
+    errorDiv.textContent = 'خطأ في الاتصال بالسيرفر';
+    errorDiv.style.display = 'block';
+  }
 });
-
-function setmsg(n, m, a) {
-  x = document.getElementById("m_"+n);
-  x.innerHTML = m;
-  switch (a) {
-    default: x.className = "frmmsg1"; break;
-    case 1: x.className = "frmmsg1 Okay"; break;
-    case 2: x.className = "frmmsg1 Error"; break;
-  }
-}
-
-function popovr(t, x) {
-  document.getElementById("popovr_box").style.display = "block";
-  document.getElementById("popovr_text").innerHTML = x;
-  document.getElementById("popovr_title").innerHTML = t;
-}
-
-function popovr_close() {
-  document.getElementById("popovr_box").style.display = "none";
-  document.getElementById("popovr_t_login").style.display = "none";
-}
-
-function logout() {
-  if(confirm('Log out?')){
-    localStorage.removeItem('nb_token');
-    localStorage.removeItem('nb_user_email');
-    window.location.reload();
-  }
-  return false;
-}
 </script>
-
 </body>
 </html>

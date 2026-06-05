@@ -10,18 +10,14 @@ const jwt = require('jsonwebtoken');
 
 const app = express();
 
-// ===== Trust Proxy (مهم لـ Railway) =====
 app.set("trust proxy", 1);
 
-// ===== Security & Performance =====
 app.use(helmet({ contentSecurityPolicy: false }));
 app.use(cors());
 app.use(compression());
 app.use(express.json({ limit: '10mb' }));
-app.use(express.static('public'));
 app.use(express.urlencoded({ extended: true }));
 
-// ===== Rate Limiting =====
 const limiter = rateLimit({
   windowMs: 15 * 60 * 1000,
   max: 1000,
@@ -29,12 +25,14 @@ const limiter = rateLimit({
 });
 app.use(limiter);
 
-// ===== User Model (مدمج في نفس الملف) =====
+app.use(express.static('public'));
+
+// ===== User Model =====
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true, trim: true, minlength: 3 },
   email: { type: String, required: true, unique: true, lowercase: true },
   password: { type: String, required: true, minlength: 6 },
-  role: { type: String, default: 'user', enum: ['user', 'admin', 'moderator'] },
+  role: { type: String, default: 'user', enum: ['user', 'moderator', 'admin'] },
   status: { type: String, default: 'active', enum: ['active', 'banned', 'suspended'] },
   createdAt: { type: Date, default: Date.now },
   lastLogin: { type: Date }
@@ -59,10 +57,42 @@ userSchema.methods.toJSON = function() {
 
 const User = mongoose.model('User', userSchema);
 
+// ===== Message Model =====
+const messageSchema = new mongoose.Schema({
+  content: { type: String, required: true },
+  author: { type: mongoose.Schema.Types.ObjectId, ref: 'User', required: true },
+  channel: { type: String, default: 'general' },
+  isSticky: { type: Boolean, default: false },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Message = mongoose.model('Message', messageSchema);
+
+// ===== Ban Model =====
+const banSchema = new mongoose.Schema({
+  target: { type: String, required: true },
+  reason: { type: String, default: '' },
+  bannedBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  createdAt: { type: Date, default: Date.now },
+  expiresAt: { type: Date }
+});
+
+const Ban = mongoose.model('Ban', banSchema);
+
+// ===== Channel Model =====
+const channelSchema = new mongoose.Schema({
+  name: { type: String, required: true, unique: true },
+  description: { type: String, default: '' },
+  createdBy: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  createdAt: { type: Date, default: Date.now }
+});
+
+const Channel = mongoose.model('Channel', channelSchema);
+
 // ===== Auth Middleware =====
 const authMiddleware = async (req, res, next) => {
   try {
-    const token = req.headers.authorization?.split(' ')[1];
+    const token = req.headers.authorization?.split(' ')[1] || req.cookies?.token;
     if (!token) return res.status(401).json({ success: false, error: 'No token provided' });
     
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
@@ -81,6 +111,13 @@ const authMiddleware = async (req, res, next) => {
 const adminMiddleware = (req, res, next) => {
   if (req.user.role !== 'admin') {
     return res.status(403).json({ success: false, error: 'Admin access required' });
+  }
+  next();
+};
+
+const moderatorMiddleware = (req, res, next) => {
+  if (!['admin', 'moderator'].includes(req.user.role)) {
+    return res.status(403).json({ success: false, error: 'Moderator access required' });
   }
   next();
 };
@@ -106,7 +143,7 @@ async function connectToMongo() {
   }
 }
 
-// ===== Routes =====
+// ===== API Routes =====
 
 // Health Check
 app.get('/api/health', (req, res) => {
@@ -119,9 +156,7 @@ app.get('/api/health', (req, res) => {
   });
 });
 
-// ===== AUTH ROUTES =====
-
-// Signup
+// ===== AUTH API =====
 app.post('/api/auth/signup', async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -156,7 +191,6 @@ app.post('/api/auth/signup', async (req, res) => {
   }
 });
 
-// Login
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { username, password } = req.body;
@@ -196,17 +230,10 @@ app.post('/api/auth/login', async (req, res) => {
   }
 });
 
-// Logout
-app.get('/api/auth/logout', authMiddleware, (req, res) => {
-  res.json({ success: true, message: 'Logged out successfully' });
-});
-
-// Get current user
-app.get('/api/auth/me', authMiddleware, async (req, res) => {
+app.get('/api/auth/me', authMiddleware, (req, res) => {
   res.json({ success: true, user: req.user.toJSON() });
 });
 
-// Get all users (Admin only)
 app.get('/api/auth/users', authMiddleware, adminMiddleware, async (req, res) => {
   try {
     const users = await User.find().sort({ createdAt: -1 });
@@ -216,12 +243,229 @@ app.get('/api/auth/users', authMiddleware, adminMiddleware, async (req, res) => 
   }
 });
 
-// Profile (protected)
+app.put('/api/auth/users/:id/role', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { role } = req.body;
+    if (!['user', 'moderator', 'admin'].includes(role)) {
+      return res.status(400).json({ success: false, error: 'Invalid role' });
+    }
+    
+    const user = await User.findByIdAndUpdate(req.params.id, { role }, { new: true });
+    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+    
+    res.json({ success: true, user: user.toJSON() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/auth/users/:id/status', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { status } = req.body;
+    if (!['active', 'banned', 'suspended'].includes(status)) {
+      return res.status(400).json({ success: false, error: 'Invalid status' });
+    }
+    
+    const user = await User.findByIdAndUpdate(req.params.id, { status }, { new: true });
+    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+    
+    res.json({ success: true, user: user.toJSON() });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/auth/users/:id', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const user = await User.findByIdAndDelete(req.params.id);
+    if (!user) return res.status(404).json({ success: false, error: 'User not found' });
+    
+    res.json({ success: true, message: 'User deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ===== MESSAGES API =====
+app.get('/api/messages', authMiddleware, async (req, res) => {
+  try {
+    const messages = await Message.find()
+      .populate('author', 'username role')
+      .sort({ createdAt: -1 })
+      .limit(100);
+    res.json({ success: true, count: messages.length, messages });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/messages', authMiddleware, async (req, res) => {
+  try {
+    const { content, channel, isSticky } = req.body;
+    
+    if (!content) {
+      return res.status(400).json({ success: false, error: 'Content is required' });
+    }
+    
+    const message = new Message({
+      content,
+      author: req.userId,
+      channel: channel || 'general',
+      isSticky: isSticky || false
+    });
+    
+    await message.save();
+    await message.populate('author', 'username role');
+    
+    res.status(201).json({ success: true, message });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/messages/:id', authMiddleware, moderatorMiddleware, async (req, res) => {
+  try {
+    const message = await Message.findByIdAndDelete(req.params.id);
+    if (!message) return res.status(404).json({ success: false, error: 'Message not found' });
+    
+    res.json({ success: true, message: 'Message deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ===== BANS API =====
+app.get('/api/bans', authMiddleware, moderatorMiddleware, async (req, res) => {
+  try {
+    const bans = await Ban.find().populate('bannedBy', 'username').sort({ createdAt: -1 });
+    res.json({ success: true, count: bans.length, bans });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/bans', authMiddleware, moderatorMiddleware, async (req, res) => {
+  try {
+    const { target, reason, expiresAt } = req.body;
+    
+    if (!target) {
+      return res.status(400).json({ success: false, error: 'Target is required' });
+    }
+    
+    const ban = new Ban({
+      target,
+      reason: reason || '',
+      bannedBy: req.userId,
+      expiresAt: expiresAt ? new Date(expiresAt) : null
+    });
+    
+    await ban.save();
+    await ban.populate('bannedBy', 'username');
+    
+    res.status(201).json({ success: true, ban });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/bans/:id', authMiddleware, moderatorMiddleware, async (req, res) => {
+  try {
+    const ban = await Ban.findByIdAndDelete(req.params.id);
+    if (!ban) return res.status(404).json({ success: false, error: 'Ban not found' });
+    
+    res.json({ success: true, message: 'Ban removed' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ===== CHANNELS API =====
+app.get('/api/channels', authMiddleware, async (req, res) => {
+  try {
+    const channels = await Channel.find().populate('createdBy', 'username').sort({ createdAt: -1 });
+    res.json({ success: true, count: channels.length, channels });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/channels', authMiddleware, moderatorMiddleware, async (req, res) => {
+  try {
+    const { name, description } = req.body;
+    
+    if (!name) {
+      return res.status(400).json({ success: false, error: 'Channel name is required' });
+    }
+    
+    const existing = await Channel.findOne({ name });
+    if (existing) {
+      return res.status(400).json({ success: false, error: 'Channel already exists' });
+    }
+    
+    const channel = new Channel({
+      name,
+      description: description || '',
+      createdBy: req.userId
+    });
+    
+    await channel.save();
+    await channel.populate('createdBy', 'username');
+    
+    res.status(201).json({ success: true, channel });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.delete('/api/channels/:id', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const channel = await Channel.findByIdAndDelete(req.params.id);
+    if (!channel) return res.status(404).json({ success: false, error: 'Channel not found' });
+    
+    res.json({ success: true, message: 'Channel deleted' });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ===== SETTINGS API =====
+const settingsSchema = new mongoose.Schema({
+  key: { type: String, required: true, unique: true },
+  value: { type: mongoose.Schema.Types.Mixed, required: true }
+});
+
+const Settings = mongoose.model('Settings', settingsSchema);
+
+app.get('/api/settings', authMiddleware, async (req, res) => {
+  try {
+    const settings = await Settings.find();
+    const settingsObj = {};
+    settings.forEach(s => { settingsObj[s.key] = s.value; });
+    res.json({ success: true, settings: settingsObj });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.put('/api/settings/:key', authMiddleware, adminMiddleware, async (req, res) => {
+  try {
+    const { value } = req.body;
+    const setting = await Settings.findOneAndUpdate(
+      { key: req.params.key },
+      { key: req.params.key, value },
+      { upsert: true, new: true }
+    );
+    res.json({ success: true, setting });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+// ===== Profile & Admin =====
 app.get('/api/profile', authMiddleware, (req, res) => {
   res.json({ success: true, message: 'Welcome to your profile', user: req.user.toJSON() });
 });
 
-// Admin Dashboard
 app.get('/api/admin/dashboard', authMiddleware, adminMiddleware, (req, res) => {
   res.json({ success: true, message: 'Welcome Admin!', user: req.user.toJSON() });
 });
@@ -260,6 +504,6 @@ app.listen(PORT, '0.0.0.0', () => {
   console.log('═══════════════════════════════════════');
   console.log('🚀 NexusBox Backend Started!');
   console.log(`📡 Port: ${PORT}`);
-  console.log(`🌍 Environment: ${process.env.NODE_ENV || 'development'}`);
+  console.log(` Environment: ${process.env.NODE_ENV || 'development'}`);
   console.log('═══════════════════════════════════════');
 });
