@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<title>NexusBox - messages-sticky.html</title>
+<title>NexusBox - webhook.html</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta content="width=device-width, initial-scale=1" name="viewport">
@@ -10,7 +10,7 @@
 </head>
 <body id="mainbody">
 
-	<script type="text/javascript" async="" src="Control%20Panel%20%C2%B7%20Cbox%20Sticky%20message_files/js"></script><script async="" src="Control%20Panel%20%C2%B7%20Cbox%20Sticky%20message_files/analytics.js"></script><script>
+	<script type="text/javascript" async="" src="Control%20Panel%20%C2%B7%20Cbox%20Webhook_files/js"></script><script async="" src="Control%20Panel%20%C2%B7%20Cbox%20Webhook_files/analytics.js"></script><script>
 	// Define stub
 	var rcvdformresponse = function () {};
 	</script>
@@ -199,38 +199,49 @@ var createBar = function ($elem, isLog, showLimit) {
 
 
 
-<h1>Sticky message</h1>
+<h1>Message webhook</h1>
 
 <p>
-Use the sticky to post a welcome message, rules, or other information that you want to be 
-displayed prominently on your Cbox. You can use <a href="https://www.cbox.ws/help?id=42">boxcode</a> to add 
-markup to your sticky message.
+Configure and enable the Cbox webhook here. This allows you to receive a copy of every 
+message published to your Cbox at your own HTTP endpoint. This allows you to keep logs, 
+trigger your own notifications, implement bots, and more. 
+</p>
+<p>
+This feature requires some development experience. <a href="https://www.cbox.ws/help?id=95">See webhook help</a>.
 </p>
 
-<iframe src="javascript:false" name="t_fsticky" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
-<form name="fsticky" target="t_fsticky" method="post" action="/admin_d_submit?f=fsticky&amp;srv=4&amp;boxid=4257987" onsubmit="return subsaving(this.name, 'sub', '');">
+<div class="notice">
+Webhook is a <a href="https://www.cbox.ws/upgrade">Cbox Pro</a> feature. Find out more about webhooks <a href="https://www.cbox.ws/help?id=95">here</a>.
+</div>
 
-<fieldset class="Med">
-	<legend>Sticky message</legend>
 
-	<textarea name="sticky" cols="95" rows="25" style="width: 100%" class="txtarea" placeholder="This message appears fixed as the latest message on your Cbox." onkeyup="if (this.value.length > 50000) this.value = this.value.substring(0, 50000);">		</textarea>
+
+<form name="fpostopt" method="post" action="">
+<fieldset>
+	<legend>Callback settings</legend>
+	<label>Callback URL:</label>
+	<input type="text" name="url" value="https://www.facebook.com/groups/3023261787777217/user/100063958663026?locale=ar_AR" placeholder="http://yoursite.example.com/cbox" maxlength="200" class="txtbox">
+
+	<label for="i_enabled">Callback enabled: </label>
+	
+	<div class="slideThree"><input type="checkbox" name="enabled" value="1" disabled="disabled" id="i_enabled"><label></label></div><input type="submit" name="sub" value=" Save ">	
+  
 </fieldset>
-
+</form>
 
 
 <fieldset>
-		<label class="withSub">Raw HTML mode:
-		<sub>Security risk: do not enable unless specifically required.</sub>
-	</label>
+	<legend>Current status</legend>
 	
+	<label>Endpoint state:</label>
+	
+		<div class="notInput">NOT CONFIGURED</div>
 		
-	<div class="slideThree"><input type="checkbox" name="htmlmode" value="1"><label></label></div><input type="submit" name="sub" value=" Save ">
-
-	<div id="m_fsticky" class="frmmsg1"></div>
-	<div id="em_fsticky" class="frmmsg2" style="text-align: left;"></div>
+	<div style="float: right">
+		<input type="button" value=" Refresh " onclick="location = '?webhook'">
+	</div>
 </fieldset>
-
-</form></div>
+</div>
 
 
 
@@ -254,7 +265,7 @@ markup to your sticky message.
 	</a>
 	<div class="verybottom">
 		© 2004–2026 Cbox Communications (Pty) Ltd, all rights reserved. 
-			0 ms. 
+			1 ms. 
 			83ce		
 	</div>
 

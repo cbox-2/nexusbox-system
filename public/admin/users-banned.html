@@ -1,105 +1,681 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<title>المستخدمون المحظورون - NexusBox</title>
-<link rel="stylesheet" href="/assets/css/admin-theme.css">
+<html lang="en"><head>
+<title>NexusBox - users-banned.html</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta name="description" content="Cbox live chat is an embeddable chat app for online communities, groups, and live-streaming events.">
+<link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
+<link rel="stylesheet" href="/cbox-files/style.css">
 </head>
-<body>
-<div id="successMsg" class="success-msg"></div>
-<div class="main-container">
-  <div class="content-section">
-    <h1>🚫 المستخدمون المحظورون</h1>
-    <div class="sub-nav">
-      <a href="/admin/users.html">المستخدمون المسجلون</a>
-      <a href="/admin/users-banned.html" class="active">المستخدمون المحظورون</a>
-      <a href="/admin/users-integration.html">تكامل المستخدم</a>
-    </div>
-    <div class="form-group">
-      <label>اختر الصندوق:</label>
-      <select id="boxSelect" onchange="loadBans()">
-        <option value="">-- اختر --</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>حظر مستخدم:</label>
-      <input type="text" id="banTarget" placeholder="اسم المستخدم أو IP" style="margin-bottom:10px;">
-      <input type="text" id="banReason" placeholder="سبب الحظر" style="margin-bottom:10px;">
-      <input type="number" id="banDuration" placeholder="المدة بالساعات (0 = دائم)" style="margin-bottom:10px;">
-      <button class="btn btn-danger" onclick="banUser()">حظر</button>
-    </div>
-    <div id="bansList" style="padding:20px; color:#888; text-align:center;">اختر صندوق</div>
-  </div>
+<body id="mainbody">
+
+	<script type="text/javascript" async="" src="Control%20Panel%20%C2%B7%20Cbox%20Blocked%20users_files/js"></script><script async="" src="Control%20Panel%20%C2%B7%20Cbox%20Blocked%20users_files/analytics.js"></script><script>
+	// Define stub
+	var rcvdformresponse = function () {};
+	</script>
+	
+	<div id="mask"></div>
+
+
+
+<div id="popovr_box">
+	<div class="wrap">
+		<div style="padding: 20px; background-color: #fff">
+			<!--<div style="float:right; font-size: 150%;"><b><a href="javascript:popovr_close()">X</a></b></div>-->
+			<div id="popovr_title">
+				<!-- title -->
+			</div>
+			
+			<div id="popovr_text" style="text-align: left; clear:both">
+				<!-- content -->
+			</div>
+
+			<div id="popovr_t_login" style="display: none; text-align: left; clear:both">
+				<p>
+					Your session has expired. Please log back in to continue.
+				</p>
+				<iframe src="javascript:false" name="t_qlpop" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+				<form name="qlpop" action="/admin_d_login?f=qlpop" target="t_qlpop" method="post" onsubmit="return subsaving(this.name, 'sub', 'logging in...');">
+				<fieldset>
+					<label>Username:</label>
+					<input type="text" name="uname" value="msmsas55@yahoo.com" maxlength="50" class="txtbox">
+					<label>Password:</label>
+					<input type="password" name="pword" value="" maxlength="50" class="txtbox">
+					<input type="submit" name="sub" value=" Log in ">
+					
+					<div id="m_qlpop" class="frmmsg1"></div>
+					<div id="em_qlpop" class="frmmsg2"></div>
+				</fieldset>
+				</form>
+			</div>
+		</div>
+
+	</div>
 </div>
-<script src="/assets/js/shared.js"></script>
-<script>
-SHARED.init('users');
-const API = SHARED.API;
-const TOKEN = localStorage.getItem('token');
 
-window.addEventListener('DOMContentLoaded', async () => {
-  if (!TOKEN) { window.location.href = '/test.html'; return; }
-  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  const data = await res.json();
-  const select = document.getElementById('boxSelect');
-  if (data.success) {
-    select.innerHTML = '<option value="">-- اختر --</option>';
-    data.boxes.forEach(b => { select.innerHTML += `<option value="${b._id}">${b.name}</option>`; });
+<!--[if lte IE 7]>
+	<div class="notice_er notice_top">
+		You are using an old version of Internet Explorer or you are in Compatibility View mode. 
+		This website will not work correctly. 
+		<br>
+		Please upgrade your browser or disable Compatibility View.
+	</div>
+<![endif]-->
+
+
+<div id="bodywrap">
+	<div id="header">
+		<div class="wrap">
+
+			<a id="logo" href="https://www.cbox.ws/">
+				<img src="/cbox-files/logo400.png" alt="NexusBox" width="200" height="86" border="0">
+			</a>
+
+			<div id="headerExtras">
+	
+								
+								<span id="userWelcome">msmsas55@yahoo.com</span>
+				<a href="/admin/index.html">My Cboxes</a>
+				<a href="/admin/account.html">My Account</a>
+												<a href="/admin/support.html">Support
+				</a><a href="#" onclick="logout()" onclick="return logout()">Log out
+				</a>
+							</div>
+		</div>
+	</div>
+
+		<div id="subbar">
+		<div class="wrap">
+			<a href="/admin/index.html" class="submenuitem"><b>MSASDWEC2015HKARNO</b>			</a><a href="/admin/publish.html" class="submenuitem">Publish
+			</a><a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel
+			</a><a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options
+			</a><a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users
+			</a><a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages
+			</a>
+		</div>
+	</div>
+	<div id="bar3">
+		<div id="hovmenu" class="wrap" style="display: block;"><a href="https://www.cbox.ws/admin?users"><span class="submenuimg" style="background-position: -44px -0px"></span> Registered users</a><a href="https://www.cbox.ws/admin?bans"><span class="submenuimg" style="background-position: -88px -0px"></span> Blocked users</a><a href="https://www.cbox.ws/admin?userint"><span class="submenuimg" style="background-position: -0px -88px"></span> User integration</a></div>
+	</div>
+	
+	<div id="wideimg" style="position: relative; width: 100%; left: 0">
+	</div>
+	
+	<div id="main" class="wrap ">
+
+<div id="content">
+
+<script type="text/javascript">
+var noticetogorig = "";
+function noticetoggle(xo, v) {
+  var xo = document.getElementById(xo);
+  z = document.getElementById('notice-more');
+  if (z.style.display == 'none') {
+    z.style.display = '';
+    noticetogorig = xo.innerHTML;
+    xo.innerHTML = v;
   }
-});
+  else {
+    z.style.display = 'none';
+    xo.innerHTML = noticetogorig;
+  }
+}
 
-async function loadBans() {
-  const boxId = document.getElementById('boxSelect').value;
-  if (!boxId) return;
-  const container = document.getElementById('bansList');
-  container.innerHTML = 'جاري التحميل...';
-  try {
-    const res = await fetch(API + '/api/boxes/' + boxId + '/bans', {
-      headers: { 'Authorization': 'Bearer ' + TOKEN }
-    });
-    const data = await res.json();
-    if (data.success && data.bans && data.bans.length > 0) {
-      let html = '<table class="data-table"><thead><tr><th>المستهدف</th><th>السبب</th><th>ينتهي في</th><th>إجراءات</th></tr></thead><tbody>';
-      data.bans.forEach(b => {
-        html += `<tr><td>${b.target}</td><td>${b.reason || '-'}</td><td>${b.expiresAt ? new Date(b.expiresAt).toLocaleString('ar') : 'دائم'}</td>
-          <td><button class="btn btn-success btn-sm" onclick="unban('${b._id}', '${boxId}')">فك الحظر</button></td></tr>`;
-      });
-      html += '</tbody></table>';
-      container.innerHTML = html;
-    } else {
-      container.innerHTML = '<p style="text-align:center; padding:20px;">لا يوجد محظورون</p>';
+function noticeclose(x) {
+  z = document.getElementById('notice');
+  z.style.display = "none";
+  document.cookie = "rnot="+x+";";
+}
+
+function highlighthelp(sec, para, on) {
+	var ico = document.getElementById("hlpico-"+sec+"-"+para);
+  	if (!ico) return;
+  	if (!on) {
+  		ico.style.filter = "alpha(opacity=60)";
+  		ico.style.opacity = 0.6;
+  	}
+  	else {
+  		ico.style.filter = "";
+  		ico.style.opacity = 1;
+  	}
+}
+
+var createBar = function ($elem, isLog, showLimit) {
+
+	var $bar = document.createElement("div");
+	$bar.className = "barFill";
+	
+	var $text = document.createElement("div");
+	$text.className = "barText";
+	
+	$elem.appendChild($bar);
+	$elem.appendChild($text);
+	
+	var minWidth = 5;
+	
+	var format = function (n) {
+		return (n+'').split('').reverse().join('').replace(/([0-9]{3})(?=[0-9])/g, "$1,").split('').reverse().join('');
+	}
+	
+	$bar.style.width = "0%";
+	
+	return {
+		setBarSize: function (val, max) {
+			var over = false;
+			if (val > max) {
+				over = true;
+			}
+			
+
+			var val = Math.min(max, Math.max(0, val));
+			var prop = val / max;
+			
+			$text.innerHTML = format(val) + (over ? "+" : "") + (showLimit ? "/" + max : "");
+
+			var w = (isLog ? (Math.log((prop*1.718 + 1))) : prop) * 100;
+
+			var r = prop/0.7 * 255 + 50;
+			var g = 255 - prop*0.6*255;
+			var b = 80;
+			
+			var comp = (255 / (r*0.9 + g * 1.1)) * 1.4;
+			
+			r = r / comp;
+			g = g / comp;
+			b = b / comp;
+			
+			window.setTimeout(function () {
+				$bar.style.width = Math.max(w, minWidth) + "%";
+				$bar.style.backgroundColor = "rgb("+(r|0)+", "+(g|0)+", "+(b|0)+")";
+			}, 100);			
+			
+		}
+	}
+};
+  		
+</script>
+
+
+
+
+
+<script type="text/javascript">
+function pf(f, t, p) {
+  c = frames[f].document.forms[0];
+  c.act.value = t;
+  if (c.parm) c.parm.value = p;
+  c.submit();
+}
+sel = new Array();
+function jselall(f) {
+  c = frames[f].document.forms[0];
+  str = "";
+  for (i = 0; i < c.length; i++) {
+    if (c[i].name.substring(0, 1) == "z") {
+      x = c[i].id;
+      if (sel[x] || !frames[f].document.getElementById(x).checked) {
+        frames[f].t(x.substring(1));
+        sel[x] = false;
+      }
+      else sel[x] = true;
     }
-  } catch(e) { container.innerHTML = 'خطأ'; }
+  }
 }
 
-async function banUser() {
-  const boxId = document.getElementById('boxSelect').value;
-  const target = document.getElementById('banTarget').value;
-  const reason = document.getElementById('banReason').value;
-  const duration = parseInt(document.getElementById('banDuration').value) || 0;
-  if (!boxId || !target) { alert('املأ الحقول المطلوبة'); return; }
-  try {
-    const res = await fetch(API + '/api/boxes/' + boxId + '/bans', {
-      method: 'POST',
-      headers: SHARED.getAuthHeaders(),
-      body: JSON.stringify({ target, reason, duration })
-    });
-    const data = await res.json();
-    if (data.success) {
-      SHARED.showSuccess('تم الحظر');
-      document.getElementById('banTarget').value = '';
-      document.getElementById('banReason').value = '';
-      document.getElementById('banDuration').value = '';
-      loadBans();
-    } else { SHARED.showError(data.error); }
-  } catch(e) { SHARED.showError('خطأ'); }
+function togsrch(f) {
+  d = document.getElementById(f);
+  if (d.style.display == "none") d.style.display = "";
+  else d.style.display = "none";
 }
 
-async function unban(id, boxId) {
-  if (!confirm('فك الحظر؟')) return;
-  await fetch(API + '/api/bans/' + id, { method: 'DELETE', headers: SHARED.getAuthHeaders() });
-  loadBans();
+function reload(f) {
+  f = document.forms[f];
+//  tmp = f.srch.value;
+//  f.srch.value = "";
+  f.submit();
+//  f.srch.value = tmp;
+}
+
+function rsziframe(i) {
+  d = frames[i].document;
+  c = Math.max(d.body.clientHeight, d.documentElement.clientHeight);
+  if (c == 0) return;
+  document.getElementById(i+"_i").style.height = c+"px"; // would be nice to be able to reference iframe object from the window reference instead. Can it be done?
 }
 </script>
-</body>
-</html>
+
+
+
+<h1>Blocked users</h1>
+
+<p>
+Maintain your ban list here. You can ban users via the <a href="https://www.cbox.ws/admin?posts">Messages</a> page or by entering their IP addresses manually on this page.
+</p>
+
+
+
+
+
+<iframe src="javascript:false" name="t_fcban" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+<form name="fcban" target="t_fcban" method="post" action="/admin_d_submit?f=fcban" onsubmit="return subsaving(this.name, 'sub', '');">
+
+<fieldset>
+	<div class="fsInlineHelp"><a href="javascript:popwin('help', '/admin_p_help?sec=4#1',%20500,%20600)" title="Get help on this section"></a></div>	<legend>Country restriction</legend>
+
+	<label>Policy:</label>
+	<select name="policy" class="txtbox">
+	<option value="0" selected="selected">Allow any</option>
+<option value="-1">Allow only from</option>
+<option value="1">Block all from</option>	</select>
+
+	<label>Country:</label>
+	<select name="country" class="txtbox">
+		<option value="AF">Afghanistan</option>
+<option value="AL">Albania</option>
+<option value="DZ">Algeria</option>
+<option value="AS">American Samoa</option>
+<option value="AD">Andorra</option>
+<option value="AO">Angola</option>
+<option value="AI">Anguilla</option>
+<option value="AQ">Antarctica</option>
+<option value="AG">Antigua and Barbuda</option>
+<option value="AR">Argentina</option>
+<option value="AM">Armenia</option>
+<option value="AW">Aruba</option>
+<option value="AU">Australia</option>
+<option value="AT">Austria</option>
+<option value="AZ">Azerbaijan</option>
+<option value="BS">Bahamas</option>
+<option value="BH">Bahrain</option>
+<option value="BD">Bangladesh</option>
+<option value="BB">Barbados</option>
+<option value="BY">Belarus</option>
+<option value="BE">Belgium</option>
+<option value="BZ">Belize</option>
+<option value="BJ">Benin</option>
+<option value="BM">Bermuda</option>
+<option value="BT">Bhutan</option>
+<option value="BO">Bolivia</option>
+<option value="BQ">Bonaire, Sint Eustatius and Saba</option>
+<option value="BA">Bosnia and Herzegovina</option>
+<option value="BW">Botswana</option>
+<option value="BV">Bouvet Island</option>
+<option value="BR">Brazil</option>
+<option value="IO">British Indian Ocean Territory</option>
+<option value="BN">Brunei Darussalam</option>
+<option value="BG">Bulgaria</option>
+<option value="BF">Burkina Faso</option>
+<option value="BI">Burundi</option>
+<option value="CV">Cabo Verde</option>
+<option value="KH">Cambodia</option>
+<option value="CM">Cameroon</option>
+<option value="CA">Canada</option>
+<option value="KY">Cayman Islands</option>
+<option value="CF">Central African Republic</option>
+<option value="TD">Chad</option>
+<option value="CL">Chile</option>
+<option value="CN">China</option>
+<option value="CX">Christmas Island</option>
+<option value="CC">Cocos (Keeling) Islands</option>
+<option value="CO">Colombia</option>
+<option value="KM">Comoros</option>
+<option value="CD">Congo</option>
+<option value="CG">Congo</option>
+<option value="CK">Cook Islands</option>
+<option value="CR">Costa Rica</option>
+<option value="HR">Croatia</option>
+<option value="CU">Cuba</option>
+<option value="CW">Curaçao</option>
+<option value="CY">Cyprus</option>
+<option value="CZ">Czech Republic</option>
+<option value="CI">Côte d'Ivoire</option>
+<option value="DK">Denmark</option>
+<option value="DJ">Djibouti</option>
+<option value="DM">Dominica</option>
+<option value="DO">Dominican Republic</option>
+<option value="EC">Ecuador</option>
+<option value="EG">Egypt</option>
+<option value="SV">El Salvador</option>
+<option value="GQ">Equatorial Guinea</option>
+<option value="ER">Eritrea</option>
+<option value="EE">Estonia</option>
+<option value="ET">Ethiopia</option>
+<option value="FK">Falkland Islands (Malvinas)</option>
+<option value="FO">Faroe Islands</option>
+<option value="FJ">Fiji</option>
+<option value="FI">Finland</option>
+<option value="FR">France</option>
+<option value="GF">French Guiana</option>
+<option value="PF">French Polynesia</option>
+<option value="TF">French Southern Territories</option>
+<option value="GA">Gabon</option>
+<option value="GM">Gambia</option>
+<option value="GE">Georgia</option>
+<option value="DE">Germany</option>
+<option value="GH">Ghana</option>
+<option value="GI">Gibraltar</option>
+<option value="GR">Greece</option>
+<option value="GL">Greenland</option>
+<option value="GD">Grenada</option>
+<option value="GP">Guadeloupe</option>
+<option value="GU">Guam</option>
+<option value="GT">Guatemala</option>
+<option value="GG">Guernsey</option>
+<option value="GN">Guinea</option>
+<option value="GW">Guinea-Bissau</option>
+<option value="GY">Guyana</option>
+<option value="HT">Haiti</option>
+<option value="HM">Heard Island and McDonald Islands</option>
+<option value="VA">Holy See</option>
+<option value="HN">Honduras</option>
+<option value="HK">Hong Kong</option>
+<option value="HU">Hungary</option>
+<option value="IS">Iceland</option>
+<option value="IN">India</option>
+<option value="ID">Indonesia</option>
+<option value="IR">Iran</option>
+<option value="IQ" selected="selected">Iraq</option>
+<option value="IE">Ireland</option>
+<option value="IM">Isle of Man</option>
+<option value="IL">Israel</option>
+<option value="IT">Italy</option>
+<option value="JM">Jamaica</option>
+<option value="JP">Japan</option>
+<option value="JE">Jersey</option>
+<option value="JO">Jordan</option>
+<option value="KZ">Kazakhstan</option>
+<option value="KE">Kenya</option>
+<option value="KI">Kiribati</option>
+<option value="KR">Korea</option>
+<option value="KP">Korea-DPR</option>
+<option value="KW">Kuwait</option>
+<option value="KG">Kyrgyzstan</option>
+<option value="LA">Lao People's Democratic Republic</option>
+<option value="LV">Latvia</option>
+<option value="LB">Lebanon</option>
+<option value="LS">Lesotho</option>
+<option value="LR">Liberia</option>
+<option value="LY">Libya</option>
+<option value="LI">Liechtenstein</option>
+<option value="LT">Lithuania</option>
+<option value="LU">Luxembourg</option>
+<option value="MO">Macao</option>
+<option value="MK">Macedonia</option>
+<option value="MG">Madagascar</option>
+<option value="MW">Malawi</option>
+<option value="MY">Malaysia</option>
+<option value="MV">Maldives</option>
+<option value="ML">Mali</option>
+<option value="MT">Malta</option>
+<option value="MH">Marshall Islands</option>
+<option value="MQ">Martinique</option>
+<option value="MR">Mauritania</option>
+<option value="MU">Mauritius</option>
+<option value="YT">Mayotte</option>
+<option value="MX">Mexico</option>
+<option value="FM">Micronesia</option>
+<option value="MD">Moldova</option>
+<option value="MC">Monaco</option>
+<option value="MN">Mongolia</option>
+<option value="ME">Montenegro</option>
+<option value="MS">Montserrat</option>
+<option value="MA">Morocco</option>
+<option value="MZ">Mozambique</option>
+<option value="MM">Myanmar</option>
+<option value="NA">Namibia</option>
+<option value="NR">Nauru</option>
+<option value="NP">Nepal</option>
+<option value="NL">Netherlands</option>
+<option value="NC">New Caledonia</option>
+<option value="NZ">New Zealand</option>
+<option value="NI">Nicaragua</option>
+<option value="NE">Niger</option>
+<option value="NG">Nigeria</option>
+<option value="NU">Niue</option>
+<option value="NF">Norfolk Island</option>
+<option value="MP">Northern Mariana Islands</option>
+<option value="NO">Norway</option>
+<option value="OM">Oman</option>
+<option value="PK">Pakistan</option>
+<option value="PW">Palau</option>
+<option value="PS">Palestine</option>
+<option value="PA">Panama</option>
+<option value="PG">Papua New Guinea</option>
+<option value="PY">Paraguay</option>
+<option value="PE">Peru</option>
+<option value="PH">Philippines</option>
+<option value="PN">Pitcairn</option>
+<option value="PL">Poland</option>
+<option value="PT">Portugal</option>
+<option value="PR">Puerto Rico</option>
+<option value="QA">Qatar</option>
+<option value="RO">Romania</option>
+<option value="RU">Russian Federation</option>
+<option value="RW">Rwanda</option>
+<option value="RE">Réunion</option>
+<option value="BL">Saint Barthélemy</option>
+<option value="SH">Saint Helena, Ascension and Tristan da Cunha</option>
+<option value="KN">Saint Kitts and Nevis</option>
+<option value="LC">Saint Lucia</option>
+<option value="MF">Saint Martin (French part)</option>
+<option value="PM">Saint Pierre and Miquelon</option>
+<option value="VC">Saint Vincent and the Grenadines</option>
+<option value="WS">Samoa</option>
+<option value="SM">San Marino</option>
+<option value="ST">Sao Tome and Principe</option>
+<option value="SA">Saudi Arabia</option>
+<option value="SN">Senegal</option>
+<option value="RS">Serbia</option>
+<option value="SC">Seychelles</option>
+<option value="SL">Sierra Leone</option>
+<option value="SG">Singapore</option>
+<option value="SX">Sint Maarten (Dutch part)</option>
+<option value="SK">Slovakia</option>
+<option value="SI">Slovenia</option>
+<option value="SB">Solomon Islands</option>
+<option value="SO">Somalia</option>
+<option value="ZA">South Africa</option>
+<option value="GS">South Georgia and the South Sandwich Islands</option>
+<option value="SS">South Sudan</option>
+<option value="ES">Spain</option>
+<option value="LK">Sri Lanka</option>
+<option value="SD">Sudan</option>
+<option value="SR">Suriname</option>
+<option value="SJ">Svalbard and Jan Mayen</option>
+<option value="SZ">Swaziland</option>
+<option value="SE">Sweden</option>
+<option value="CH">Switzerland</option>
+<option value="SY">Syrian Arab Republic</option>
+<option value="TW">Taiwan</option>
+<option value="TJ">Tajikistan</option>
+<option value="TZ">Tanzania</option>
+<option value="TH">Thailand</option>
+<option value="TL">Timor-Leste</option>
+<option value="TG">Togo</option>
+<option value="TK">Tokelau</option>
+<option value="TO">Tonga</option>
+<option value="TT">Trinidad and Tobago</option>
+<option value="TN">Tunisia</option>
+<option value="TR">Turkey</option>
+<option value="TM">Turkmenistan</option>
+<option value="TC">Turks and Caicos Islands</option>
+<option value="TV">Tuvalu</option>
+<option value="UG">Uganda</option>
+<option value="UA">Ukraine</option>
+<option value="AE">United Arab Emirates</option>
+<option value="GB">United Kingdom</option>
+<option value="UM">United States Minor Outlying Islands</option>
+<option value="US">United States of America</option>
+<option value="UY">Uruguay</option>
+<option value="UZ">Uzbekistan</option>
+<option value="VU">Vanuatu</option>
+<option value="VE">Venezuela</option>
+<option value="VN">Viet Nam</option>
+<option value="VG">Virgin Islands, British</option>
+<option value="VI">Virgin Islands, U.S.</option>
+<option value="WF">Wallis and Futuna</option>
+<option value="EH">Western Sahara</option>
+<option value="YE">Yemen</option>
+<option value="ZM">Zambia</option>
+<option value="ZW">Zimbabwe</option>
+<option value="AX">Åland Islands</option>	</select>
+	
+    <input type="submit" name="sub" value="Add/update">
+
+	<div id="m_fcban" class="frmmsg1"></div>
+	<div id="em_fcban" class="frmmsg2"></div>
+
+	<div id="country_ban_policy">
+	Current policy: <b>Allow any</b> <br>This feature requires <a href="https://www.cbox.ws/upgrade?p=2">Cbox Pro</a>.	</div>
+	
+</fieldset>
+
+</form>
+
+
+<iframe src="javascript:false" name="t_fban" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+<form name="fban" target="t_fban" method="post" action="/admin_d_submit?f=fban" onsubmit="return subsaving(this.name, 'sub', '');">
+
+<fieldset>
+	<div class="fsInlineHelp"><a href="javascript:popwin('help', '/admin_p_help?sec=4#2',%20500,%20600)" title="Get help on this section"></a></div>	<legend>Add IP ban</legend>
+
+	<label>IP to ban:</label>
+	<input type="text" placeholder="123.45.67.89" name="ip" maxlength="15" size="20" class="txtbox">
+
+	<label>Duration:</label>
+	<input type="text" name="dur" maxlength="15" placeholder="1 week" size="9" class="txtbox">
+	
+	<label>Reason/memo:</label>
+	<input type="text" name="ref" maxlength="25" size="40" class="txtbox">
+
+    <input type="submit" name="sub" value=" Add ">
+
+	<div id="m_fban" class="frmmsg1"></div>
+	<div id="em_fban" class="frmmsg2"></div>
+
+</fieldset>
+
+</form>
+
+
+
+<fieldset>
+	<div class="fsInlineHelp"><a href="javascript:popwin('help', '/admin_p_help?sec=4#3',%20500,%20600)" title="Get help on this section"></a></div>	<legend>User/IP ban list</legend>
+
+	<table class="dHead">
+	<tbody><tr>
+		<td>
+			<a href="javascript:jselall('cboxbans')">Select All</a> | 
+			<a href="javascript:togsrch('srchbans')">Search</a> | 
+			<a href="javascript:reload('srchbansf')">Refresh</a>
+		</td>
+		<td align="right">
+			With selected: 
+			<a href="javascript:pf('cboxbans', 1)">Unban</a> | 
+			<a href="javascript:if (confirm('Are you sure you want to strengthen the bans on the selected user(s)?\nPlease note that strong bans may block users you do not intend to ban.')) {pf('cboxbans', 2)}">Strengthen</a> | 
+			<a href="javascript:void(0)" onclick="p = prompt('Enter new duration from now, e.g. 3 weeks; 1 month; forever', '4 weeks'); if (p !== null) pf('cboxbans', 3, p);">Change expiry</a>
+		</td>
+	</tr>
+	<tr id="srchbans" style="display:none">
+		<form name="srchbansf" target="cboxbans" action="/admin_l_bans" method="get"></form>
+		<td colspan="2" align="center"><br>Search for: <input type="text" name="srch" maxlength="100" size="30" class="txtbox"> in <select name="srchin" class="txtbox"><option value="nme" selected="selected">Name</option><option value="ref">Mod / Reason</option><option value="applied">Ban Date</option><option value="expiry">Expiry</option></select>&nbsp;<input type="submit" name="find" value=" Find "></td>
+		
+	</tr>
+	</tbody></table>
+	
+	<iframe src="Control%20Panel%20%C2%B7%20Cbox%20Blocked%20users_files/admin_l_bans.htm" onload="rsziframe(this.name)" marginheight="0" marginwidth="0" scrolling="auto" name="cboxbans" id="cboxbans_i" allowtransparency="yes" style="height: 592px;" width="100%" height="600" frameborder="0"></iframe>
+
+	
+</fieldset></div></div>
+
+
+
+<div style="clear: both"></div>
+</div><!-- /content -->
+
+<!-- /bodywrap -->
+
+<div id="siteErrorBar"><div class="wrap" id="siteErrorBarCont">Loading...</div></div>
+
+
+
+<div id="footer">
+
+	<a href="https://www.cbox.ws/">About
+	</a><a href="https://www.cbox.ws/products">Plans &amp; pricing
+	</a><a href="https://www.cbox.ws/terms">Terms &amp; conditions
+	</a><a href="https://www.cbox.ws/privacy">Privacy policy
+	</a><a href="https://www.cbox.ws/notices">Notices
+	</a><a href="https://www.cbox.ws/contact">Contact us
+	</a>
+	<div class="verybottom">
+		© 2004–2026 Cbox Communications (Pty) Ltd, all rights reserved. 
+			1 ms. 
+			83ce		
+	</div>
+
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-242554-2', {
+	'cookieDomain': 'www.cbox.ws'
+});
+ga('send', 'pageview');
+
+</script>
+
+
+<script src="/cbox-files/code.js"></script>
+<script>
+	// Modal / naked mode.
+	if (window.isPopup) {
+		document.body.className = "Popped";
+	}
+	
+	// Only for CP pages
+	upgradeCheckboxes();
+
+var dropCrumb = function () {
+	if (!localStorage) {
+		return;
+	}
+	var bc = getCrumbs();
+	bc.push(location.href);
+	bc.splice(0, bc.length - 5);
+	localStorage.setItem("site:bread", JSON.stringify(bc));
+};
+
+var getCrumbs = function () {
+	if (!localStorage) {
+		return [];
+	}
+	var bcStr = localStorage.getItem("site:bread");
+	var bc = [];
+	if (bcStr) {
+		bc = JSON.parse(bcStr);
+	}
+	
+	return bc;
+}
+
+dropCrumb();
+</script>
+
+
+
+
+
+
+<script>
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/';
+}
+</script>
+</body></html>

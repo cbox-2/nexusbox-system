@@ -1,127 +1,459 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<title>المستخدمون - NexusBox</title>
-<link rel="stylesheet" href="/assets/css/admin-theme.css">
+<html lang="en"><head>
+<title>NexusBox - users.html</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta name="description" content="Cbox live chat is an embeddable chat app for online communities, groups, and live-streaming events.">
+<link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
+<link rel="stylesheet" href="/cbox-files/style.css">
 </head>
-<body>
-<div id="successMsg" class="success-msg"></div>
-<div id="errorMsg" class="error-msg"></div>
-<div class="main-container">
-  <div class="content-section">
-    <h1>👥 المستخدمون</h1>
-    <div class="sub-nav">
-      <a href="/admin/users.html" class="active">المستخدمون المسجلون</a>
-      <a href="/admin/users-banned.html">المستخدمون المحظورون</a>
-      <a href="/admin/users-integration.html">تكامل المستخدم</a>
-    </div>
-    <div class="form-group">
-      <label>اختر الصندوق:</label>
-      <select id="boxSelect" onchange="loadUsers()">
-        <option value="">-- اختر --</option>
-      </select>
-    </div>
-    <div class="form-group">
-      <label>إضافة مستخدم جديد:</label>
-      <input type="text" id="newUserName" placeholder="اسم المستخدم" style="margin-bottom:10px;">
-      <input type="password" id="newUserPass" placeholder="كلمة المرور" style="margin-bottom:10px;">
-      <select id="newUserRole" style="margin-bottom:10px;">
-        <option value="2">مستخدم عادي</option>
-        <option value="3">مشرف</option>
-        <option value="4">مدير</option>
-        <option value="5">مالك</option>
-      </select>
-      <button class="btn btn-primary" onclick="addUser()">إضافة مستخدم</button>
-    </div>
-    <div id="usersList" style="padding:20px; color:#888; text-align:center;">اختر صندوق</div>
-  </div>
+<body id="mainbody">
+
+	<script type="text/javascript" async="" src="Control%20Panel%20%C2%B7%20Cbox%20%20Registered%20users_files/js"></script><script async="" src="Control%20Panel%20%C2%B7%20Cbox%20%20Registered%20users_files/analytics.js"></script><script>
+	// Define stub
+	var rcvdformresponse = function () {};
+	</script>
+	
+	<div id="mask"></div>
+
+
+
+<div id="popovr_box">
+	<div class="wrap">
+		<div style="padding: 20px; background-color: #fff">
+			<!--<div style="float:right; font-size: 150%;"><b><a href="javascript:popovr_close()">X</a></b></div>-->
+			<div id="popovr_title">
+				<!-- title -->
+			</div>
+			
+			<div id="popovr_text" style="text-align: left; clear:both">
+				<!-- content -->
+			</div>
+
+			<div id="popovr_t_login" style="display: none; text-align: left; clear:both">
+				<p>
+					Your session has expired. Please log back in to continue.
+				</p>
+				<iframe src="javascript:false" name="t_qlpop" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+				<form name="qlpop" action="/admin_d_login?f=qlpop" target="t_qlpop" method="post" onsubmit="return subsaving(this.name, 'sub', 'logging in...');">
+				<fieldset>
+					<label>Username:</label>
+					<input type="text" name="uname" value="msmsas55@yahoo.com" maxlength="50" class="txtbox">
+					<label>Password:</label>
+					<input type="password" name="pword" value="" maxlength="50" class="txtbox">
+					<input type="submit" name="sub" value=" Log in ">
+					
+					<div id="m_qlpop" class="frmmsg1"></div>
+					<div id="em_qlpop" class="frmmsg2"></div>
+				</fieldset>
+				</form>
+			</div>
+		</div>
+
+	</div>
 </div>
-<script src="/assets/js/shared.js"></script>
-<script>
-SHARED.init('users');
-const API = SHARED.API;
-const TOKEN = localStorage.getItem('token');
 
-window.addEventListener('DOMContentLoaded', async () => {
-  if (!TOKEN) { window.location.href = '/test.html'; return; }
-  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  const data = await res.json();
-  const select = document.getElementById('boxSelect');
-  if (data.success) {
-    select.innerHTML = '<option value="">-- اختر --</option>';
-    data.boxes.forEach(b => { select.innerHTML += `<option value="${b._id}">${b.name}</option>`; });
+<!--[if lte IE 7]>
+	<div class="notice_er notice_top">
+		You are using an old version of Internet Explorer or you are in Compatibility View mode. 
+		This website will not work correctly. 
+		<br>
+		Please upgrade your browser or disable Compatibility View.
+	</div>
+<![endif]-->
+
+
+<div id="bodywrap">
+	<div id="header">
+		<div class="wrap">
+
+			<a id="logo" href="https://www.cbox.ws/">
+				<img src="/cbox-files/logo400.png" alt="NexusBox" width="200" height="86" border="0">
+			</a>
+
+			<div id="headerExtras">
+	
+								
+								<span id="userWelcome">msmsas55@yahoo.com</span>
+				<a href="/admin/index.html">My Cboxes</a>
+				<a href="/admin/account.html">My Account</a>
+												<a href="/admin/support.html">Support
+				</a><a href="#" onclick="logout()" onclick="return logout()">Log out
+				</a>
+							</div>
+		</div>
+	</div>
+
+		<div id="subbar">
+		<div class="wrap">
+			<a href="/admin/index.html" class="submenuitem"><b>MSASDWEC2015HKARNO</b>			</a><a href="/admin/publish.html" class="submenuitem">Publish
+			</a><a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel
+			</a><a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options
+			</a><a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users
+			</a><a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages
+			</a>
+		</div>
+	</div>
+	<div id="bar3">
+		<div id="hovmenu" class="wrap"><a></a></div>
+	</div>
+	
+	<div id="wideimg" style="position: relative; width: 100%; left: 0">
+	</div>
+	
+	<div id="main" class="wrap ">
+
+<div id="content">
+
+<script type="text/javascript">
+var noticetogorig = "";
+function noticetoggle(xo, v) {
+  var xo = document.getElementById(xo);
+  z = document.getElementById('notice-more');
+  if (z.style.display == 'none') {
+    z.style.display = '';
+    noticetogorig = xo.innerHTML;
+    xo.innerHTML = v;
   }
-});
+  else {
+    z.style.display = 'none';
+    xo.innerHTML = noticetogorig;
+  }
+}
 
-async function loadUsers() {
-  const boxId = document.getElementById('boxSelect').value;
-  if (!boxId) return;
-  const container = document.getElementById('usersList');
-  container.innerHTML = 'جاري التحميل...';
-  try {
-    const res = await fetch(API + '/api/boxes/' + boxId + '/users', {
-      headers: { 'Authorization': 'Bearer ' + TOKEN }
-    });
-    const data = await res.json();
-    if (data.success && data.users && data.users.length > 0) {
-      let html = '<table class="data-table"><thead><tr><th>الاسم</th><th>الرتبة</th><th>تاريخ التسجيل</th><th>إجراءات</th></tr></thead><tbody>';
-      data.users.forEach(u => {
-        html += `<tr><td>${u.name}</td><td>${u.level}</td><td>${new Date(u.registeredAt).toLocaleDateString('ar')}</td>
-          <td>
-            <button class="btn btn-warning btn-sm" onclick="changeRole('${u._id}', '${boxId}')">تغيير الرتبة</button>
-            <button class="btn btn-danger btn-sm" onclick="deleteUser('${u._id}', '${boxId}')">حذف</button>
-          </td></tr>`;
-      });
-      html += '</tbody></table>';
-      container.innerHTML = html;
-    } else {
-      container.innerHTML = '<p style="text-align:center; padding:20px;">لا يوجد مستخدمون</p>';
+function noticeclose(x) {
+  z = document.getElementById('notice');
+  z.style.display = "none";
+  document.cookie = "rnot="+x+";";
+}
+
+function highlighthelp(sec, para, on) {
+	var ico = document.getElementById("hlpico-"+sec+"-"+para);
+  	if (!ico) return;
+  	if (!on) {
+  		ico.style.filter = "alpha(opacity=60)";
+  		ico.style.opacity = 0.6;
+  	}
+  	else {
+  		ico.style.filter = "";
+  		ico.style.opacity = 1;
+  	}
+}
+
+var createBar = function ($elem, isLog, showLimit) {
+
+	var $bar = document.createElement("div");
+	$bar.className = "barFill";
+	
+	var $text = document.createElement("div");
+	$text.className = "barText";
+	
+	$elem.appendChild($bar);
+	$elem.appendChild($text);
+	
+	var minWidth = 5;
+	
+	var format = function (n) {
+		return (n+'').split('').reverse().join('').replace(/([0-9]{3})(?=[0-9])/g, "$1,").split('').reverse().join('');
+	}
+	
+	$bar.style.width = "0%";
+	
+	return {
+		setBarSize: function (val, max) {
+			var over = false;
+			if (val > max) {
+				over = true;
+			}
+			
+
+			var val = Math.min(max, Math.max(0, val));
+			var prop = val / max;
+			
+			$text.innerHTML = format(val) + (over ? "+" : "") + (showLimit ? "/" + max : "");
+
+			var w = (isLog ? (Math.log((prop*1.718 + 1))) : prop) * 100;
+
+			var r = prop/0.7 * 255 + 50;
+			var g = 255 - prop*0.6*255;
+			var b = 80;
+			
+			var comp = (255 / (r*0.9 + g * 1.1)) * 1.4;
+			
+			r = r / comp;
+			g = g / comp;
+			b = b / comp;
+			
+			window.setTimeout(function () {
+				$bar.style.width = Math.max(w, minWidth) + "%";
+				$bar.style.backgroundColor = "rgb("+(r|0)+", "+(g|0)+", "+(b|0)+")";
+			}, 100);			
+			
+		}
+	}
+};
+  		
+</script>
+
+
+
+
+<script type="text/javascript">
+function pf(f, t, p) {
+  c = frames[f].document.forms[0];
+  c.act.value = t;
+  if (c.parm) c.parm.value = p;
+  c.submit();
+}
+
+sel = new Array();
+function jselall(f) {
+  c = frames[f].document.forms[0];
+  str = "";
+  for (i = 0; i < c.length; i++) {
+    if (c[i].name.substring(0, 1) == "x") {
+      x = c[i].id;
+      if (sel[x] || !frames[f].document.getElementById(x).checked) {
+        frames[f].t(x.substring(1));
+        sel[x] = false;
+      }
+      else sel[x] = true;
     }
-  } catch(e) { container.innerHTML = 'خطأ'; }
+  }
 }
 
-async function addUser() {
-  const boxId = document.getElementById('boxSelect').value;
-  const name = document.getElementById('newUserName').value;
-  const password = document.getElementById('newUserPass').value;
-  const level = parseInt(document.getElementById('newUserRole').value);
-  if (!boxId || !name || !password) { alert('املأ جميع الحقول'); return; }
-  try {
-    const res = await fetch(API + '/api/boxes/' + boxId + '/users', {
-      method: 'POST',
-      headers: SHARED.getAuthHeaders(),
-      body: JSON.stringify({ name, password, level })
-    });
-    const data = await res.json();
-    if (data.success) {
-      SHARED.showSuccess('تمت الإضافة');
-      document.getElementById('newUserName').value = '';
-      document.getElementById('newUserPass').value = '';
-      loadUsers();
-    } else { SHARED.showError(data.error); }
-  } catch(e) { SHARED.showError('خطأ'); }
+function togsrch(f) {
+  d = document.getElementById(f);
+  if (d.style.display == "none") d.style.display = "";
+  else d.style.display = "none";
 }
 
-async function deleteUser(id, boxId) {
-  if (!confirm('حذف المستخدم؟')) return;
-  await fetch(API + '/api/users/' + id, { method: 'DELETE', headers: SHARED.getAuthHeaders() });
-  loadUsers();
+function reload(f) {
+  f = document.forms[f];
+//  tmp = f.srch.value;
+//  f.srch.value = "";
+  f.submit();
+//  f.srch.value = tmp;
 }
 
-async function changeRole(id, boxId) {
-  const newRole = prompt('أدخل الرتبة الجديدة (2-5):');
-  if (!newRole) return;
-  try {
-    await fetch(API + '/api/users/' + id, {
-      method: 'PUT',
-      headers: SHARED.getAuthHeaders(),
-      body: JSON.stringify({ level: parseInt(newRole) })
-    });
-    SHARED.showSuccess('تم التغيير');
-    loadUsers();
-  } catch(e) { SHARED.showError('خطأ'); }
+function rsziframe(i) {
+  d = frames[i];
+  c = (d.document && d.document.forms) ? d.document.forms[0].scrollHeight : 0;
+  if (c == 0) return;
+  document.getElementById(i+"_i").style.height = c + 40 + "px"; // would be nice to be able to reference iframe object from the window reference instead. Can it be done?	
 }
 </script>
-</body>
-</html>
+
+
+
+<h1>Registered users</h1>
+
+<p>
+Add or remove registered users and delegate moderator authority. 
+Users registered here log in with their names on your Cbox. Mod and admin users are able to delete messages and ban users. 
+</p>
+
+
+<iframe src="javascript:false" name="t_fuseropt" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+<form name="fuseropt" target="t_fuseropt" method="post" action="/admin_d_submit?f=fuseropt" onsubmit="return subsaving(this.name, 'sub', '');">
+<input type="hidden" name="dummyinput" value="for-no-post-vars-check">
+
+
+<fieldset class="Short">
+<div class="fsInlineHelp"><a href="javascript:popwin('help', '/admin_p_help?sec=3#0',%20500,%20600)" title="Get help on this section"></a></div>	<legend>User options</legend>
+
+	<label for="i_regonly"> Users must be registered to post:</label>
+	
+	<!--
+	<select name="regonly" class="txtbox">
+		<option value="0" >Nobody (locked)</option>
+		<option value="3" >Voiced users</option>
+		<option value="1" >Registered users</option>
+		<option value="2" selected>Guest users</option>
+	</select>
+	-->
+	<div class="slideThree"><input type="checkbox" name="regonly" value="1" id="i_regonly"><label></label></div><label for="i_selfreg"> Users can password-protect their names:</label>
+	
+
+	<div class="slideThree"><input type="checkbox" name="selfreg" value="1" checked="checked" id="i_selfreg"><label></label></div><label for="i_auth_fb"> Users can authenticate via Facebook:
+		</label>
+	
+
+	<!--
+	<label>Protect unregistered users from impersonation</label>
+	<input type="checkbox" name="autoprotect" value="20"  id="i_autoprotect" >
+	
+	<label for="i_autouserdel"> Automatically delete unused registered names</label>
+	<input type="checkbox" name="autouserdel" value="1"  id="i_autouserdel" >
+	-->
+	<div class="slideThree"><input type="checkbox" name="auth_fb" value="1" id="i_auth_fb"><label></label></div><input type="hidden" name="autoprotect" value="0">
+	<input type="hidden" name="autouserdel" value="0">
+	
+	
+	
+	<label for="i_lpdel"> Registered users can delete their own recent messages:</label>
+	
+
+  <div class="slideThree"><input type="checkbox" name="lastpostdel" value="1" id="i_lpdel"><label></label></div><input type="submit" name="sub" value=" Save ">
+  <div id="m_fuseropt" class="frmmsg1"></div>
+  <div id="em_fuseropt" class="frmmsg2"></div>
+  
+</fieldset>
+</form>
+
+
+<iframe src="javascript:false" name="t_fuseradd" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+<form name="fuseradd" target="t_fuseradd" method="post" action="/admin_d_submit?f=fuseradd" onsubmit="return subsaving(this.name, 'sub', '');">
+
+<fieldset>
+<div class="fsInlineHelp"><a href="javascript:popwin('help', '/admin_p_help?sec=3#1',%20500,%20600)" title="Get help on this section"></a></div>	<legend>Register a new user</legend>
+
+	<label>Name:</label>
+	<input type="text" name="uname" maxlength="25" size="25" tabindex="100" class="txtbox">
+	
+	<label>Password:</label>
+	<input type="password" name="pword" maxlength="50" size="25" tabindex="101" class="txtbox">
+	
+	<label>User type:</label>
+
+	<select class="txtbox" name="lvl">
+	<option value="2" selected="selected">Regular user
+	</option><option value="3">Moderator
+	</option><option value="4">Administrator
+	</option><option value="5">Bot user
+	</option></select>
+	
+  <input type="submit" name="sub" value=" Add " tabindex="102">
+
+  <div id="m_fuseradd" class="frmmsg1"></div>
+  <div id="em_fuseradd" class="frmmsg2"></div>
+
+</fieldset>
+</form>
+
+
+
+<fieldset>
+	<legend>Registered users</legend>
+
+	<table class="dHead">
+	<tbody><tr>
+		<td>
+			<a href="javascript:jselall('cboxusers')">Select All</a> | 
+			<a href="javascript:togsrch('srchusers')">Search</a> | 
+			<a href="javascript:reload('srchusersf')">Refresh</a>
+		</td>
+		<td>With selected: 
+			<!--
+			<a href="JavaScript:if (confirm('Are you sure you want to ban the selected user(s)?')) {pf('cboxusers', 1)}">Ban</a> | 
+			-->
+			<a href="javascript:if (confirm('Are you sure you want to delete the selected user(s)?')) {pf('cboxusers', 2)}">Delete</a> | 
+			<a href="javascript:{pf('cboxusers', 5)}">(Un-)Voice</a> | 
+			<a href="javascript:if (confirm('Are you sure you want to toggle moderator status for the selected user(s)?')) {pf('cboxusers', 3)}">(Un-)Mod</a> | 
+			<a href="javascript:if (confirm('Are you sure you want to toggle admin status for the selected user(s)?')) {pf('cboxusers', 4)}">(Un-)Admin</a>
+		</td>
+	</tr>
+	<tr id="srchusers" style="display:none">
+		<form name="srchusersf" target="cboxusers" action="/admin_l_users" method="get"></form>
+		<td colspan="2" align="center"><br>Search for: <input type="text" name="srch" maxlength="100" size="30" class="txtbox"> in <select name="srchin" class="txtbox"><option value="nme" selected="selected">Name</option><option value="status">Status</option><option value="lastused">Date Last Used</option><option value="regged">Date Registered</option><option value="lastip">Last IP</option></select>&nbsp;<input type="submit" name="find" value=" Find "></td>
+		
+	</tr>
+	</tbody></table>
+	
+	<iframe src="Control%20Panel%20%C2%B7%20Cbox%20%20Registered%20users_files/admin_l_users.htm" onload="rsziframe(this.name)" marginheight="0" marginwidth="0" scrolling="auto" name="cboxusers" id="cboxusers_i" allowtransparency="yes" style="height: 120px;" width="100%" height="600" frameborder="0"></iframe>
+
+</fieldset></div>
+
+</div>
+
+
+
+<div style="clear: both"></div>
+</div><!-- /content -->
+
+<!-- /bodywrap -->
+
+<div id="siteErrorBar"><div class="wrap" id="siteErrorBarCont">Loading...</div></div>
+
+
+
+<div id="footer">
+
+	<a href="https://www.cbox.ws/">About
+	</a><a href="https://www.cbox.ws/products">Plans &amp; pricing
+	</a><a href="https://www.cbox.ws/terms">Terms &amp; conditions
+	</a><a href="https://www.cbox.ws/privacy">Privacy policy
+	</a><a href="https://www.cbox.ws/notices">Notices
+	</a><a href="https://www.cbox.ws/contact">Contact us
+	</a>
+	<div class="verybottom">
+		© 2004–2026 Cbox Communications (Pty) Ltd, all rights reserved. 
+			1 ms. 
+			83ce		
+	</div>
+
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-242554-2', {
+	'cookieDomain': 'www.cbox.ws'
+});
+ga('send', 'pageview');
+
+</script>
+
+
+<script src="/cbox-files/code.js"></script>
+<script>
+	// Modal / naked mode.
+	if (window.isPopup) {
+		document.body.className = "Popped";
+	}
+	
+	// Only for CP pages
+	upgradeCheckboxes();
+
+var dropCrumb = function () {
+	if (!localStorage) {
+		return;
+	}
+	var bc = getCrumbs();
+	bc.push(location.href);
+	bc.splice(0, bc.length - 5);
+	localStorage.setItem("site:bread", JSON.stringify(bc));
+};
+
+var getCrumbs = function () {
+	if (!localStorage) {
+		return [];
+	}
+	var bcStr = localStorage.getItem("site:bread");
+	var bc = [];
+	if (bcStr) {
+		bc = JSON.parse(bcStr);
+	}
+	
+	return bc;
+}
+
+dropCrumb();
+</script>
+
+
+
+
+
+
+<script>
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/';
+}
+</script>
+</body></html>

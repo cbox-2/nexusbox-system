@@ -1,82 +1,342 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
-<head>
-<meta charset="UTF-8">
-<title>أرشيف الرسائل - NexusBox</title>
-<link rel="stylesheet" href="/assets/css/admin-theme.css">
+<html lang="en"><head>
+<title>NexusBox - messages-archive.html</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta name="description" content="Cbox live chat is an embeddable chat app for online communities, groups, and live-streaming events.">
+<link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
+<link rel="stylesheet" href="/cbox-files/style.css">
 </head>
-<body>
-<div id="successMsg" class="success-msg"></div>
-<div id="errorMsg" class="error-msg"></div>
-<div class="main-container">
-  <div class="content-section">
-    <h1>📚 أرشيف الرسائل</h1>
-    <div class="sub-nav">
-      <a href="/admin/messages.html">الرسائل</a>
-      <a href="/admin/messages-archive.html" class="active">الأرشيف</a>
-      <a href="/admin/messages-sticky.html">الرسائل اللاصقة</a>
-      <a href="/admin/messages-channels.html">القنوات</a>
-      <a href="/admin/messages-weblinks.html">روابط الويب</a>
-    </div>
-    <div class="form-group">
-      <label>بحث:</label>
-      <input type="text" id="searchInput" placeholder="ابحث في الرسائل..." onkeyup="searchMessages()">
-    </div>
-    <div class="form-group">
-      <label>تصفية حسب الصندوق:</label>
-      <select id="boxSelect" onchange="loadArchive()">
-        <option value="">-- اختر --</option>
-      </select>
-    </div>
-    <div id="archiveList" style="padding:20px; color:#888; text-align:center;">اختر صندوق لعرض الأرشيف</div>
-  </div>
+<body id="mainbody">
+
+	<script type="text/javascript" async="" src="Control%20Panel%20%C2%B7%20Cbox%20Archives_files/js"></script><script async="" src="Control%20Panel%20%C2%B7%20Cbox%20Archives_files/analytics.js"></script><script>
+	// Define stub
+	var rcvdformresponse = function () {};
+	</script>
+	
+	<div id="mask"></div>
+
+
+
+<div id="popovr_box">
+	<div class="wrap">
+		<div style="padding: 20px; background-color: #fff">
+			<!--<div style="float:right; font-size: 150%;"><b><a href="javascript:popovr_close()">X</a></b></div>-->
+			<div id="popovr_title">
+				<!-- title -->
+			</div>
+			
+			<div id="popovr_text" style="text-align: left; clear:both">
+				<!-- content -->
+			</div>
+
+			<div id="popovr_t_login" style="display: none; text-align: left; clear:both">
+				<p>
+					Your session has expired. Please log back in to continue.
+				</p>
+				<iframe src="javascript:false" name="t_qlpop" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+				<form name="qlpop" action="/admin_d_login?f=qlpop" target="t_qlpop" method="post" onsubmit="return subsaving(this.name, 'sub', 'logging in...');">
+				<fieldset>
+					<label>Username:</label>
+					<input type="text" name="uname" value="msmsas55@yahoo.com" maxlength="50" class="txtbox">
+					<label>Password:</label>
+					<input type="password" name="pword" value="" maxlength="50" class="txtbox">
+					<input type="submit" name="sub" value=" Log in ">
+					
+					<div id="m_qlpop" class="frmmsg1"></div>
+					<div id="em_qlpop" class="frmmsg2"></div>
+				</fieldset>
+				</form>
+			</div>
+		</div>
+
+	</div>
 </div>
-<script src="/assets/js/shared.js"></script>
-<script>
-SHARED.init('messages');
-const API = SHARED.API;
-const TOKEN = localStorage.getItem('token');
 
-window.addEventListener('DOMContentLoaded', async () => {
-  if (!TOKEN) { window.location.href = '/test.html'; return; }
-  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  const data = await res.json();
-  const select = document.getElementById('boxSelect');
-  if (data.success) {
-    select.innerHTML = '<option value="">-- اختر --</option>';
-    data.boxes.forEach(b => { select.innerHTML += `<option value="${b._id}">${b.name}</option>`; });
+<!--[if lte IE 7]>
+	<div class="notice_er notice_top">
+		You are using an old version of Internet Explorer or you are in Compatibility View mode. 
+		This website will not work correctly. 
+		<br>
+		Please upgrade your browser or disable Compatibility View.
+	</div>
+<![endif]-->
+
+
+<div id="bodywrap">
+	<div id="header">
+		<div class="wrap">
+
+			<a id="logo" href="https://www.cbox.ws/">
+				<img src="/cbox-files/logo400.png" alt="NexusBox" width="200" height="86" border="0">
+			</a>
+
+			<div id="headerExtras">
+	
+								
+								<span id="userWelcome">msmsas55@yahoo.com</span>
+				<a href="/admin/index.html">My Cboxes</a>
+				<a href="/admin/account.html">My Account</a>
+												<a href="/admin/support.html">Support
+				</a><a href="#" onclick="logout()" onclick="return logout()">Log out
+				</a>
+							</div>
+		</div>
+	</div>
+
+		<div id="subbar">
+		<div class="wrap">
+			<a href="/admin/index.html" class="submenuitem"><b>MSASDWEC2015HKARNO</b>			</a><a href="/admin/publish.html" class="submenuitem">Publish
+			</a><a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel
+			</a><a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options
+			</a><a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users
+			</a><a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages
+			</a>
+		</div>
+	</div>
+	<div id="bar3">
+		<div id="hovmenu" class="wrap"><a></a></div>
+	</div>
+	
+	<div id="wideimg" style="position: relative; width: 100%; left: 0">
+	</div>
+	
+	<div id="main" class="wrap ">
+
+<div id="content">
+
+<script type="text/javascript">
+var noticetogorig = "";
+function noticetoggle(xo, v) {
+  var xo = document.getElementById(xo);
+  z = document.getElementById('notice-more');
+  if (z.style.display == 'none') {
+    z.style.display = '';
+    noticetogorig = xo.innerHTML;
+    xo.innerHTML = v;
   }
-});
-
-async function loadArchive() {
-  const boxId = document.getElementById('boxSelect').value;
-  if (!boxId) return;
-  const container = document.getElementById('archiveList');
-  container.innerHTML = 'جاري التحميل...';
-  try {
-    const res = await fetch(API + '/api/boxes/' + boxId + '/messages?archived=true', {
-      headers: { 'Authorization': 'Bearer ' + TOKEN }
-    });
-    const data = await res.json();
-    if (data.success && data.messages && data.messages.length > 0) {
-      let html = '<table class="data-table"><thead><tr><th>المحتوى</th><th>التاريخ</th></tr></thead><tbody>';
-      data.messages.forEach(m => {
-        html += `<tr><td>${m.content}</td><td>${new Date(m.createdAt).toLocaleDateString('ar')}</td></tr>`;
-      });
-      html += '</tbody></table>';
-      container.innerHTML = html;
-    } else {
-      container.innerHTML = '<p style="text-align:center; padding:20px;">لا توجد رسائل في الأرشيف</p>';
-    }
-  } catch(e) { container.innerHTML = 'خطأ'; }
+  else {
+    z.style.display = 'none';
+    xo.innerHTML = noticetogorig;
+  }
 }
 
-function searchMessages() {
-  const term = document.getElementById('searchInput').value.toLowerCase();
-  document.querySelectorAll('#archiveList tbody tr').forEach(row => {
-    row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
-  });
+function noticeclose(x) {
+  z = document.getElementById('notice');
+  z.style.display = "none";
+  document.cookie = "rnot="+x+";";
+}
+
+function highlighthelp(sec, para, on) {
+	var ico = document.getElementById("hlpico-"+sec+"-"+para);
+  	if (!ico) return;
+  	if (!on) {
+  		ico.style.filter = "alpha(opacity=60)";
+  		ico.style.opacity = 0.6;
+  	}
+  	else {
+  		ico.style.filter = "";
+  		ico.style.opacity = 1;
+  	}
+}
+
+var createBar = function ($elem, isLog, showLimit) {
+
+	var $bar = document.createElement("div");
+	$bar.className = "barFill";
+	
+	var $text = document.createElement("div");
+	$text.className = "barText";
+	
+	$elem.appendChild($bar);
+	$elem.appendChild($text);
+	
+	var minWidth = 5;
+	
+	var format = function (n) {
+		return (n+'').split('').reverse().join('').replace(/([0-9]{3})(?=[0-9])/g, "$1,").split('').reverse().join('');
+	}
+	
+	$bar.style.width = "0%";
+	
+	return {
+		setBarSize: function (val, max) {
+			var over = false;
+			if (val > max) {
+				over = true;
+			}
+			
+
+			var val = Math.min(max, Math.max(0, val));
+			var prop = val / max;
+			
+			$text.innerHTML = format(val) + (over ? "+" : "") + (showLimit ? "/" + max : "");
+
+			var w = (isLog ? (Math.log((prop*1.718 + 1))) : prop) * 100;
+
+			var r = prop/0.7 * 255 + 50;
+			var g = 255 - prop*0.6*255;
+			var b = 80;
+			
+			var comp = (255 / (r*0.9 + g * 1.1)) * 1.4;
+			
+			r = r / comp;
+			g = g / comp;
+			b = b / comp;
+			
+			window.setTimeout(function () {
+				$bar.style.width = Math.max(w, minWidth) + "%";
+				$bar.style.backgroundColor = "rgb("+(r|0)+", "+(g|0)+", "+(b|0)+")";
+			}, 100);			
+			
+		}
+	}
+};
+  		
+</script>
+
+
+
+
+<h1>Archived messages</h1>
+
+<p>
+View and download your message archives. All messages are archived, 
+including messages that are later deleted via your Cbox or the control 
+panel, and archives are stored for 
+three months. Your archives will be generated in tab-separated CSV 
+format, which can be imported into various applications, including 
+spreadsheets, for processing and 
+exporting. 
+</p>
+<p>
+<span class="highlightGood">TIP</span> You can receive copies of messages directly to your own server using our <a href="https://www.cbox.ws/admin?webhook">webhook</a> feature.
+</p>
+
+
+<iframe src="javascript:false" name="t_fpostsarc" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+<form name="fpostsarc" target="t_fpostsarc" method="post" action="/admin_d_submit?f=fpostsarc" onsubmit="return subsaving(this.name, 'sub', 'Queuing...');">
+
+<fieldset>
+<legend>Generate archive download</legend>
+
+<table cellspacing="0" cellpadding="2" border="0" align="center">
+<tbody><tr><td>&nbsp;</td><td align="center">Year</td><td align="center">Month</td><td align="center">Day</td><td></td></tr>
+<tr><td align="right">From</td><td><input type="text" name="yy1" size="5" maxlength="5" class="txtbox" value="2026"></td><td><input type="text" name="mm1" size="3" maxlength="3" class="txtbox" value="06"></td><td><input type="text" name="dd1" size="3" maxlength="3" class="txtbox" value="01"></td>
+</tr>
+<tr><td align="right">To</td><td><input type="text" name="yy2" size="5" maxlength="5" class="txtbox" value="2026"></td><td><input type="text" name="mm2" size="3" maxlength="3" class="txtbox" value="06"></td><td><input type="text" name="dd2" size="3" maxlength="3" class="txtbox" value="03"></td></tr>
+</tbody></table>
+
+<input type="submit" name="sub" value=" Go ">
+<div id="m_fpostsarc" class="frmmsg1"></div>
+<div id="em_fpostsarc" class="frmmsg2"></div>
+
+
+</fieldset>
+</form>
+
+
+
+<h2>Recently generated archives</h2>
+<div class="block_grey">
+
+<i>Right-click and select Save Target As or Save Link As...</i><br>
+
+<ul>
+<li><a href="https://www.cbox.ws/archives/cbox4_4257987_2016-03-28_2016-03-30.zip">2016-03-28 – 2016-03-30</a> <small>(127 KB)</small></li><li><a href="https://www.cbox.ws/archives/cbox4_4257987_2015-08-03_2015-08-10.zip">2015-08-03 – 2015-08-10</a> <small>(156 KB)</small></li></ul>
+
+</div>
+
+</div>
+
+
+
+<div style="clear: both"></div>
+</div><!-- /content -->
+
+</div><!-- /bodywrap -->
+
+<div id="siteErrorBar"><div class="wrap" id="siteErrorBarCont">Loading...</div></div>
+
+
+
+<div id="footer">
+
+	<a href="https://www.cbox.ws/">About
+	</a><a href="https://www.cbox.ws/products">Plans &amp; pricing
+	</a><a href="https://www.cbox.ws/terms">Terms &amp; conditions
+	</a><a href="https://www.cbox.ws/privacy">Privacy policy
+	</a><a href="https://www.cbox.ws/notices">Notices
+	</a><a href="https://www.cbox.ws/contact">Contact us
+	</a>
+	<div class="verybottom">
+		© 2004–2026 Cbox Communications (Pty) Ltd, all rights reserved. 
+			40 ms. 
+			83ce		
+	</div>
+
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-242554-2', {
+	'cookieDomain': 'www.cbox.ws'
+});
+ga('send', 'pageview');
+
+</script>
+
+
+<script src="/cbox-files/code.js"></script>
+<script>
+	// Modal / naked mode.
+	if (window.isPopup) {
+		document.body.className = "Popped";
+	}
+	
+	// Only for CP pages
+	upgradeCheckboxes();
+
+var dropCrumb = function () {
+	if (!localStorage) {
+		return;
+	}
+	var bc = getCrumbs();
+	bc.push(location.href);
+	bc.splice(0, bc.length - 5);
+	localStorage.setItem("site:bread", JSON.stringify(bc));
+};
+
+var getCrumbs = function () {
+	if (!localStorage) {
+		return [];
+	}
+	var bcStr = localStorage.getItem("site:bread");
+	var bc = [];
+	if (bcStr) {
+		bc = JSON.parse(bcStr);
+	}
+	
+	return bc;
+}
+
+dropCrumb();
+</script>
+
+
+
+
+
+
+<script>
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/';
 }
 </script>
-</body>
-</html>
+</body></html>
