@@ -1,0 +1,105 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>المستخدمون المحظورون - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+<div id="successMsg" class="success-msg"></div>
+<div class="main-container">
+  <div class="content-section">
+    <h1>🚫 المستخدمون المحظورون</h1>
+    <div class="sub-nav">
+      <a href="/admin/users.html">المستخدمون المسجلون</a>
+      <a href="/admin/users-banned.html" class="active">المستخدمون المحظورون</a>
+      <a href="/admin/users-integration.html">تكامل المستخدم</a>
+    </div>
+    <div class="form-group">
+      <label>اختر الصندوق:</label>
+      <select id="boxSelect" onchange="loadBans()">
+        <option value="">-- اختر --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>حظر مستخدم:</label>
+      <input type="text" id="banTarget" placeholder="اسم المستخدم أو IP" style="margin-bottom:10px;">
+      <input type="text" id="banReason" placeholder="سبب الحظر" style="margin-bottom:10px;">
+      <input type="number" id="banDuration" placeholder="المدة بالساعات (0 = دائم)" style="margin-bottom:10px;">
+      <button class="btn btn-danger" onclick="banUser()">حظر</button>
+    </div>
+    <div id="bansList" style="padding:20px; color:#888; text-align:center;">اختر صندوق</div>
+  </div>
+</div>
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('users');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!TOKEN) { window.location.href = '/test.html'; return; }
+  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  const data = await res.json();
+  const select = document.getElementById('boxSelect');
+  if (data.success) {
+    select.innerHTML = '<option value="">-- اختر --</option>';
+    data.boxes.forEach(b => { select.innerHTML += `<option value="${b._id}">${b.name}</option>`; });
+  }
+});
+
+async function loadBans() {
+  const boxId = document.getElementById('boxSelect').value;
+  if (!boxId) return;
+  const container = document.getElementById('bansList');
+  container.innerHTML = 'جاري التحميل...';
+  try {
+    const res = await fetch(API + '/api/boxes/' + boxId + '/bans', {
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    });
+    const data = await res.json();
+    if (data.success && data.bans && data.bans.length > 0) {
+      let html = '<table class="data-table"><thead><tr><th>المستهدف</th><th>السبب</th><th>ينتهي في</th><th>إجراءات</th></tr></thead><tbody>';
+      data.bans.forEach(b => {
+        html += `<tr><td>${b.target}</td><td>${b.reason || '-'}</td><td>${b.expiresAt ? new Date(b.expiresAt).toLocaleString('ar') : 'دائم'}</td>
+          <td><button class="btn btn-success btn-sm" onclick="unban('${b._id}', '${boxId}')">فك الحظر</button></td></tr>`;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = '<p style="text-align:center; padding:20px;">لا يوجد محظورون</p>';
+    }
+  } catch(e) { container.innerHTML = 'خطأ'; }
+}
+
+async function banUser() {
+  const boxId = document.getElementById('boxSelect').value;
+  const target = document.getElementById('banTarget').value;
+  const reason = document.getElementById('banReason').value;
+  const duration = parseInt(document.getElementById('banDuration').value) || 0;
+  if (!boxId || !target) { alert('املأ الحقول المطلوبة'); return; }
+  try {
+    const res = await fetch(API + '/api/boxes/' + boxId + '/bans', {
+      method: 'POST',
+      headers: SHARED.getAuthHeaders(),
+      body: JSON.stringify({ target, reason, duration })
+    });
+    const data = await res.json();
+    if (data.success) {
+      SHARED.showSuccess('تم الحظر');
+      document.getElementById('banTarget').value = '';
+      document.getElementById('banReason').value = '';
+      document.getElementById('banDuration').value = '';
+      loadBans();
+    } else { SHARED.showError(data.error); }
+  } catch(e) { SHARED.showError('خطأ'); }
+}
+
+async function unban(id, boxId) {
+  if (!confirm('فك الحظر؟')) return;
+  await fetch(API + '/api/bans/' + id, { method: 'DELETE', headers: SHARED.getAuthHeaders() });
+  loadBans();
+}
+</script>
+</body>
+</html>

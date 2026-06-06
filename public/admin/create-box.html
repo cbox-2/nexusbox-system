@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>إنشاء صندوق - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+<div id="successMsg" class="success-msg"></div>
+<div class="main-container">
+  <div class="content-section">
+    <h1>➕ إنشاء صندوق جديد</h1>
+    <div class="form-group">
+      <label>اسم الصندوق:</label>
+      <input type="text" id="boxName" placeholder="اسم الصندوق">
+    </div>
+    <div class="form-group">
+      <label>اللون الأساسي:</label>
+      <input type="color" id="primaryColor" value="#667eea">
+    </div>
+    <div class="form-group">
+      <label>العرض:</label>
+      <input type="number" id="width" value="400">
+    </div>
+    <div class="form-group">
+      <label>الارتفاع:</label>
+      <input type="number" id="height" value="500">
+    </div>
+    <button class="btn btn-primary" onclick="createBox()">إنشاء الصندوق</button>
+    <div id="result" style="margin-top:20px;"></div>
+  </div>
+</div>
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+
+async function createBox() {
+  if (!TOKEN) { alert('سجل دخول'); window.location.href = '/test.html'; return; }
+  const name = document.getElementById('boxName').value;
+  if (!name) { alert('أدخل الاسم'); return; }
+  try {
+    const res = await fetch(API + '/api/boxes', {
+      method: 'POST',
+      headers: SHARED.getAuthHeaders(),
+      body: JSON.stringify({
+        name,
+        theme: { primaryColor: document.getElementById('primaryColor').value },
+        layout: { width: parseInt(document.getElementById('width').value), height: parseInt(document.getElementById('height').value) }
+      })
+    });
+    const data = await res.json();
+    if (data.success) {
+      document.getElementById('result').innerHTML = `
+        <div class="info-msg">
+          <h3>✅ تم الإنشاء!</h3>
+          <p>Embed Key: ${data.box.embedKey}</p>
+          <a href="/admin/publish.html?key=${data.box.embedKey}" class="btn btn-success">الحصول على كود التضمين</a>
+        </div>
+      `;
+    } else { SHARED.showError(data.error); }
+  } catch(e) { SHARED.showError('خطأ'); }
+}
+</script>
+</body>
+</html>

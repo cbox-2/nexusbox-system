@@ -1,0 +1,134 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>الرسائل - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+
+<div id="successMsg" class="success-msg"></div>
+<div id="errorMsg" class="error-msg"></div>
+
+<div class="main-container">
+  <div class="content-section">
+    <h1> الرسائل</h1>
+    
+    <div class="sub-nav">
+      <a href="/admin/messages.html" class="active">الرسائل</a>
+      <a href="/admin/messages-archive.html">الأرشيف</a>
+      <a href="/admin/messages-sticky.html">الرسائل اللاصقة</a>
+      <a href="/admin/messages-channels.html">القنوات</a>
+      <a href="/admin/messages-weblinks.html">روابط الويب</a>
+    </div>
+    
+    <div class="form-group">
+      <label>اختر الصندوق:</label>
+      <select id="boxSelect" onchange="loadMessages()">
+        <option value="">جاري التحميل...</option>
+      </select>
+    </div>
+    
+    <div id="messagesList">
+      <p style="color:#888; text-align:center; padding:30px;">اختر صندوق لعرض الرسائل</p>
+    </div>
+  </div>
+</div>
+
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('messages');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+let currentBox = null;
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!TOKEN) { alert('سجل دخول أولاً'); window.location.href = '/test.html'; return; }
+  await loadBoxes();
+});
+
+async function loadBoxes() {
+  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  const data = await res.json();
+  const select = document.getElementById('boxSelect');
+  if (data.success) {
+    select.innerHTML = '<option value="">-- اختر صندوق --</option>';
+    data.boxes.forEach(b => {
+      select.innerHTML += `<option value="${b._id}" data-key="${b.embedKey}">${b.name}</option>`;
+    });
+  }
+}
+
+async function loadMessages() {
+  const select = document.getElementById('boxSelect');
+  const boxId = select.value;
+  if (!boxId) return;
+  
+  currentBox = select.options[select.selectedIndex].dataset.key;
+  const container = document.getElementById('messagesList');
+  container.innerHTML = '<p style="text-align:center; padding:20px;">جاري التحميل...</p>';
+  
+  try {
+    const res = await fetch(API + '/api/boxes/' + boxId + '/messages', {
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    });
+    const data = await res.json();
+    
+    if (data.success && data.messages && data.messages.length > 0) {
+      let html = '<table class="data-table"><thead><tr><th>المحتوى</th><th>الكاتب</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody>';
+      data.messages.forEach(m => {
+        html += `<tr>
+          <td>${m.content.substring(0, 50)}...</td>
+          <td>${m.author?.username || 'مجهول'}</td>
+          <td>${new Date(m.createdAt).toLocaleDateString('ar')}</td>
+          <td>
+            <button class="btn btn-danger btn-sm" onclick="deleteMessage('${m._id}')">حذف</button>
+            <button class="btn btn-warning btn-sm" onclick="toggleSticky('${m._id}', ${!m.isSticky})">${m.isSticky ? 'إلغاء التثبيت' : 'تثبيت'}</button>
+          </td>
+        </tr>`;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = '<p style="text-align:center; padding:30px; color:#888;">لا توجد رسائل</p>';
+    }
+  } catch(e) {
+    container.innerHTML = '<p style="color:red;">خطأ في التحميل</p>';
+  }
+}
+
+async function deleteMessage(msgId) {
+  if (!confirm('هل أنت متأكد من الحذف؟')) return;
+  try {
+    const res = await fetch(API + '/api/messages/' + msgId, {
+      method: 'DELETE',
+      headers: SHARED.getAuthHeaders()
+    });
+    const data = await res.json();
+    if (data.success) {
+      SHARED.showSuccess('تم الحذف');
+      loadMessages();
+    } else {
+      SHARED.showError(data.error || 'فشل الحذف');
+    }
+  } catch(e) { SHARED.showError('خطأ في الاتصال'); }
+}
+
+async function toggleSticky(msgId, sticky) {
+  try {
+    const res = await fetch(API + '/api/messages/' + msgId, {
+      method: 'PUT',
+      headers: SHARED.getAuthHeaders(),
+      body: JSON.stringify({ isSticky: sticky })
+    });
+    const data = await res.json();
+    if (data.success) {
+      SHARED.showSuccess(sticky ? 'تم التثبيت' : 'تم إلغاء التثبيت');
+      loadMessages();
+    }
+  } catch(e) { SHARED.showError('خطأ'); }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>روابط الويب - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+<div id="successMsg" class="success-msg"></div>
+<div class="main-container">
+  <div class="content-section">
+    <h1> روابط الويب</h1>
+    <div class="sub-nav">
+      <a href="/admin/messages.html">الرسائل</a>
+      <a href="/admin/messages-archive.html">الأرشيف</a>
+      <a href="/admin/messages-sticky.html">الرسائل اللاصقة</a>
+      <a href="/admin/messages-channels.html">القنوات</a>
+      <a href="/admin/messages-weblinks.html" class="active">روابط الويب</a>
+    </div>
+    <div class="form-group">
+      <label>اختر الصندوق:</label>
+      <select id="boxSelect" onchange="loadLinks()">
+        <option value="">-- اختر --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>عنوان الرابط:</label>
+      <input type="text" id="linkTitle" placeholder="العنوان">
+    </div>
+    <div class="form-group">
+      <label>URL:</label>
+      <input type="url" id="linkUrl" placeholder="https://example.com">
+      <button class="btn btn-primary" onclick="addLink()" style="margin-top:10px;">إضافة رابط</button>
+    </div>
+    <div id="linksList" style="padding:20px; color:#888; text-align:center;">اختر صندوق</div>
+  </div>
+</div>
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('messages');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!TOKEN) { window.location.href = '/test.html'; return; }
+  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  const data = await res.json();
+  const select = document.getElementById('boxSelect');
+  if (data.success) {
+    select.innerHTML = '<option value="">-- اختر --</option>';
+    data.boxes.forEach(b => { select.innerHTML += `<option value="${b._id}">${b.name}</option>`; });
+  }
+});
+
+async function loadLinks() {
+  const boxId = document.getElementById('boxSelect').value;
+  if (!boxId) return;
+  const container = document.getElementById('linksList');
+  container.innerHTML = 'جاري التحميل...';
+  try {
+    const res = await fetch(API + '/api/boxes/' + boxId + '/weblinks', {
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    });
+    const data = await res.json();
+    if (data.success && data.links && data.links.length > 0) {
+      let html = '<table class="data-table"><thead><tr><th>العنوان</th><th>URL</th><th>إجراءات</th></tr></thead><tbody>';
+      data.links.forEach(l => {
+        html += `<tr><td>${l.title}</td><td><a href="${l.url}" target="_blank">${l.url}</a></td><td><button class="btn btn-danger btn-sm" onclick="deleteLink('${l._id}', '${boxId}')">حذف</button></td></tr>`;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = '<p style="text-align:center; padding:20px;">لا توجد روابط</p>';
+    }
+  } catch(e) { container.innerHTML = 'خطأ'; }
+}
+
+async function addLink() {
+  const boxId = document.getElementById('boxSelect').value;
+  const title = document.getElementById('linkTitle').value;
+  const url = document.getElementById('linkUrl').value;
+  if (!boxId || !title || !url) { alert('املأ جميع الحقول'); return; }
+  try {
+    const res = await fetch(API + '/api/boxes/' + boxId + '/weblinks', {
+      method: 'POST',
+      headers: SHARED.getAuthHeaders(),
+      body: JSON.stringify({ title, url })
+    });
+    const data = await res.json();
+    if (data.success) {
+      SHARED.showSuccess('تمت الإضافة');
+      document.getElementById('linkTitle').value = '';
+      document.getElementById('linkUrl').value = '';
+      loadLinks();
+    } else { SHARED.showError(data.error); }
+  } catch(e) { SHARED.showError('خطأ'); }
+}
+
+async function deleteLink(id, boxId) {
+  if (!confirm('حذف؟')) return;
+  await fetch(API + '/api/weblinks/' + id, { method: 'DELETE', headers: SHARED.getAuthHeaders() });
+  loadLinks();
+}
+</script>
+</body>
+</html>

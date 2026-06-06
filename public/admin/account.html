@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>حسابي - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+<div id="successMsg" class="success-msg"></div>
+<div class="main-container">
+  <div class="content-section">
+    <h1> حسابي</h1>
+    <div id="userInfo">جاري التحميل...</div>
+    <div class="form-group" style="margin-top:20px;">
+      <label>تغيير كلمة المرور:</label>
+      <input type="password" id="newPass" placeholder="كلمة المرور الجديدة">
+      <button class="btn btn-primary" onclick="changePassword()" style="margin-top:10px;">تغيير</button>
+    </div>
+  </div>
+</div>
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!TOKEN) { window.location.href = '/test.html'; return; }
+  const res = await fetch(API + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  const data = await res.json();
+  if (data.success) {
+    const u = data.user;
+    document.getElementById('userInfo').innerHTML = `
+      <table class="data-table">
+        <tr><th>اسم المستخدم</th><td>${u.username}</td></tr>
+        <tr><th>البريد الإلكتروني</th><td>${u.email}</td></tr>
+        <tr><th>الرتبة</th><td>${u.role}</td></tr>
+        <tr><th>الحالة</th><td>${u.status}</td></tr>
+        <tr><th>تاريخ الإنشاء</th><td>${new Date(u.createdAt).toLocaleDateString('ar')}</td></tr>
+      </table>
+    `;
+  }
+});
+
+async function changePassword() {
+  const pass = document.getElementById('newPass').value;
+  if (!pass || pass.length < 6) { alert('كلمة المرور قصيرة'); return; }
+  try {
+    const res = await fetch(API + '/api/auth/change-password', {
+      method: 'POST',
+      headers: SHARED.getAuthHeaders(),
+      body: JSON.stringify({ password: pass })
+    });
+    const data = await res.json();
+    if (data.success) SHARED.showSuccess('تم التغيير');
+    else SHARED.showError(data.error);
+  } catch(e) { SHARED.showError('خطأ'); }
+}
+</script>
+</body>
+</html>

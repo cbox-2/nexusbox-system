@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>المظهر والملمس - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+<div id="successMsg" class="success-msg"></div>
+<div class="main-container">
+  <div class="content-section">
+    <h1>🎨 المظهر والملمس</h1>
+    <div class="sub-nav">
+      <a href="/admin/lookfeel.html" class="active">محرر السمات</a>
+      <a href="/admin/lookfeel-layout.html">خيارات التخطيط</a>
+    </div>
+    <div class="form-group">
+      <label>اختر الصندوق:</label>
+      <select id="boxSelect" onchange="loadTheme()">
+        <option value="">-- اختر --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>اللون الأساسي:</label>
+      <input type="color" id="primaryColor" value="#667eea" onchange="updatePreview()">
+    </div>
+    <div class="form-group">
+      <label>لون الخلفية:</label>
+      <input type="color" id="bgColor" value="#ffffff" onchange="updatePreview()">
+    </div>
+    <div class="form-group">
+      <label>لون النص:</label>
+      <input type="color" id="textColor" value="#333333" onchange="updatePreview()">
+    </div>
+    <div class="form-group">
+      <label>CSS مخصص:</label>
+      <textarea id="customCss" rows="6" placeholder=".box { /* CSS هنا */ }"></textarea>
+    </div>
+    <button class="btn btn-primary" onclick="saveTheme()">حفظ السمة</button>
+    <div id="preview" style="margin-top:20px; padding:20px; border-radius:8px; border:2px solid #ddd;">
+      <h3>معاينة مباشرة</h3>
+      <p>هذا نص تجريبي للمعاينة</p>
+    </div>
+  </div>
+</div>
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('lookfeel');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+let currentBoxId = null;
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!TOKEN) { window.location.href = '/test.html'; return; }
+  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  const data = await res.json();
+  const select = document.getElementById('boxSelect');
+  if (data.success) {
+    select.innerHTML = '<option value="">-- اختر --</option>';
+    data.boxes.forEach(b => { select.innerHTML += `<option value="${b._id}">${b.name}</option>`; });
+  }
+});
+
+async function loadTheme() {
+  const boxId = document.getElementById('boxSelect').value;
+  if (!boxId) return;
+  currentBoxId = boxId;
+  try {
+    const res = await fetch(API + '/api/boxes/' + boxId, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    const data = await res.json();
+    if (data.success && data.box) {
+      const t = data.box.theme || {};
+      document.getElementById('primaryColor').value = t.primaryColor || '#667eea';
+      document.getElementById('bgColor').value = t.backgroundColor || '#ffffff';
+      document.getElementById('textColor').value = t.textColor || '#333333';
+      document.getElementById('customCss').value = t.customCss || '';
+      updatePreview();
+    }
+  } catch(e) {}
+}
+
+function updatePreview() {
+  const preview = document.getElementById('preview');
+  preview.style.backgroundColor = document.getElementById('bgColor').value;
+  preview.style.color = document.getElementById('textColor').value;
+  preview.style.borderColor = document.getElementById('primaryColor').value;
+}
+
+async function saveTheme() {
+  if (!currentBoxId) { alert('اختر صندوق أولاً'); return; }
+  try {
+    const res = await fetch(API + '/api/boxes/' + currentBoxId, {
+      method: 'PUT',
+      headers: SHARED.getAuthHeaders(),
+      body: JSON.stringify({
+        theme: {
+          primaryColor: document.getElementById('primaryColor').value,
+          backgroundColor: document.getElementById('bgColor').value,
+          textColor: document.getElementById('textColor').value,
+          customCss: document.getElementById('customCss').value
+        }
+      })
+    });
+    const data = await res.json();
+    if (data.success) SHARED.showSuccess('تم حفظ السمة');
+    else SHARED.showError(data.error);
+  } catch(e) { SHARED.showError('خطأ'); }
+}
+</script>
+</body>
+</html>

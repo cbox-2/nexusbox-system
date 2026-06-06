@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>نشر - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+<div id="successMsg" class="success-msg"></div>
+<div class="main-container">
+  <div class="content-section">
+    <h1>🚀 انشر صندوق بريدك الإلكتروني</h1>
+    <p>احصل على رمز التضمين لإضافة صندوق التحكم الخاص بك إلى موقعك الإلكتروني.</p>
+    
+    <div class="form-group">
+      <label>اختر الصندوق:</label>
+      <select id="boxSelect" onchange="loadPublish()">
+        <option value="">-- اختر --</option>
+      </select>
+    </div>
+    
+    <div class="form-group">
+      <label>رابط موقعك:</label>
+      <input type="url" id="siteUrl" placeholder="https://example.com">
+    </div>
+    
+    <div class="toggle-group">
+      <div><strong>القائمة البيضاء</strong><small>السماح لمواقع محددة فقط</small></div>
+      <label class="toggle"><input type="checkbox" id="whitelist" onchange="toggleWhitelist()"><span class="slider"></span></label>
+    </div>
+    <div class="form-group" id="whitelistInput" style="display:none;">
+      <label>المواقع المسموحة (فاصلة):</label>
+      <input type="text" id="allowedSites" placeholder="example.com">
+    </div>
+    
+    <div class="toggle-group">
+      <div><strong>HTTPS (SSL/TLS)</strong><small>اتصال آمن</small></div>
+      <label class="toggle"><input type="checkbox" id="ssl" checked><span class="slider"></span></label>
+    </div>
+    
+    <div class="form-group">
+      <label>علامة الأمان:</label>
+      <input type="text" id="securityTag" readonly>
+    </div>
+    
+    <div class="toggle-group">
+      <div><strong>Auto-Resize</strong><small>تعديل الارتفاع تلقائياً</small></div>
+      <label class="toggle"><input type="checkbox" id="autoResize" checked><span class="slider"></span></label>
+    </div>
+    
+    <div class="form-group">
+      <label>العرض (px):</label>
+      <input type="number" id="width" value="400" min="200" max="800">
+    </div>
+    <div class="form-group">
+      <label>الارتفاع (px):</label>
+      <input type="number" id="height" value="500" min="300" max="1000">
+    </div>
+    
+    <button class="btn btn-primary" onclick="generateCode()">💾 توليد الكود</button>
+  </div>
+  
+  <div class="content-section">
+    <h2>📝 رمز التضمين</h2>
+    <div class="form-group">
+      <label>نوع الكود:</label>
+      <select id="codeType" onchange="generateCode()">
+        <option value="iframe">Iframe (موصى به)</option>
+        <option value="script">Script Widget</option>
+      </select>
+    </div>
+    <div class="code-box" id="codeOutput">اختر صندوق أولاً...</div>
+    <button class="btn btn-success" onclick="copyCode()"> نسخ الكود</button>
+  </div>
+  
+  <div class="content-section">
+    <h2> تعليمات التثبيت</h2>
+    <div class="info-msg">
+      <ol style="padding-right:20px; line-height:2;">
+        <li>انسخ الكود من الصندوق أعلاه</li>
+        <li>افتح محرر HTML لموقعك</li>
+        <li>الصق الكود في المكان المناسب</li>
+        <li>احفظ وانشر الصفحة</li>
+        <li>افتح موقعك للتحقق</li>
+      </ol>
+    </div>
+  </div>
+  
+  <div class="content-section">
+    <h2>👁️ معاينة مباشرة</h2>
+    <div id="preview" style="border:2px solid #ddd; border-radius:8px; padding:10px; background:#f8f9fa;">
+      <p style="color:#888; text-align:center;">اختر صندوق لرؤية المعاينة</p>
+    </div>
+  </div>
+</div>
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('publish');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+let currentBox = null;
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!TOKEN) { window.location.href = '/test.html'; return; }
+  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  const data = await res.json();
+  const select = document.getElementById('boxSelect');
+  if (data.success) {
+    select.innerHTML = '<option value="">-- اختر --</option>';
+    data.boxes.forEach(b => { select.innerHTML += `<option value="${b._id}" data-key="${b.embedKey}">${b.name}</option>`; });
+  }
+  // Check URL for key
+  const params = new URLSearchParams(window.location.search);
+  const key = params.get('key');
+  if (key) {
+    setTimeout(() => {
+      const opt = [...select.options].find(o => o.dataset.key === key);
+      if (opt) { select.value = opt.value; loadPublish(); }
+    }, 500);
+  }
+});
+
+async function loadPublish() {
+  const select = document.getElementById('boxSelect');
+  const boxId = select.value;
+  if (!boxId) return;
+  currentBox = select.options[select.selectedIndex].dataset.key;
+  document.getElementById('securityTag').value = currentBox;
+  try {
+    const res = await fetch(API + '/api/embed/' + currentBox, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    const data = await res.json();
+    if (data.success && data.box) {
+      const b = data.box;
+      if (b.layout) {
+        document.getElementById('width').value = b.layout.width || 400;
+        document.getElementById('height').value = b.layout.height || 500;
+      }
+      if (b.publish) {
+        document.getElementById('siteUrl').value = b.publish.siteUrl || '';
+        document.getElementById('whitelist').checked = b.publish.whitelistEnabled || false;
+        toggleWhitelist();
+      }
+      generateCode();
+    }
+  } catch(e) {}
+}
+
+function toggleWhitelist() {
+  document.getElementById('whitelistInput').style.display = document.getElementById('whitelist').checked ? 'block' : 'none';
+}
+
+function generateCode() {
+  if (!currentBox) { document.getElementById('codeOutput').textContent = 'اختر صندوق أولاً...'; return; }
+  const width = document.getElementById('width').value;
+  const height = document.getElementById('height').value;
+  const ssl = document.getElementById('ssl').checked;
+  const type = document.getElementById('codeType').value;
+  const protocol = ssl ? 'https' : 'http';
+  const domain = window.location.hostname;
+  const url = protocol + '://' + domain + '/embed.html?key=' + currentBox;
+  
+  let code = '';
+  if (type === 'iframe') {
+    code = '<iframe src="' + url + '" width="' + width + '" height="' + height + '" style="border:none; border-radius:10px;"></iframe>';
+  } else {
+    code = '<script src="' + protocol + '://' + domain + '/widget.js" data-box="' + currentBox + '" data-width="' + width + '" data-height="' + height + '"><\/script>';
+  }
+  document.getElementById('codeOutput').textContent = code;
+  
+  // Preview
+  document.getElementById('preview').innerHTML = '<iframe src="' + url + '" width="100%" height="' + height + '" style="border:none;"></iframe>';
+}
+
+function copyCode() {
+  const code = document.getElementById('codeOutput').textContent;
+  navigator.clipboard.writeText(code).then(() => SHARED.showSuccess('تم النسخ'));
+}
+</script>
+</body>
+</html>

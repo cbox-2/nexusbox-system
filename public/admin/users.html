@@ -1,0 +1,127 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>المستخدمون - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+<div id="successMsg" class="success-msg"></div>
+<div id="errorMsg" class="error-msg"></div>
+<div class="main-container">
+  <div class="content-section">
+    <h1>👥 المستخدمون</h1>
+    <div class="sub-nav">
+      <a href="/admin/users.html" class="active">المستخدمون المسجلون</a>
+      <a href="/admin/users-banned.html">المستخدمون المحظورون</a>
+      <a href="/admin/users-integration.html">تكامل المستخدم</a>
+    </div>
+    <div class="form-group">
+      <label>اختر الصندوق:</label>
+      <select id="boxSelect" onchange="loadUsers()">
+        <option value="">-- اختر --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>إضافة مستخدم جديد:</label>
+      <input type="text" id="newUserName" placeholder="اسم المستخدم" style="margin-bottom:10px;">
+      <input type="password" id="newUserPass" placeholder="كلمة المرور" style="margin-bottom:10px;">
+      <select id="newUserRole" style="margin-bottom:10px;">
+        <option value="2">مستخدم عادي</option>
+        <option value="3">مشرف</option>
+        <option value="4">مدير</option>
+        <option value="5">مالك</option>
+      </select>
+      <button class="btn btn-primary" onclick="addUser()">إضافة مستخدم</button>
+    </div>
+    <div id="usersList" style="padding:20px; color:#888; text-align:center;">اختر صندوق</div>
+  </div>
+</div>
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('users');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!TOKEN) { window.location.href = '/test.html'; return; }
+  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  const data = await res.json();
+  const select = document.getElementById('boxSelect');
+  if (data.success) {
+    select.innerHTML = '<option value="">-- اختر --</option>';
+    data.boxes.forEach(b => { select.innerHTML += `<option value="${b._id}">${b.name}</option>`; });
+  }
+});
+
+async function loadUsers() {
+  const boxId = document.getElementById('boxSelect').value;
+  if (!boxId) return;
+  const container = document.getElementById('usersList');
+  container.innerHTML = 'جاري التحميل...';
+  try {
+    const res = await fetch(API + '/api/boxes/' + boxId + '/users', {
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    });
+    const data = await res.json();
+    if (data.success && data.users && data.users.length > 0) {
+      let html = '<table class="data-table"><thead><tr><th>الاسم</th><th>الرتبة</th><th>تاريخ التسجيل</th><th>إجراءات</th></tr></thead><tbody>';
+      data.users.forEach(u => {
+        html += `<tr><td>${u.name}</td><td>${u.level}</td><td>${new Date(u.registeredAt).toLocaleDateString('ar')}</td>
+          <td>
+            <button class="btn btn-warning btn-sm" onclick="changeRole('${u._id}', '${boxId}')">تغيير الرتبة</button>
+            <button class="btn btn-danger btn-sm" onclick="deleteUser('${u._id}', '${boxId}')">حذف</button>
+          </td></tr>`;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = '<p style="text-align:center; padding:20px;">لا يوجد مستخدمون</p>';
+    }
+  } catch(e) { container.innerHTML = 'خطأ'; }
+}
+
+async function addUser() {
+  const boxId = document.getElementById('boxSelect').value;
+  const name = document.getElementById('newUserName').value;
+  const password = document.getElementById('newUserPass').value;
+  const level = parseInt(document.getElementById('newUserRole').value);
+  if (!boxId || !name || !password) { alert('املأ جميع الحقول'); return; }
+  try {
+    const res = await fetch(API + '/api/boxes/' + boxId + '/users', {
+      method: 'POST',
+      headers: SHARED.getAuthHeaders(),
+      body: JSON.stringify({ name, password, level })
+    });
+    const data = await res.json();
+    if (data.success) {
+      SHARED.showSuccess('تمت الإضافة');
+      document.getElementById('newUserName').value = '';
+      document.getElementById('newUserPass').value = '';
+      loadUsers();
+    } else { SHARED.showError(data.error); }
+  } catch(e) { SHARED.showError('خطأ'); }
+}
+
+async function deleteUser(id, boxId) {
+  if (!confirm('حذف المستخدم؟')) return;
+  await fetch(API + '/api/users/' + id, { method: 'DELETE', headers: SHARED.getAuthHeaders() });
+  loadUsers();
+}
+
+async function changeRole(id, boxId) {
+  const newRole = prompt('أدخل الرتبة الجديدة (2-5):');
+  if (!newRole) return;
+  try {
+    await fetch(API + '/api/users/' + id, {
+      method: 'PUT',
+      headers: SHARED.getAuthHeaders(),
+      body: JSON.stringify({ level: parseInt(newRole) })
+    });
+    SHARED.showSuccess('تم التغيير');
+    loadUsers();
+  } catch(e) { SHARED.showError('خطأ'); }
+}
+</script>
+</body>
+</html>

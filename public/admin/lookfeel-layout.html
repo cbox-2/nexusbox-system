@@ -1,0 +1,113 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>خيارات التخطيط - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+<div id="successMsg" class="success-msg"></div>
+<div class="main-container">
+  <div class="content-section">
+    <h1>📐 خيارات التخطيط</h1>
+    <div class="sub-nav">
+      <a href="/admin/lookfeel.html">محرر السمات</a>
+      <a href="/admin/lookfeel-layout.html" class="active">خيارات التخطيط</a>
+    </div>
+    <div class="form-group">
+      <label>اختر الصندوق:</label>
+      <select id="boxSelect" onchange="loadLayout()">
+        <option value="">-- اختر --</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label>العرض (px):</label>
+      <input type="number" id="width" value="400" min="200" max="800">
+    </div>
+    <div class="form-group">
+      <label>الارتفاع (px):</label>
+      <input type="number" id="height" value="500" min="300" max="1000">
+    </div>
+    <div class="form-group">
+      <label>ارتفاع النموذج (px):</label>
+      <input type="number" id="formHeight" value="107" min="50" max="200">
+    </div>
+    <div class="toggle-group">
+      <div><strong>النموذج في الأعلى</strong><small>وضع نموذج الإدخال فوق الرسائل</small></div>
+      <label class="toggle"><input type="checkbox" id="formOnTop"><span class="slider"></span></label>
+    </div>
+    <div class="toggle-group">
+      <div><strong>تخطيط ضيق</strong><small>تقليل العرض للعرض على الموبايل</small></div>
+      <label class="toggle"><input type="checkbox" id="narrowLayout"><span class="slider"></span></label>
+    </div>
+    <div class="form-group">
+      <label>اللغة:</label>
+      <select id="language">
+        <option value="ar">العربية</option>
+        <option value="en">English</option>
+      </select>
+    </div>
+    <button class="btn btn-primary" onclick="saveLayout()">حفظ التخطيط</button>
+  </div>
+</div>
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('lookfeel');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+let currentBoxId = null;
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!TOKEN) { window.location.href = '/test.html'; return; }
+  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  const data = await res.json();
+  const select = document.getElementById('boxSelect');
+  if (data.success) {
+    select.innerHTML = '<option value="">-- اختر --</option>';
+    data.boxes.forEach(b => { select.innerHTML += `<option value="${b._id}">${b.name}</option>`; });
+  }
+});
+
+async function loadLayout() {
+  const boxId = document.getElementById('boxSelect').value;
+  if (!boxId) return;
+  currentBoxId = boxId;
+  try {
+    const res = await fetch(API + '/api/boxes/' + boxId, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    const data = await res.json();
+    if (data.success && data.box) {
+      const l = data.box.layout || {};
+      document.getElementById('width').value = l.width || 400;
+      document.getElementById('height').value = l.height || 500;
+      document.getElementById('formHeight').value = l.formHeight || 107;
+      document.getElementById('formOnTop').checked = l.formOnTop || false;
+      document.getElementById('narrowLayout').checked = l.narrowLayout || false;
+      document.getElementById('language').value = (data.box.settings || {}).language || 'ar';
+    }
+  } catch(e) {}
+}
+
+async function saveLayout() {
+  if (!currentBoxId) { alert('اختر صندوق'); return; }
+  try {
+    const res = await fetch(API + '/api/boxes/' + currentBoxId, {
+      method: 'PUT',
+      headers: SHARED.getAuthHeaders(),
+      body: JSON.stringify({
+        layout: {
+          width: parseInt(document.getElementById('width').value),
+          height: parseInt(document.getElementById('height').value),
+          formHeight: parseInt(document.getElementById('formHeight').value),
+          formOnTop: document.getElementById('formOnTop').checked,
+          narrowLayout: document.getElementById('narrowLayout').checked
+        },
+        settings: { language: document.getElementById('language').value }
+      })
+    });
+    const data = await res.json();
+    if (data.success) SHARED.showSuccess('تم الحفظ');
+  } catch(e) { SHARED.showError('خطأ'); }
+}
+</script>
+</body>
+</html>

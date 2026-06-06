@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>أرشيف الرسائل - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+<div id="successMsg" class="success-msg"></div>
+<div id="errorMsg" class="error-msg"></div>
+<div class="main-container">
+  <div class="content-section">
+    <h1>📚 أرشيف الرسائل</h1>
+    <div class="sub-nav">
+      <a href="/admin/messages.html">الرسائل</a>
+      <a href="/admin/messages-archive.html" class="active">الأرشيف</a>
+      <a href="/admin/messages-sticky.html">الرسائل اللاصقة</a>
+      <a href="/admin/messages-channels.html">القنوات</a>
+      <a href="/admin/messages-weblinks.html">روابط الويب</a>
+    </div>
+    <div class="form-group">
+      <label>بحث:</label>
+      <input type="text" id="searchInput" placeholder="ابحث في الرسائل..." onkeyup="searchMessages()">
+    </div>
+    <div class="form-group">
+      <label>تصفية حسب الصندوق:</label>
+      <select id="boxSelect" onchange="loadArchive()">
+        <option value="">-- اختر --</option>
+      </select>
+    </div>
+    <div id="archiveList" style="padding:20px; color:#888; text-align:center;">اختر صندوق لعرض الأرشيف</div>
+  </div>
+</div>
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('messages');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!TOKEN) { window.location.href = '/test.html'; return; }
+  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+  const data = await res.json();
+  const select = document.getElementById('boxSelect');
+  if (data.success) {
+    select.innerHTML = '<option value="">-- اختر --</option>';
+    data.boxes.forEach(b => { select.innerHTML += `<option value="${b._id}">${b.name}</option>`; });
+  }
+});
+
+async function loadArchive() {
+  const boxId = document.getElementById('boxSelect').value;
+  if (!boxId) return;
+  const container = document.getElementById('archiveList');
+  container.innerHTML = 'جاري التحميل...';
+  try {
+    const res = await fetch(API + '/api/boxes/' + boxId + '/messages?archived=true', {
+      headers: { 'Authorization': 'Bearer ' + TOKEN }
+    });
+    const data = await res.json();
+    if (data.success && data.messages && data.messages.length > 0) {
+      let html = '<table class="data-table"><thead><tr><th>المحتوى</th><th>التاريخ</th></tr></thead><tbody>';
+      data.messages.forEach(m => {
+        html += `<tr><td>${m.content}</td><td>${new Date(m.createdAt).toLocaleDateString('ar')}</td></tr>`;
+      });
+      html += '</tbody></table>';
+      container.innerHTML = html;
+    } else {
+      container.innerHTML = '<p style="text-align:center; padding:20px;">لا توجد رسائل في الأرشيف</p>';
+    }
+  } catch(e) { container.innerHTML = 'خطأ'; }
+}
+
+function searchMessages() {
+  const term = document.getElementById('searchInput').value.toLowerCase();
+  document.querySelectorAll('#archiveList tbody tr').forEach(row => {
+    row.style.display = row.textContent.toLowerCase().includes(term) ? '' : 'none';
+  });
+}
+</script>
+</body>
+</html>

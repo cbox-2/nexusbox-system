@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>تكامل المستخدم - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+<div id="successMsg" class="success-msg"></div>
+<div class="main-container">
+  <div class="content-section">
+    <h1> تكامل المستخدم (API Integration)</h1>
+    <div class="sub-nav">
+      <a href="/admin/users.html">المستخدمون المسجلون</a>
+      <a href="/admin/users-banned.html">المستخدمون المحظورون</a>
+      <a href="/admin/users-integration.html" class="active">تكامل المستخدم</a>
+    </div>
+    <div class="form-group">
+      <label>مفاتيح API الخاصة بك:</label>
+      <div class="code-box" id="apiKeys">جاري التحميل...</div>
+    </div>
+    <button class="btn btn-warning" onclick="regenerateKey()">🔄 إعادة توليد المفتاح</button>
+    <div style="margin-top:30px;">
+      <h2>📖 توثيق API</h2>
+      <p>استخدم المفتاح أعلاه للوصول إلى API:</p>
+      <div class="code-box">Authorization: Bearer YOUR_API_KEY</div>
+      <p>Endpoints متاحة:</p>
+      <ul style="padding-right:20px; color:#555; line-height:2;">
+        <li><code>GET /api/boxes</code> - جلب الصناديق</li>
+        <li><code>POST /api/boxes/:id/messages</code> - إرسال رسالة</li>
+        <li><code>GET /api/boxes/:id/users</code> - جلب المستخدمين</li>
+        <li><code>POST /api/boxes/:id/bans</code> - حظر مستخدم</li>
+      </ul>
+    </div>
+  </div>
+</div>
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('users');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+
+window.addEventListener('DOMContentLoaded', () => {
+  if (!TOKEN) { window.location.href = '/test.html'; return; }
+  document.getElementById('apiKeys').textContent = 'API Key: ' + TOKEN.substring(0, 30) + '...';
+});
+
+async function regenerateKey() {
+  if (!confirm('إعادة توليد المفتاح ستبطل المفتاح الحالي. متأكد؟')) return;
+  try {
+    const res = await fetch(API + '/api/auth/regenerate-key', {
+      method: 'POST',
+      headers: SHARED.getAuthHeaders()
+    });
+    const data = await res.json();
+    if (data.success) {
+      localStorage.setItem('token', data.token);
+      document.getElementById('apiKeys').textContent = 'API Key: ' + data.token.substring(0, 30) + '...';
+      SHARED.showSuccess('تم إعادة التوليد');
+    }
+  } catch(e) { SHARED.showError('خطأ'); }
+}
+</script>
+</body>
+</html>
