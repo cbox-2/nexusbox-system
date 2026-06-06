@@ -1,0 +1,153 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>NexusBox Live Chat</title>
+<style>
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body { font-family: 'Segoe UI', Tahoma, sans-serif; background: #f0f2f5; }
+.chat-container { max-width: 600px; margin: 0 auto; background: white; border-radius: 10px; box-shadow: 0 4px 20px rgba(0,0,0,0.1); overflow: hidden; }
+.chat-header { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 20px; text-align: center; }
+.chat-header h1 { font-size: 24px; margin-bottom: 5px; }
+.chat-header p { font-size: 14px; opacity: 0.9; }
+.chat-messages { height: 400px; overflow-y: auto; padding: 20px; background: #f9f9f9; }
+.message { margin-bottom: 15px; padding: 12px; background: white; border-radius: 8px; box-shadow: 0 1px 3px rgba(0,0,0,0.1); }
+.message.sticky { background: #fff3cd; border-right: 4px solid #ffc107; }
+.message-header { display: flex; justify-content: space-between; margin-bottom: 8px; }
+.message-author { font-weight: bold; color: #667eea; font-size: 14px; }
+.message-time { color: #999; font-size: 12px; }
+.message-content { color: #333; font-size: 14px; line-height: 1.5; }
+.chat-form { padding: 20px; background: white; border-top: 1px solid #ddd; }
+.chat-form input, .chat-form textarea { width: 100%; padding: 10px; border: 2px solid #ddd; border-radius: 5px; font-size: 14px; margin-bottom: 10px; }
+.chat-form button { width: 100%; padding: 12px; background: #667eea; color: white; border: none; border-radius: 5px; font-size: 16px; font-weight: bold; cursor: pointer; }
+.chat-form button:hover { background: #5568d3; }
+.no-messages { text-align: center; padding: 60px 20px; color: #888; }
+</style>
+</head>
+<body>
+
+<div class="chat-container">
+  <div class="chat-header">
+    <h1 id="boxName">NexusBox Live Chat</h1>
+    <p id="boxDesc">مرحباً بك في الشات المباشر</p>
+  </div>
+  
+  <div class="chat-messages" id="messagesContainer">
+    <div class="no-messages">جاري تحميل الرسائل...</div>
+  </div>
+  
+  <div class="chat-form">
+    <input type="text" id="username" placeholder="اسمك (اختياري)" value="زائر">
+    <textarea id="messageInput" rows="3" placeholder="اكتب رسالتك هنا..."></textarea>
+    <button onclick="sendMessage()">إرسال الرسالة</button>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+const params = new URLSearchParams(window.location.search);
+const embedKey = params.get('key');
+let boxData = null;
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!embedKey) {
+    alert('مفتاح الصندوق غير موجود');
+    return;
+  }
+  await loadBox();
+  await loadMessages();
+  setInterval(loadMessages, 5000); // Auto-refresh every 5 seconds
+});
+
+async function loadBox() {
+  try {
+    const res = await fetch(API + '/api/embed/' + embedKey);
+    const data = await res.json();
+    if (data.success) {
+      boxData = data.box;
+      document.getElementById('boxName').textContent = boxData.name;
+      document.title = boxData.name + ' - NexusBox';
+      
+      // Apply theme
+      if (boxData.theme) {
+        document.querySelector('.chat-header').style.background = 
+          'linear-gradient(135deg, ' + (boxData.theme.primaryColor || '#667eea') + ' 0%, ' + 
+          (boxData.theme.primaryColor || '#764ba2') + ' 100%)';
+      }
+    }
+  } catch(e) {
+    console.error('Error loading box:', e);
+  }
+}
+
+async function loadMessages() {
+  if (!boxData) return;
+  
+  try {
+    const res = await fetch(API + '/api/embed/' + embedKey + '/messages');
+    const data = await res.json();
+    
+    const container = document.getElementById('messagesContainer');
+    
+    if (data.success && data.messages && data.messages.length > 0) {
+      let html = '';
+      data.messages.forEach(msg => {
+        const stickyClass = msg.isSticky ? 'sticky' : '';
+        const time = new Date(msg.createdAt).toLocaleTimeString('ar', { hour: '2-digit', minute: '2-digit' });
+        html += '<div class="message ' + stickyClass + '">';
+        html += '<div class="message-header">';
+        html += '<span class="message-author">' + (msg.author?.username || 'زائر') + '</span>';
+        html += '<span class="message-time">' + time + '</span>';
+        html += '</div>';
+        html += '<div class="message-content">' + escapeHtml(msg.content) + '</div>';
+        html += '</div>';
+      });
+      container.innerHTML = html;
+      container.scrollTop = container.scrollHeight;
+    } else {
+      container.innerHTML = '<div class="no-messages">لا توجد رسائل بعد. كن أول من يرسل رسالة!</div>';
+    }
+  } catch(e) {
+    console.error('Error loading messages:', e);
+  }
+}
+
+async function sendMessage() {
+  const username = document.getElementById('username').value.trim() || 'زائر';
+  const content = document.getElementById('messageInput').value.trim();
+  
+  if (!content) {
+    alert('اكتب رسالة أولاً');
+    return;
+  }
+  
+  try {
+    const res = await fetch(API + '/api/embed/' + embedKey + '/messages', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ username, content })
+    });
+    
+    const data = await res.json();
+    
+    if (data.success) {
+      document.getElementById('messageInput').value = '';
+      await loadMessages();
+    } else {
+      alert('خطأ: ' + (data.error || 'فشل إرسال الرسالة'));
+    }
+  } catch(e) {
+    alert('خطأ في الاتصال');
+  }
+}
+
+function escapeHtml(text) {
+  const div = document.createElement('div');
+  div.textContent = text;
+  return div.innerHTML;
+}
+</script>
+
+</body>
+</html>

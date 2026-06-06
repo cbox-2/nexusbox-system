@@ -621,3 +621,72 @@ app.listen(PORT, () => {
   console.log(`🚀 NexusBox server running on port ${PORT}`);
   console.log(`📍 http://localhost:${PORT}`);
 });
+
+// ===== PUBLIC CHAT ROUTES =====
+
+app.get('/api/embed/:embedKey/messages', async (req, res) => {
+  try {
+    const box = await Box.findOne({ embedKey: req.params.embedKey, status: 'active' });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    
+    const messages = await Message.find({ 
+      boxId: box._id, 
+      isDeleted: false,
+      isArchived: false 
+    })
+    .sort({ createdAt: -1 })
+    .limit(50);
+    
+    res.json({ success: true, messages });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});
+
+app.post('/api/embed/:embedKey/messages', async (req, res) => {
+  try {
+    const box = await Box.findOne({ embedKey: req.params.embedKey, status: 'active' });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    
+    // Check if guest posting is allowed
+    if (!box.settings.allowGuestPost && !req.body.userId) {
+      return res.status(403).json({ success: false, error: 'Guest posting not allowed' });
+    }
+    
+    const message = new Message({
+      boxId: box._id,
+      content: req.body.content,
+      author: {
+        id: req.body.userId || null,
+        username: req.body.username || 'زائر'
+      },
+      channel: req.body.channel || 'general'
+    });
+    
+    await message.save();
+    await Box.findByIdAndUpdate(box._id, { $inc: { 'stats.totalMessages': 1 } });
+    
+    // Send webhook if enabled
+    if (box.webhook.enabled && box.webhook.url) {
+      try {
+        const fetch = require('node-fetch');
+        await fetch(box.webhook.url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            content: message.content,
+            author: message.author.username,
+            box: box.name,
+            timestamp: message.createdAt
+          })
+        });
+      } catch(e) {
+        console.error('Webhook error:', e);
+      }
+    }
+    
+    res.status(201).json({ success: true, message });
+  } catch (error) {
+    res.status(500).json({ success: false, error: error.message });
+  }
+});

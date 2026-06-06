@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<title>اختر صندوق - NexusBox</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
+</head>
+<body>
+<div class="main-container">
+  <div class="content-section">
+    <h1>اختر صندوق التحكم</h1>
+    <div id="boxesList" style="margin-top:30px;">
+      <p style="text-align:center; padding:40px; color:#888;">جاري التحميل...</p>
+    </div>
+  </div>
+</div>
+<script src="/assets/js/shared.js"></script>
+<script>
+SHARED.init('');
+const API = SHARED.API;
+const TOKEN = localStorage.getItem('token');
+
+window.addEventListener('DOMContentLoaded', async () => {
+  if (!TOKEN) { window.location.href = '/test.html'; return; }
+  await loadBoxes();
+});
+
+async function loadBoxes() {
+  try {
+    const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
+    const data = await res.json();
+    const container = document.getElementById('boxesList');
+    
+    if (!data.success || data.boxes.length === 0) {
+      container.innerHTML = '<div style="text-align:center; padding:60px;"><h2>لا توجد صناديق</h2><p style="margin:20px 0;">أنشئ أول صندوق الآن</p><a href="/admin/create-box.html" class="btn btn-primary">إنشاء صندوق جديد</a></div>';
+      return;
+    }
+    
+    let html = '<div style="display:grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap:20px;">';
+    data.boxes.forEach(box => {
+      html += '<div style="background:#f9f9f9; padding:25px; border-radius:10px; border-right:4px solid #667eea; cursor:pointer;" onclick="selectBox(\'' + box._id + '\')">';
+      html += '<h3 style="margin:0 0 10px 0; color:#333;">' + box.name + '</h3>';
+      html += '<p style="color:#666; font-size:14px; margin:5px 0;">Slug: ' + box.slug + '</p>';
+      html += '<p style="color:#666; font-size:14px; margin:5px 0;">الحالة: ' + (box.status === 'active' ? '✅ نشط' : '❌ ' + box.status) + '</p>';
+      html += '<p style="color:#999; font-size:12px; margin-top:10px;">' + new Date(box.createdAt).toLocaleDateString('ar') + '</p>';
+      html += '</div>';
+    });
+    html += '</div>';
+    container.innerHTML = html;
+  } catch(e) {
+    document.getElementById('boxesList').innerHTML = '<p style="color:red; text-align:center;">خطأ في التحميل</p>';
+  }
+}
+
+function selectBox(boxId) {
+  localStorage.setItem('currentBoxId', boxId);
+  window.location.href = '/admin/messages.html';
+}
+</script>
+</body>
+</html>
