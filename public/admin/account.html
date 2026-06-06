@@ -1,62 +1,126 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
+<title>My Account · NexusBox</title>
 <meta charset="UTF-8">
-<title>حسابي - NexusBox</title>
-<link rel="stylesheet" href="/assets/css/admin-theme.css">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<link rel="stylesheet" href="/cbox-files/style.css">
+<script src="/cbox-files/code.js"></script>
 </head>
-<body>
-<div id="successMsg" class="success-msg"></div>
-<div class="main-container">
-  <div class="content-section">
-    <h1> حسابي</h1>
-    <div id="userInfo">جاري التحميل...</div>
-    <div class="form-group" style="margin-top:20px;">
-      <label>تغيير كلمة المرور:</label>
-      <input type="password" id="newPass" placeholder="كلمة المرور الجديدة">
-      <button class="btn btn-primary" onclick="changePassword()" style="margin-top:10px;">تغيير</button>
+<body id="mainbody">
+<div id="mask"></div>
+<div id="bodywrap">
+  <div id="header">
+    <div class="wrap">
+      <a id="logo" href="/"><img src="/cbox-files/logo400.png" alt="NexusBox" width="200" height="86" border="0"></a>
+      <div id="headerExtras">
+        <span id="userWelcome">Loading...</span>
+        <a href="/admin/index.html">My Cboxes</a>
+        <a href="/admin/account.html">My Account</a>
+        <a href="/admin/support.html">Support</a>
+        <a href="#" onclick="logout()">Log out</a>
+      </div>
     </div>
   </div>
+  <div id="subbar">
+    <div class="wrap">
+      <a href="/admin/index.html" class="submenuitem"><b>MY CBOXES</b></a>
+      <a href="/admin/publish.html" class="submenuitem">Publish</a>
+      <a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+      <a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options</a>
+      <a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users</a>
+      <a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages</a>
+    </div>
+  </div>
+  <div id="bar3"><div id="hovmenu" class="wrap"><a></a></div></div>
+  <div id="main" class="wrap">
+    <div id="content">
+      <h1>My Account</h1>
+      <div class="block_grey">
+        <h2>Account Information</h2>
+        <fieldset>
+          <label>Email:</label>
+          <input type="email" id="userEmail" class="txtbox" readonly>
+          <label>Account ID:</label>
+          <input type="text" id="userId" class="txtbox" readonly>
+          <label>Member Since:</label>
+          <input type="text" id="memberSince" class="txtbox" readonly>
+        </fieldset>
+      </div>
+      <div class="block_grey">
+        <h2>Change Password</h2>
+        <form id="passwordForm">
+          <fieldset>
+            <label>Current Password:</label>
+            <input type="password" name="currentPassword" class="txtbox" required>
+            <label>New Password:</label>
+            <input type="password" name="newPassword" class="txtbox" required>
+            <label>Confirm Password:</label>
+            <input type="password" name="confirmPassword" class="txtbox" required>
+            <input type="submit" value="Update Password">
+            <div id="m_passwordForm" class="frmmsg1"></div>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="footer">
+    <a href="/">Home</a>
+    <a href="/admin/support.html">Support</a>
+    <div class="verybottom">&copy; 2026 NexusBox</div>
+  </div>
 </div>
-<script src="/assets/js/shared.js"></script>
+<script src="/cbox-files/activate.js"></script>
 <script>
-SHARED.init('');
-const API = SHARED.API;
+const API = window.location.origin;
 const TOKEN = localStorage.getItem('token');
 
-window.addEventListener('DOMContentLoaded', async () => {
-  if (!TOKEN) { window.location.href = '/test.html'; return; }
-  const res = await fetch(API + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  const data = await res.json();
-  if (data.success) {
-    const u = data.user;
-    document.getElementById('userInfo').innerHTML = `
-      <table class="data-table">
-        <tr><th>اسم المستخدم</th><td>${u.username}</td></tr>
-        <tr><th>البريد الإلكتروني</th><td>${u.email}</td></tr>
-        <tr><th>الرتبة</th><td>${u.role}</td></tr>
-        <tr><th>الحالة</th><td>${u.status}</td></tr>
-        <tr><th>تاريخ الإنشاء</th><td>${new Date(u.createdAt).toLocaleDateString('ar')}</td></tr>
-      </table>
-    `;
+if (TOKEN) {
+  fetch(API + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+    .then(r => r.json())
+    .then(d => {
+      if (d.success && d.user) {
+        document.getElementById('userWelcome').textContent = d.user.email;
+        document.getElementById('userEmail').value = d.user.email;
+        document.getElementById('userId').value = d.user._id;
+        document.getElementById('memberSince').value = new Date(d.user.createdAt).toLocaleDateString();
+      }
+    });
+}
+
+document.getElementById('passwordForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData);
+  
+  if (data.newPassword !== data.confirmPassword) {
+    document.getElementById('m_passwordForm').textContent = 'Passwords do not match';
+    document.getElementById('m_passwordForm').className = 'frmmsg1 Error';
+    return;
   }
+  
+  fetch(API + '/api/auth/change-password', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      document.getElementById('m_passwordForm').textContent = 'Password updated!';
+      document.getElementById('m_passwordForm').className = 'frmmsg1 Okay';
+      this.reset();
+    } else {
+      document.getElementById('m_passwordForm').textContent = d.message || 'Error';
+      document.getElementById('m_passwordForm').className = 'frmmsg1 Error';
+    }
+  });
 });
 
-async function changePassword() {
-  const pass = document.getElementById('newPass').value;
-  if (!pass || pass.length < 6) { alert('كلمة المرور قصيرة'); return; }
-  try {
-    const res = await fetch(API + '/api/auth/change-password', {
-      method: 'POST',
-      headers: SHARED.getAuthHeaders(),
-      body: JSON.stringify({ password: pass })
-    });
-    const data = await res.json();
-    if (data.success) SHARED.showSuccess('تم التغيير');
-    else SHARED.showError(data.error);
-  } catch(e) { SHARED.showError('خطأ'); }
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/';
 }
 </script>
-<script src="/cbox-files/activate.js"></script>
 </body>
 </html>

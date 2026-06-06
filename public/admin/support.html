@@ -1,40 +1,118 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
+<title>Support · NexusBox</title>
 <meta charset="UTF-8">
-<title>الدعم - NexusBox</title>
-<link rel="stylesheet" href="/assets/css/admin-theme.css">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<link rel="stylesheet" href="/cbox-files/style.css">
+<script src="/cbox-files/code.js"></script>
 </head>
-<body>
-<div class="main-container">
-  <div class="content-section">
-    <h1>💬 الدعم</h1>
-    <div class="info-msg">
-      <h3>تواصل معنا</h3>
-      <p>للحصول على المساعدة، يمكنك:</p>
-      <ul style="padding-right:20px; line-height:2;">
-        <li>البريد: support@nexusbox.com</li>
-        <li>الوثائق: <a href="/api/health">API Docs</a></li>
-        <li>GitHub: <a href="https://github.com/cbox-2/nexusbox-system" target="_blank">المستودع</a></li>
-      </ul>
-    </div>
-    <div class="form-group">
-      <label>أرسل رسالة دعم:</label>
-      <textarea id="supportMsg" rows="5" placeholder="اكتب رسالتك..."></textarea>
-      <button class="btn btn-primary" onclick="sendSupport()" style="margin-top:10px;">إرسال</button>
+<body id="mainbody">
+<div id="mask"></div>
+<div id="bodywrap">
+  <div id="header">
+    <div class="wrap">
+      <a id="logo" href="/"><img src="/cbox-files/logo400.png" alt="NexusBox" width="200" height="86" border="0"></a>
+      <div id="headerExtras">
+        <span id="userWelcome">Loading...</span>
+        <a href="/admin/index.html">My Cboxes</a>
+        <a href="/admin/account.html">My Account</a>
+        <a href="/admin/support.html">Support</a>
+        <a href="#" onclick="logout()">Log out</a>
+      </div>
     </div>
   </div>
+  <div id="subbar">
+    <div class="wrap">
+      <a href="/admin/index.html" class="submenuitem"><b>MY CBOXES</b></a>
+      <a href="/admin/publish.html" class="submenuitem">Publish</a>
+      <a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+      <a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options</a>
+      <a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users</a>
+      <a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages</a>
+    </div>
+  </div>
+  <div id="bar3"><div id="hovmenu" class="wrap"><a></a></div></div>
+  <div id="main" class="wrap">
+    <div id="content">
+      <h1>Support</h1>
+      <div class="block_grey">
+        <h2>Help & Documentation</h2>
+        <ul>
+          <li><a href="/admin/index.html">Getting Started</a></li>
+          <li><a href="/admin/publish.html">Publishing Your Cbox</a></li>
+          <li><a href="/admin/lookfeel.html">Customizing Appearance</a></li>
+          <li><a href="/admin/options.html">Configuration Options</a></li>
+        </ul>
+      </div>
+      <div class="block_grey">
+        <h2>Contact Support</h2>
+        <p>For technical support, please email us at: <a href="mailto:support@nexusbox.com">support@nexusbox.com</a></p>
+        <p>Or visit our community forum for help from other users.</p>
+      </div>
+      <div class="block_grey">
+        <h2>Report a Bug</h2>
+        <form id="bugForm">
+          <fieldset>
+            <label>Subject:</label>
+            <input type="text" name="subject" class="txtbox" required>
+            <label>Description:</label>
+            <textarea name="description" class="txtarea" rows="5" required></textarea>
+            <input type="submit" value="Submit Report">
+            <div id="m_bugForm" class="frmmsg1"></div>
+          </fieldset>
+        </form>
+      </div>
+    </div>
+  </div>
+  <div id="footer">
+    <a href="/">Home</a>
+    <a href="/admin/support.html">Support</a>
+    <div class="verybottom">&copy; 2026 NexusBox</div>
+  </div>
 </div>
-<script src="/assets/js/shared.js"></script>
+<script src="/cbox-files/activate.js"></script>
 <script>
-SHARED.init('');
-function sendSupport() {
-  const msg = document.getElementById('supportMsg').value;
-  if (!msg) { alert('اكتب رسالة'); return; }
-  alert('تم إرسال رسالتك. سنرد عليك قريباً.');
-  document.getElementById('supportMsg').value = '';
+const API = window.location.origin;
+const TOKEN = localStorage.getItem('token');
+
+if (TOKEN) {
+  fetch(API + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+    .then(r => r.json())
+    .then(d => {
+      if (d.success && d.user) {
+        document.getElementById('userWelcome').textContent = d.user.email;
+      }
+    });
+}
+
+document.getElementById('bugForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  const formData = new FormData(this);
+  const data = Object.fromEntries(formData);
+  
+  fetch(API + '/api/support/bug-report', {
+    method: 'POST',
+    headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
+    body: JSON.stringify(data)
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) {
+      document.getElementById('m_bugForm').textContent = 'Report submitted!';
+      document.getElementById('m_bugForm').className = 'frmmsg1 Okay';
+      this.reset();
+    } else {
+      document.getElementById('m_bugForm').textContent = d.message || 'Error';
+      document.getElementById('m_bugForm').className = 'frmmsg1 Error';
+    }
+  });
+});
+
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/';
 }
 </script>
-<script src="/cbox-files/activate.js"></script>
 </body>
 </html>
