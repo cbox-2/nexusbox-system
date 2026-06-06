@@ -2,16 +2,26 @@
 const API = window.location.origin;
 const TOKEN = localStorage.getItem('token');
 
+// الصفحات التي لا تتطلب تسجيل دخول
+const publicPages = ['/', '/index.html', '/test.html', '/api-test.html', '/chat.html', '/embed.html'];
+
 // التحقق من تسجيل الدخول
 function checkAuth() {
+  const currentPath = window.location.pathname;
+  
+  // السماح بالوصول للصفحات العامة
+  if (publicPages.some(page => currentPath.includes(page))) {
+    return true;
+  }
+  
+  // إذا لم يكن هناك token والصفحة ليست عامة
   if (!TOKEN) {
-    // السماح للزوار في الصفحة الرئيسية
-    if (window.location.pathname === '/' || window.location.pathname === '/index.html') {
-      return true;
-    }
-    window.location.href = '/test.html';
+    // لا تعيد التوجيه فوراً، اسمح للصفحة بالتحميل
+    // فقط احذر المستخدم
+    console.log('Login required for this page');
     return false;
   }
+  
   return true;
 }
 
@@ -30,8 +40,8 @@ function loadUserInfo() {
     }
   })
   .catch(() => {
+    // لا تعيد التوجيه، فقط احذف التوكن
     localStorage.removeItem('token');
-    window.location.href = '/test.html';
   });
 }
 
@@ -239,8 +249,7 @@ function activateButtons() {
 
 // التهيئة عند تحميل الصفحة
 window.addEventListener('DOMContentLoaded', function() {
-  if (!checkAuth()) return;
-  
+  checkAuth(); // فقط تحقق، لا تعيد التوجيه
   loadUserInfo();
   
   // تحميل البيانات حسب الصفحة
