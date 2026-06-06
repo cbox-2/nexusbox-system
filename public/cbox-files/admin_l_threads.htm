@@ -1,0 +1,52 @@
+<html><head><title>Cbox Channels</title><meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="style.css">
+<script type="text/javascript">
+function s() {
+  return confirm("Are you sure?");
+}
+sel = new Array();
+function t(id) {
+  if (!document.getElementById("r"+id)) return false;
+  if (sel[id] == null) {
+    sel[id] = document.getElementById("r"+id).style.backgroundColor;
+    document.getElementById("r"+id).style.backgroundColor="#e9eff3";
+    document.getElementById("c"+id).checked = true;
+  }
+  else {
+    document.getElementById("r"+id).style.backgroundColor=sel[id];
+    document.getElementById("c"+id).checked = false;
+    sel[id] = null;
+  }
+}
+</script>
+</head>
+<body class="embList" style="overflow:auto;" onload="">
+<form name="users" action="/admin_l_threads.php" method="post">
+<input type="hidden" name="act" value="0">
+<input type="hidden" name="pg" value="0">
+
+<a name="top"></a>
+<div align="right">Page: -</div>
+<table style="table-layout:fixed;word-wrap:break-word;overflow:hidden;" width="100%" cellspacing="1" cellpadding="2" border="0">
+<tbody><tr><td width="20">&nbsp;</td>
+<td width="50"><b><a href="https://www.cbox.ws/admin_l_threads.php?srch=&amp;srchin=&amp;pg=0&amp;ordby=0&amp;orddir=0">ID #</a></b></td>
+<td><b>Key</b></td>
+<td><b><a href="https://www.cbox.ws/admin_l_threads.php?srch=&amp;srchin=&amp;pg=0&amp;ordby=1&amp;orddir=0">Name</a></b></td>
+<td width="80"><b>Code</b></td>
+<td width="80"><b>Messages</b></td>
+<td width="100"><b><a href="https://www.cbox.ws/admin_l_threads.php?srch=&amp;srchin=&amp;pg=0&amp;ordby=3&amp;orddir=0">Time Created</a><img src="admin_l_threads_data/arrow_coldn.gif" width="12" height="12"></b></td>
+</tr>
+
+<tr><td colspan="7" align="center"><i>No channels found</i></td></tr></tbody></table>
+<div align="right">Page: -</div>
+<script type="text/javascript">
+tosel = new Array("");
+for (i in tosel) {
+  if (tosel[i] > 0) t(tosel[i]);
+}
+</script>
+</form>
+
+
+
+</body></html>

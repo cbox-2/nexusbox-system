@@ -1,134 +1,154 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>الرسائل - NexusBox</title>
-<link rel="stylesheet" href="/assets/css/admin-theme.css">
+<title>Messages · NexusBox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<link rel="stylesheet" href="/cbox-files/style.css">
+<script src="/cbox-files/code.js"></script>
 </head>
-<body>
+<body id="mainbody">
 
-<div id="successMsg" class="success-msg"></div>
-<div id="errorMsg" class="error-msg"></div>
+<div id="mask"></div>
 
-<div class="main-container">
-  <div class="content-section">
-    <h1> الرسائل</h1>
-    
-    <div class="sub-nav">
-      <a href="/admin/messages.html" class="active">الرسائل</a>
-      <a href="/admin/messages-archive.html">الأرشيف</a>
-      <a href="/admin/messages-sticky.html">الرسائل اللاصقة</a>
-      <a href="/admin/messages-channels.html">القنوات</a>
-      <a href="/admin/messages-weblinks.html">روابط الويب</a>
+<div id="bodywrap">
+  <div id="header">
+    <div class="wrap">
+      <a id="logo" href="/">
+        <img src="/cbox-files/logo400.png" alt="NexusBox" width="200" height="86" border="0">
+      </a>
+      <div id="headerExtras">
+        <span id="userWelcome">user@example.com</span>
+        <a href="/admin/index.html">My Cboxes</a>
+        <a href="/admin/account.html">My Account</a>
+        <a href="/admin/support.html">Support</a>
+        <a href="#" onclick="logout()">Log out</a>
+      </div>
     </div>
-    
-    <div class="form-group">
-      <label>اختر الصندوق:</label>
-      <select id="boxSelect" onchange="loadMessages()">
-        <option value="">جاري التحميل...</option>
-      </select>
+  </div>
+
+  <div id="subbar">
+    <div class="wrap">
+      <a href="/admin/index.html" class="submenuitem"><b>MYBOX</b></a>
+      <a href="/admin/publish.html" class="submenuitem">Publish</a>
+      <a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+      <a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options</a>
+      <a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users</a>
+      <a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages</a>
     </div>
-    
-    <div id="messagesList">
-      <p style="color:#888; text-align:center; padding:30px;">اختر صندوق لعرض الرسائل</p>
+  </div>
+
+  <div id="bar3">
+    <div id="hovmenu" class="wrap"><a></a></div>
+  </div>
+
+  <div id="main" class="wrap">
+    <div id="content">
+      <h1>Messages</h1>
+      
+      <div class="block_grey">
+        <form id="msgForm">
+          <fieldset>
+            <label>Email notification:</label>
+            <input type="checkbox" name="emlnotify" value="1">
+            
+            <input type="submit" name="sub" value=" Save">
+            <div id="m_msgForm" class="frmmsg1"></div>
+          </fieldset>
+        </form>
+      </div>
+
+      <h2>Prune messages</h2>
+      <div class="block_grey">
+        <form id="pruneForm">
+          <fieldset>
+            <label>Delete oldest:</label>
+            <input type="text" name="prunenum" value="150" class="txtbox" style="width:100px;">
+            <input type="submit" name="sub" value="Delete" class="Danger">
+            <div id="m_pruneForm" class="frmmsg1"></div>
+          </fieldset>
+        </form>
+      </div>
+
+      <h2>Search messages</h2>
+      <div class="block_grey">
+        <form id="searchForm">
+          <fieldset>
+            <label>Search:</label>
+            <input type="text" name="srch" class="txtbox" style="width:300px;">
+            <input type="submit" name="find" value=" Find">
+          </fieldset>
+        </form>
+      </div>
+
+      <div id="messagesList" style="margin-top:20px;">
+        <p>Loading messages...</p>
+      </div>
+
     </div>
+  </div>
+
+  <div id="footer">
+    <a href="/">Home</a>
+    <a href="/admin/support.html">Support</a>
+    <div class="verybottom">&copy; 2026 NexusBox</div>
   </div>
 </div>
 
-<script src="/assets/js/shared.js"></script>
 <script>
-SHARED.init('messages');
-const API = SHARED.API;
+const API = window.location.origin;
 const TOKEN = localStorage.getItem('token');
-let currentBox = null;
 
-window.addEventListener('DOMContentLoaded', async () => {
-  if (!TOKEN) { alert('سجل دخول أولاً'); window.location.href = '/test.html'; return; }
-  await loadBoxes();
-});
+// Load user info
+fetch(API + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success && d.user) {
+      document.getElementById('userWelcome').textContent = d.user.email;
+    }
+  });
 
-async function loadBoxes() {
-  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  const data = await res.json();
-  const select = document.getElementById('boxSelect');
-  if (data.success) {
-    select.innerHTML = '<option value="">-- اختر صندوق --</option>';
-    data.boxes.forEach(b => {
-      select.innerHTML += `<option value="${b._id}" data-key="${b.embedKey}">${b.name}</option>`;
-    });
-  }
-}
-
-async function loadMessages() {
-  const select = document.getElementById('boxSelect');
-  const boxId = select.value;
-  if (!boxId) return;
-  
-  currentBox = select.options[select.selectedIndex].dataset.key;
-  const container = document.getElementById('messagesList');
-  container.innerHTML = '<p style="text-align:center; padding:20px;">جاري التحميل...</p>';
-  
-  try {
-    const res = await fetch(API + '/api/boxes/' + boxId + '/messages', {
-      headers: { 'Authorization': 'Bearer ' + TOKEN }
-    });
-    const data = await res.json();
-    
-    if (data.success && data.messages && data.messages.length > 0) {
-      let html = '<table class="data-table"><thead><tr><th>المحتوى</th><th>الكاتب</th><th>التاريخ</th><th>إجراءات</th></tr></thead><tbody>';
-      data.messages.forEach(m => {
+// Load messages
+const boxId = localStorage.getItem('currentBoxId');
+if (boxId) {
+  fetch(API + '/api/boxes/' + boxId + '/messages', {
+    headers: { 'Authorization': 'Bearer ' + TOKEN }
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success && d.messages) {
+      let html = '<table><thead><tr><th>Message</th><th>Author</th><th>Date</th><th>Actions</th></tr></thead><tbody>';
+      d.messages.forEach(m => {
         html += `<tr>
-          <td>${m.content.substring(0, 50)}...</td>
-          <td>${m.author?.username || 'مجهول'}</td>
-          <td>${new Date(m.createdAt).toLocaleDateString('ar')}</td>
-          <td>
-            <button class="btn btn-danger btn-sm" onclick="deleteMessage('${m._id}')">حذف</button>
-            <button class="btn btn-warning btn-sm" onclick="toggleSticky('${m._id}', ${!m.isSticky})">${m.isSticky ? 'إلغاء التثبيت' : 'تثبيت'}</button>
-          </td>
+          <td>${m.content.substring(0, 100)}</td>
+          <td>${m.author?.username || 'Guest'}</td>
+          <td>${new Date(m.createdAt).toLocaleString()}</td>
+          <td><input type="button" value="Delete" onclick="deleteMsg('${m._id}')" class="Danger"></td>
         </tr>`;
       });
       html += '</tbody></table>';
-      container.innerHTML = html;
-    } else {
-      container.innerHTML = '<p style="text-align:center; padding:30px; color:#888;">لا توجد رسائل</p>';
+      document.getElementById('messagesList').innerHTML = html;
     }
-  } catch(e) {
-    container.innerHTML = '<p style="color:red;">خطأ في التحميل</p>';
-  }
+  });
 }
 
-async function deleteMessage(msgId) {
-  if (!confirm('هل أنت متأكد من الحذف؟')) return;
-  try {
-    const res = await fetch(API + '/api/messages/' + msgId, {
-      method: 'DELETE',
-      headers: SHARED.getAuthHeaders()
-    });
-    const data = await res.json();
-    if (data.success) {
-      SHARED.showSuccess('تم الحذف');
-      loadMessages();
-    } else {
-      SHARED.showError(data.error || 'فشل الحذف');
-    }
-  } catch(e) { SHARED.showError('خطأ في الاتصال'); }
+function deleteMsg(id) {
+  if (!confirm('Delete this message?')) return;
+  fetch(API + '/api/messages/' + id, {
+    method: 'DELETE',
+    headers: { 'Authorization': 'Bearer ' + TOKEN }
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success) location.reload();
+  });
 }
 
-async function toggleSticky(msgId, sticky) {
-  try {
-    const res = await fetch(API + '/api/messages/' + msgId, {
-      method: 'PUT',
-      headers: SHARED.getAuthHeaders(),
-      body: JSON.stringify({ isSticky: sticky })
-    });
-    const data = await res.json();
-    if (data.success) {
-      SHARED.showSuccess(sticky ? 'تم التثبيت' : 'تم إلغاء التثبيت');
-      loadMessages();
-    }
-  } catch(e) { SHARED.showError('خطأ'); }
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/';
 }
 </script>
+
 </body>
 </html>
