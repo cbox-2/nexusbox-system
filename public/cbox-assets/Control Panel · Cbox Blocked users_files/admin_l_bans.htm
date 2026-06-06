@@ -1,0 +1,55 @@
+<html><head><title>Cbox Bans</title><meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="style.css">
+<script type="text/javascript">
+function s() {
+  return confirm("Are you sure?");
+}
+sel = new Array();
+function t(id) {
+  if (!document.getElementById("r"+id)) return false;
+  if (sel[id] == null) {
+    sel[id] = document.getElementById("r"+id).style.backgroundColor;
+    document.getElementById("r"+id).style.backgroundColor="#e9eff3";
+    document.getElementById("c"+id).checked = true;
+  }
+  else {
+    document.getElementById("r"+id).style.backgroundColor=sel[id];
+    document.getElementById("c"+id).checked = false;
+    sel[id] = null;
+  }
+}
+</script>
+</head>
+<body class="embList" style="overflow:auto;" onload="">
+<form name="bans" action="/admin_l_bans.php?" method="post">
+<input type="hidden" name="act" value="0">
+<input type="hidden" name="parm" value="null">
+<input type="hidden" name="pg" value="0">
+
+
+<div align="right">Page: -&nbsp;</div>
+<table width="100%" cellspacing="1" cellpadding="2" border="0">
+<tbody><tr><td width="20">&nbsp;</td>
+<td><a href="https://www.cbox.ws/admin_l_bans.php?srch=&amp;srchin=&amp;pg=0&amp;ordby=0&amp;orddir=1">Name</a><img src="admin_l_bans_data/arrow_colup.gif" width="12" height="12"></td>
+<td><a href="https://www.cbox.ws/admin_l_bans.php?srch=&amp;srchin=&amp;pg=0&amp;ordby=1&amp;orddir=0">Mod / Reason</a></td>
+<td width="80" align="right"><a href="https://www.cbox.ws/admin_l_bans.php?srch=&amp;srchin=&amp;pg=0&amp;ordby=4&amp;orddir=0">IP Address</a></td>
+<td width="75" align="right"><a href="https://www.cbox.ws/admin_l_bans.php?srch=&amp;srchin=&amp;pg=0&amp;ordby=2&amp;orddir=0">Ban Date</a></td>
+<td width="75" align="right"><a href="https://www.cbox.ws/admin_l_bans.php?srch=&amp;srchin=&amp;pg=0&amp;ordby=3&amp;orddir=0">Expiry</a></td>
+
+</tr>
+
+<tr><td colspan="6" align="center"><i>No bans found</i></td></tr></tbody></table>
+<div align="right">Page: -&nbsp;</div>
+</form>
+
+<script type="text/javascript">
+tosel = new Array("");
+for (i in tosel) {
+  if (tosel[i] > 0) t(tosel[i]);
+}
+</script>
+
+
+
+
+</body></html>

@@ -1,0 +1,62 @@
+<html><head><title>Cbox Posts</title><meta http-equiv="content-type" content="text/html; charset=UTF-8">
+<link rel="stylesheet" href="style.css">
+<script type="text/javascript">
+function s() {
+  return confirm("Are you sure?");
+}
+sel = new Array();
+function t(id) {
+  if (!document.getElementById("r"+id)) return false;
+  if (sel[id] == null) {
+    sel[id] = document.getElementById("r"+id).style.backgroundColor;
+    document.getElementById("r"+id).style.backgroundColor="#e9eff3";
+    document.getElementById("c"+id).checked = true;
+  }
+  else {
+    document.getElementById("r"+id).style.backgroundColor=sel[id];
+    document.getElementById("c"+id).checked = false;
+    sel[id] = null;
+  }
+}
+</script>
+</head>
+<body class="embList" style="overflow:auto;" onload="">
+<form name="users" action="/admin_l_posts.php?tid=0" method="post">
+<input type="hidden" name="act" value="0">
+<input type="hidden" name="pg" value="1">
+<input type="hidden" name="thread" value="0">
+<a name="top"></a>
+<div align="right">Page:  [1] </div>
+<table style="table-layout:fixed;word-wrap:break-word;overflow:hidden;" width="100%" cellspacing="1" cellpadding="2" border="0">
+<tbody><tr><td width="20">&nbsp;</td>
+<td><b><a href="https://www.cbox.ws/admin_l_posts.php?tid=0&amp;srch=&amp;srchin=&amp;pg=1&amp;ordby=0&amp;orddir=0">Name</a> / <a href="https://www.cbox.ws/admin_l_posts.php?tid=0&amp;srch=&amp;srchin=&amp;pg=1&amp;ordby=1&amp;orddir=0">Email</a> / <a href="https://www.cbox.ws/admin_l_posts.php?tid=0&amp;srch=&amp;srchin=&amp;pg=1&amp;ordby=2&amp;orddir=0">Message</a></b></td>
+<td width="100"><b><a href="https://www.cbox.ws/admin_l_posts.php?tid=0&amp;srch=&amp;srchin=&amp;pg=1&amp;ordby=3&amp;orddir=0">Date</a><img src="admin_l_posts_data/arrow_coldn.gif" width="12" height="12"> / <a href="https://www.cbox.ws/admin_l_posts.php?tid=0&amp;srch=&amp;srchin=&amp;pg=1&amp;ordby=4&amp;orddir=0">IP</a></b></td>
+</tr>
+
+<tr id="r926326" onclick="t('926326')" bgcolor="#ffffff">
+<td><input type="checkbox" name="x926326" id="c926326"></td>
+<td><i>مهند</i> &lt;www.3rbz.com/uploads/49536fe97acc1.jpg&gt;<br>حيدر</td>
+<td align="right"><small>30 Mar 16 18:31<br>
+185.112.188.165</small></td>
+</tr>
+
+<tr id="r926325" onclick="t('926325')">
+<td><input type="checkbox" name="x926325" id="c926325"></td>
+<td><i>صـامت</i> <br>مهند</td>
+<td align="right"><small>30 Mar 16 18:28<br>
+5.62.131.164</small></td>
+</tr>
+
+</tbody></table>
+<div align="right">Page:  [1] </div>
+<script type="text/javascript">
+tosel = new Array("");
+for (i in tosel) {
+  if (tosel[i] > 0) t(tosel[i]);
+}
+</script>
+</form>
+
+
+
+</body></html>

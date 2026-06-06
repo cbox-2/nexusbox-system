@@ -1,0 +1,583 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>Help · Cbox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta name="description" content="Cbox live chat is an embeddable chat app for online communities, groups, and live-streaming events.">
+<link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
+<link rel="stylesheet" href="Help%20%C2%B7%20Cbox%20%D9%8A%D8%AF%D8%B9%D9%85%20%D9%88%D8%A7%D9%84%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D9%87_files/style.css">
+</head>
+<body id="mainbody">
+
+	<script type="text/javascript" async="" src="Help%20%C2%B7%20Cbox%20%D9%8A%D8%AF%D8%B9%D9%85%20%D9%88%D8%A7%D9%84%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D9%87_files/js"></script><script async="" src="Help%20%C2%B7%20Cbox%20%D9%8A%D8%AF%D8%B9%D9%85%20%D9%88%D8%A7%D9%84%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D9%87_files/analytics.js"></script><script>
+	// Define stub
+	var rcvdformresponse = function () {};
+	</script>
+	
+	<div id="mask"></div>
+
+
+
+<div id="popovr_box">
+	<div class="wrap">
+		<div style="padding: 20px; background-color: #fff">
+			<!--<div style="float:right; font-size: 150%;"><b><a href="javascript:popovr_close()">X</a></b></div>-->
+			<div id="popovr_title">
+				<!-- title -->
+			</div>
+			
+			<div id="popovr_text" style="text-align: left; clear:both">
+				<!-- content -->
+			</div>
+
+			<div id="popovr_t_login" style="display: none; text-align: left; clear:both">
+				<p>
+					Your session has expired. Please log back in to continue.
+				</p>
+				<iframe src="javascript:false" name="t_qlpop" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+				<form name="qlpop" action="/admin_d_login?f=qlpop" target="t_qlpop" method="post" onsubmit="return subsaving(this.name, 'sub', 'logging in...');">
+				<fieldset>
+					<label>Username:</label>
+					<input type="text" name="uname" value="msmsas55@yahoo.com" maxlength="50" class="txtbox">
+					<label>Password:</label>
+					<input type="password" name="pword" value="" maxlength="50" class="txtbox">
+					<input type="submit" name="sub" value=" Log in ">
+					
+					<div id="m_qlpop" class="frmmsg1"></div>
+					<div id="em_qlpop" class="frmmsg2"></div>
+				</fieldset>
+				</form>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<!--[if lte IE 7]>
+	<div class="notice_er notice_top">
+		You are using an old version of Internet Explorer or you are in Compatibility View mode. 
+		This website will not work correctly. 
+		<br>
+		Please upgrade your browser or disable Compatibility View.
+	</div>
+<![endif]-->
+
+
+<div id="bodywrap">
+	<div id="header">
+		<div class="wrap">
+
+			<a id="logo" href="https://www.cbox.ws/">
+				<img src="Help%20%C2%B7%20Cbox%20%D9%8A%D8%AF%D8%B9%D9%85%20%D9%88%D8%A7%D9%84%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D9%87_files/logo400.png" alt="Cbox" width="200" height="86" border="0">
+			</a>
+
+			<div id="headerExtras">
+	
+								
+								<span id="userWelcome">msmsas55@yahoo.com</span>
+				<a href="https://www.cbox.ws/admin?switch">My Cboxes</a>
+				<a href="https://www.cbox.ws/admin?acct">My Account</a>
+												<a href="https://www.cbox.ws/help">Support
+				</a><a href="https://www.cbox.ws/admin?preproc=logout" onclick="return logout()">Log out
+				</a>
+							</div>
+		</div>
+	</div>
+
+		<div id="subbar">
+		<div class="wrap">
+			<a href="https://www.cbox.ws/admin?home" class="submenuitem"><b>MSASDWEC2015HKARNO</b>			</a><a href="https://www.cbox.ws/admin?snippet" class="submenuitem">Publish
+			</a><a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel
+			</a><a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options
+			</a><a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users
+			</a><a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages
+			</a>
+		</div>
+	</div>
+	<div id="bar3">
+		<div id="hovmenu" class="wrap"><a></a></div>
+	</div>
+	
+	<div id="wideimg" style="position: relative; width: 100%; left: 0">
+	</div>
+	
+	<div id="main" class="wrap ">
+<script language="JavaScript">
+var hit = new Array();
+var openans = new Array();
+
+function toggleanswer(id) {
+  if (typeof(document.getElementById("ans"+id).style.display) == "undefined") {
+    return true;
+  }
+  x = document.getElementById("ans"+id);
+  if (x.style.display != "none") {
+    x.style.display = "none";
+  }
+  else {
+    x.style.display = "";
+    if (document.images && !hit[id]) {
+      (new Image()).src="/help?hit="+id;
+      hit[id] = true;
+    }
+	if (x.scrollIntoViewIfNeeded) {
+		// Cuts question title off in some cases; workaround not straightforward. 
+		x.scrollIntoViewIfNeeded();
+	}
+  }
+  return false;
+}
+</script>
+
+<div id="content" class="withAside">
+<h1>Help &amp; Support</h1>
+
+
+	<p>
+	Our help database contains answers to most of the common questions regarding our products. 
+	</p>
+	<p>
+	If you are unable to locate a satisfactory answer for your query by searching here, please <a href="https://www.cbox.ws/contact?ref=help">contact us</a>.
+	</p>
+
+	<form action="/help" method="get">
+	<fieldset>
+	<legend>Search support</legend>
+	<input type="text" id="inpHelpQuery" name="srch" size="45" maxlength="255" class="txtbox" placeholder="e.g. how do I change my theme?">
+	<input type="submit" value=" Go " style="">
+	</fieldset>
+	</form>
+
+<script>
+	document.getElementById("inpHelpQuery").focus();
+	document.getElementById("inpHelpQuery").select();
+</script>
+<h2 id="q9"><a href="https://www.cbox.ws/help?id=9" onclick="return toggleanswer(9)">I lost my Cbox embed code. Where can I get it?</a></h2>
+
+<div class="helpContent" id="ans9" data-score="1" style="display:none;">
+	<p>
+Your Cbox embed code is available at your <a href="https://www.cbox.ws/admin?snippet">control panel</a>. You need this code to install your Cbox on your website.
+</p>
+<p>
+Also on that page is your Quick Link — a URL which you can use to access
+ your Cbox directly in your browser or on your mobile device. 
+</p>		<div class="helpDate">
+		Last updated 19 October 2015	</div>
+	</div>
+<h2 id="q24"><a href="https://www.cbox.ws/help?id=24" onclick="return toggleanswer(24)">How do I put my Cbox on my website?</a></h2>
+
+<div class="helpContent" id="ans24" data-score="1" style="display:none;">
+	<p>
+Once you have <a href="https://www.cbox.ws/getone">created your Cbox account</a>, go to the <a href="https://www.cbox.ws/admin?snippet">Publish</a> page of your control panel. The code and steps for embedding your Cbox are provided there for a number of common platforms. 
+</p>
+<p>
+If you install your Cbox and all you see is code, or nothing at all, 
+your web host may be removing or otherwise interfering with the HTML 
+iframe tags that Cbox uses. Your Cbox code needs to be pasted into an 
+area of your site that accepts HTML without modification. This may mean 
+switching your editor from "rich text" or "WYSIWYG" mode into 
+HTML-editing or "raw" mode, or you may need to open your template files 
+in a plain-text editor like Notepad. 
+</p><p>
+Remember that you always have the option of posting or sharing your Cbox <a href="https://www.cbox.ws/admin?snippet">Quick Link</a>
+ — this gives visitors direct access to your Cbox in a full-screen 
+layout, so it's perfect as a mobile option or for stand-alone use.
+</p>		<div class="helpDate">
+		Last updated 19 October 2015	</div>
+	</div>
+<h2 id="q14"><a href="https://www.cbox.ws/help?id=14" onclick="return toggleanswer(14)">How do change my Cbox's style to go with my site's design?</a></h2>
+
+<div class="helpContent" id="ans14" data-score="1" style="display:none;">
+	<p>
+Go to the <a href="https://www.cbox.ws/admin?style">Theme editor</a> in 
+your control panel. There you can specify the fonts and colours of your 
+Cbox, using a point-and-click editor. You can always reset your theme to
+ one of the preset defaults there, if you would like to start again.  
+</p>
+<p>
+If you have a <a href="https://www.cbox.ws/upgrade">Premium or Pro Cbox</a> you can <a href="https://www.cbox.ws/admin?styleadv">edit CSS</a>, which gives you complete control over presentation. 
+</p>		<div class="helpDate">
+		Last updated 1 June 2016	</div>
+	</div>
+<h2 id="q16"><a href="https://www.cbox.ws/help?id=16" onclick="return toggleanswer(16)">How do I delete messages?</a></h2>
+
+<div class="helpContent" id="ans16" data-score="1" style="display:none;">
+	<p>
+If you have a <a href="https://www.cbox.ws/upgrade">Premium or Pro Cbox</a>, you can create a moderator name for yourself at your <a href="https://www.cbox.ws/admin?users">Users page</a>,
+ and then log in on your Cbox using the "profile" link. You will see a 
+delete icon [x] next to each message in your Cbox, and you will not have
+ to log in at your control panel at all to delete messages.
+</p>
+<p>
+Alternatively, visit your <a href="https://www.cbox.ws/admin?posts">Messages page</a>
+ to delete messages individually or in bulk. Deleted messages are 
+removed from your public Cbox history, but are preserved in your <a href="https://www.cbox.ws/admin?postsarc">Archives</a>.
+</p>
+		<div class="helpDate">
+		Last updated 18 April 2016	</div>
+	</div>
+<h2 id="q15"><a href="https://www.cbox.ws/help?id=15" onclick="return toggleanswer(15)">Can I make my Cbox transparent?</a></h2>
+
+<div class="helpContent" id="ans15" data-score="1" style="display:none;">
+	<p>
+Yes. In the <a href="https://www.cbox.ws/admin?style">Theme editor</a>, 
+simply delete the colour codes for the main and form background ("BG") 
+elements. This will make the Cbox transparent, allowing whatever is 
+behind the Cbox to show through. 
+</p>
+<p>
+Note that any pop-ups generated by a transparent Cbox will have the 
+default background colour — usually white. If your font colour is light,
+ it may be invisible in popups. You can fix this by <a href="https://www.cbox.ws/admin?styleadv">editing the CSS</a> to introduce a background-color rule for popups. 
+</p>		<div class="helpDate">
+		Last updated 27 May 2015	</div>
+	</div>
+<h2 id="q42"><a href="https://www.cbox.ws/help?id=42" onclick="return toggleanswer(42)">Formatting messages with boxcode</a></h2>
+
+<div class="helpContent" id="ans42" data-score="1" style="display:none;">
+	<p class="aside">
+When boxcode is disabled in <a href="https://www.cbox.ws/admin?settings">Posting options</a>, it is only disabled for user messages. You will still be able to use it for your Sticky message and Custom filtering rules. 
+</p>
+<p>
+Cbox supports <b>boxcode</b>, which is a way to add markup to messages. You can also use it to style your <a href="https://www.cbox.ws/admin?sticky">Sticky message</a> and <a href="https://www.cbox.ws/admin?filtering">Custom filtering</a> replacement text. 
+</p>
+<p>
+The boxcodes supported by Cbox are:
+</p>
+<ul>
+<li>[color=#ff0000]<span style="color:#f00">hex colour</span>[/color] or [color=forestgreen]<span style="color:forestgreen">named colour</span>[/color]
+</li><li>[color=#f00,#ff0]<span style="color:#f00; background-color:#ff0">foreground and background</span>[/color]
+</li><li>[b]<b>bold text</b>[/b]
+</li><li>[u]<u>underlined text</u>[/u]
+</li><li>[i]<i>italicized text</i>[/i]
+</li><li>[s]<s>struck-out text</s>[/s]
+</li><li>[q]<q>quoted text</q>[/q]
+</li><li>[sub]<sub>subscript</sub>[/sub]
+</li><li>[sup]<sup>superscript</sup>[/sup]
+</li><li>[center]centered text[/center]
+</li><li>[br]<br>(line break)
+</li><li>[big]<span style="font-size:120%">larger font</span>[/big]
+</li><li>[small]<span style="font-size: 90%">smaller font</span>[/small]
+</li><li>[class=custom]custom-styled text[/custom]
+</li><li>[code]<code>fixed-width text</code>[/code]
+</li><li>[url=https://address.com/hyperlink]link text[/url] or [url]https://address.com/hyperlink[/url]
+</li><li>[img=https://address.com/image.jpg]image title[/img] or [img]https://address.com/image.jpg[/img]
+</li></ul>
+
+<h3>Combining boxcode</h3>
+<p class="aside">
+Besides using boxcode in <a href="https://www.cbox.ws/admin?filtering">Custom filtering</a> replacement text, you can also <i>match</i> boxcodes in filter rules. <a href="https://www.cbox.ws/help?id=67">See more.</a>
+</p>
+<p>
+It's possible to combine boxcode by nesting it, with some caveats:
+</p><ol>
+<li>Tags must be nested in the correct order: <kbd>[b][u]bold underline[/u][/b]</kbd> is valid but <kbd>[b][u]broken[/b][/u]</kbd> is not. 
+</li><li>The same tag cannot be nested. For example, <kbd>[class=one][class=two]some text[/class][/class]</kbd> will not work. To get the intended behaviour in this case, you could have a combined class instead: <kbd>[class=onetwo]some text[/class]</kbd>.
+</li><li>The no-attribute form of [url] (e.g. without link text), and 
+both forms of the [img] tag, must be the innermost element in any nested
+ sequence. 
+</li></ol>
+<p></p>
+
+<h3>Styling boxcode</h3>
+<p>
+Boxcode is translated internally to HTML. You can thus affect the presentation of boxcode by <a href="https://www.cbox.ws/admin?styleadv">editing your CSS</a>. For example, to change the presentation of the [s] tag:
+</p>
+<pre>s {
+	text-decoration: none; /* reset default */
+	opacity: 0.2;
+}
+</pre>
+<p class="aside">[class] parameters must start with a letter, and are limited to 20 alphanumeric characters. <kbd>[class=blink]</kbd> is valid but <kbd>[class=2]</kbd> is not. </p>
+<p>
+The [class] boxcode is intended for open-ended styling. It produces a 
+span with no default CSS. You can create a corresponding class using a <code>cc_</code> prefix. For example, for blurred text, copy this to <a href="https://www.cbox.ws/admin?styleadv">your CSS</a>:
+</p>
+<pre>.cc_blur {
+	text-shadow: #000 0 0 0.5em;
+	color: transparent;
+}
+</pre>
+<p>
+Now users can blur the text in their messages: <kbd>[class=blur]this will be blurred![/class]</kbd>.
+</p>
+<p>
+<a href="https://www.cbox.ws/help?id=94#custom">Find out more about custom CSS.</a>
+</p>		<div class="helpDate">
+		Last updated 31 May 2021	</div>
+	</div>
+<h2 id="q30"><a href="https://www.cbox.ws/help?id=30" onclick="return toggleanswer(30)">I deleted some messages by accident. Can I get them back?</a></h2>
+
+<div class="helpContent" id="ans30" data-score="1" style="display:none;">
+	<p>
+Unfortunately deleted messages cannot be restored to your Cbox conversation history without re-posting them. 
+</p>
+<p>
+However, if you have a Premium or Pro Cbox, all your messages are 
+archived, including messages that were deleted. You can generate a 
+transcript from your archive at <a href="https://www.cbox.ws/admin?postsarc">this page</a>. 
+</p>
+		<div class="helpDate">
+		Last updated 16 June 2015	</div>
+	</div>
+<h2 id="q54"><a href="https://www.cbox.ws/help?id=54" onclick="return toggleanswer(54)">I can't hear the sound effect or its volume is too low</a></h2>
+
+<div class="helpContent" id="ans54" data-score="1" style="display:none;">
+	<p>
+Check that sound notification is enabled at the <a href="https://www.cbox.ws/admin?settings">Settings</a> page of your Control Panel.
+</p>
+<p>
+If it is enabled, then you should see a volume control button in your 
+Cbox. Clicking this will toggle through three levels. It will also play 
+the sound on each click to confirm the level. 
+</p>
+<p>
+If you are using a custom sound, ensure that you have uploaded both OGG 
+and MP3 versions of the file. Cbox chooses which one to load based on 
+the browser's capabilities. 
+</p>
+<p>
+If you still cannot hear the sound, then there may be a problem with your browser or system. Please <a href="https://www.cbox.ws/contact">contact us</a> for further assistance. 
+</p>		<div class="helpDate">
+		Last updated 16 June 2015	</div>
+	</div>
+<h2 id="q67"><a href="https://www.cbox.ws/help?id=67" onclick="return toggleanswer(67)">Filtering names and messages</a></h2>
+
+<div class="helpContent" id="ans67" data-score="1" style="display:none;">
+	<p>
+At its simplest, the <a href="https://www.cbox.ws/admin?filtering">Custom filter</a>
+ is a list of words that you want hidden or replaced in your Cbox. Enter
+ words, one per line, and if a user's name or message contains that 
+word, it will be filtered out. 
+</p>
+<pre>badword
+badderword:betterword
+</pre>
+<p>
+When a message is applied to the above filter, "badword" will be turned 
+into asterisks, and "badderword" will be replaced by "betterword". The 
+":" (colon) character separates the pattern text from the replacement 
+text. If the colon is left out, the entire line is the word to match. 
+</p>
+<p>
+Filters can be useful for more interesting things too, however.
+</p>
+<h3>Styling and aliasing names</h3>
+<p>
+You can set colours for admins, mods and registered users on your <a href="https://www.cbox.ws/admin?style">Themes</a> page, but you can create individualized filters for particular names or words you want to highlight. 
+</p>
+<pre>jacob:[color=green]TheRealJacob[/color]
+</pre>
+<p>
+This user would still enter "jacob" as his name in your Cbox, but 
+whenever he posts, or whenever someone mentions him in a message, the 
+output will be <span style="color:green">TheRealJacob</span>, in green. 
+</p>
+<p>
+If you want to apply style besides colour to names, you can use the <kbd>[class]</kbd> boxcode.
+</p>
+<pre>jacob:[class=vip]{$0}[/vip]
+</pre>
+<p>
+You will then need to define your <a href="https://www.cbox.ws/help?id=94#custom">custom CSS</a> for this class. 
+</p>
+
+<h3>Using and disabling boxcode</h3>
+<p class="aside">
+Boxcode itself can be customised, making the combination of filtering and formatting very powerful. <a href="https://www.cbox.ws/help?id=42">See more.</a>
+</p>
+<p>
+Your custom filtering rules support boxcode, as seen in the example 
+above, even if you have boxcode disabled for messages in your <a href="https://www.cbox.ws/admin?settings">Settings</a>. You can also <i>match</i> the boxcode that people use (or attempt to use) in their messages. 
+</p>
+<pre>![br]:/
+haiku:The moment two bubbles[br]are united, they both vanish.[br]A lotus blooms.
+</pre>
+<p>
+The first rule will match "[br]" appearing in messages, and replace it 
+with a slash. But the [br]s that appear in the second rule will still 
+work, creating line breaks, because each replacement string is 
+boxcode-filtered independently. 
+</p>
+<p>
+If boxcode is <i>enabled</i> for messages, then you can create aliases and compound boxcode using partial (open) tags:
+</p>
+<pre>![red]:[color=#f00][b]
+![/red]:[/b][/color]
+</pre>
+<p>
+When a user enters <kbd>[red]this is red[/red]</kbd>, the filter translates this to <kbd>[color=#f00][b]this is red[/b][/color]</kbd>, which is now valid boxcode, and will in turn become HTML. 
+</p>
+<p class="aside">
+<b>Tip:</b> If a rule isn't matching when it should, try putting <kbd>!</kbd> at the start of the line. If a rule is matching when it shouldn't, try putting <kbd>~</kbd> at the start of the line.
+</p>
+<h3>Filter modes</h3>
+<p>
+By default, filter rules are matched anywhere that the search text is 
+not surrounded by other letters. Starting a line with the prefix "!" 
+(exclamation mark) makes the rule a simple <em>substring filter</em> 
+instead. Such rules are stronger in the sense that they will match in 
+more contexts. However, unintended substitution is also more likely. 
+</p>
+<p>
+By contrast, a rule that begins with "~" (tilde) is only matched when 
+preceded by space and followed by space or punctuation. This is similar 
+to how emoticon substitution works. Such rules are looser in the sense 
+that they are only matched in this specific form. Unintended 
+substitution is less likely, but the rule may not be triggered as easily
+ as desired. 
+</p><pre>fred:Fred
+!color:colour
+~plane:✈
+</pre>
+<p>
+In this example, the first rule will match the "fred" in "@fred" and 
+"(fred)", but not in "freddy" or "alfred". The second rule will match 
+"color" as well as "colorful" (substituting "colour" and "colourful" 
+respectively). The third rule matches only "plane" by itself or followed
+ by punctuation.
+</p>
+<h3>Filter order</h3>
+<p>
+Names and messages are filtered first by your custom rules. Messages are
+ then parsed for smilies, boxcode, and links, in that order, if you have
+ these features enabled. Names do not have these built-in filters 
+applied. 
+</p>
+<p>
+Within your custom filter itself, the order of rule-matching is from top to bottom. 
+</p>
+<pre>hi:hello
+hello:goodbye
+</pre>
+<p>
+If a user posts "hi!", then as the message passes through the above 
+rules it will be translated first to "hello!", and then, because it now 
+matches the second rule, it becomes "goodbye!". In general, whenever a 
+rule matches something that appears in another rule's replacement text, 
+the order matters, and earlier rules can influence the effect of later 
+ones. It's not recommended to depend on this behaviour, however. To 
+create internal shortcuts, use variables. 
+</p>
+<h3>Variables</h3>
+<p>
+A line beginning with a "$" (dollar sign) defines a variable that you can use in subsequent replacement text:
+</p>
+<pre>$pre:[big][color=#ff0000]
+$suf:[/big][/color]
+jane:{$pre}Jane{$suf}
+john:{$pre}{$0}{$suf}
+</pre>
+<p>
+The first two lines do not match any name or message text; they define 
+variables representing the strings following the colon. Variables are 
+written in to the replacement string by surrounding them with braces. 
+Variables in replacement text are expanded before filtering itself is 
+applied to messages. The variable $0 is special: it contains the text 
+that matched. 
+</p>
+		<div class="helpDate">
+		Last updated 7 August 2018	</div>
+	</div>
+<h2 id="q78"><a href="https://www.cbox.ws/help?id=78" onclick="return toggleanswer(78)">How do I change the Cbox language?</a></h2>
+
+<div class="helpContent" id="ans78" data-score="1" style="display:none;">
+	<p>
+You can set your preferred language at <a href="https://www.cbox.ws/admin?home">your control panel</a>.
+ This will change the language that your Cbox is displayed in, providing
+ that we have a translation for that language. The Cbox website and 
+control panel is only available in English. 
+</p><p>
+If you would like to provide a translation for Cbox for your language, please <a href="https://www.cbox.ws/contact">contact us</a>. 
+</p>
+		<div class="helpDate">
+		Last updated 19 October 2015	</div>
+	</div>
+<p style="text-align: right;">
+<a href="https://www.cbox.ws/help?all=1">All articles »</a>
+</p>
+</div>
+
+
+<div style="clear: both"></div>
+</div><!-- /content -->
+
+</div><!-- /bodywrap -->
+
+<div id="siteErrorBar"><div class="wrap" id="siteErrorBarCont">Loading...</div></div>
+
+
+
+<div id="footer">
+
+	<a href="https://www.cbox.ws/">About
+	</a><a href="https://www.cbox.ws/products">Plans &amp; pricing
+	</a><a href="https://www.cbox.ws/terms">Terms &amp; conditions
+	</a><a href="https://www.cbox.ws/privacy">Privacy policy
+	</a><a href="https://www.cbox.ws/notices">Notices
+	</a><a href="https://www.cbox.ws/contact">Contact us
+	</a>
+	<div class="verybottom">
+		© 2004–2026 Cbox Communications (Pty) Ltd, all rights reserved. 
+			1 ms. 
+			83ce		
+	</div>
+
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-242554-2', {
+	'cookieDomain': 'www.cbox.ws'
+});
+ga('send', 'pageview');
+
+</script>
+
+
+<script src="Help%20%C2%B7%20Cbox%20%D9%8A%D8%AF%D8%B9%D9%85%20%D9%88%D8%A7%D9%84%D9%85%D8%B3%D8%A7%D8%B9%D8%AF%D9%87_files/code.js"></script>
+<script>
+	// Modal / naked mode.
+	if (window.isPopup) {
+		document.body.className = "Popped";
+	}
+	
+	// Only for CP pages
+	upgradeCheckboxes();
+
+var dropCrumb = function () {
+	if (!localStorage) {
+		return;
+	}
+	var bc = getCrumbs();
+	bc.push(location.href);
+	bc.splice(0, bc.length - 5);
+	localStorage.setItem("site:bread", JSON.stringify(bc));
+};
+
+var getCrumbs = function () {
+	if (!localStorage) {
+		return [];
+	}
+	var bcStr = localStorage.getItem("site:bread");
+	var bc = [];
+	if (bcStr) {
+		bc = JSON.parse(bcStr);
+	}
+	
+	return bc;
+}
+
+dropCrumb();
+</script>
+
+
+
+
+
+</body></html>
