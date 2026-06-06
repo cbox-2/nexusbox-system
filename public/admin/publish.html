@@ -1,180 +1,188 @@
 <!DOCTYPE html>
-<html lang="ar" dir="rtl">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<title>نشر - NexusBox</title>
-<link rel="stylesheet" href="/assets/css/admin-theme.css">
+<title>Publish · NexusBox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<link rel="stylesheet" href="/cbox-files/style.css">
+<script src="/cbox-files/code.js"></script>
 </head>
-<body>
-<div id="successMsg" class="success-msg"></div>
-<div class="main-container">
-  <div class="content-section">
-    <h1>🚀 انشر صندوق بريدك الإلكتروني</h1>
-    <p>احصل على رمز التضمين لإضافة صندوق التحكم الخاص بك إلى موقعك الإلكتروني.</p>
-    
-    <div class="form-group">
-      <label>اختر الصندوق:</label>
-      <select id="boxSelect" onchange="loadPublish()">
-        <option value="">-- اختر --</option>
-      </select>
-    </div>
-    
-    <div class="form-group">
-      <label>رابط موقعك:</label>
-      <input type="url" id="siteUrl" placeholder="https://example.com">
-    </div>
-    
-    <div class="toggle-group">
-      <div><strong>القائمة البيضاء</strong><small>السماح لمواقع محددة فقط</small></div>
-      <label class="toggle"><input type="checkbox" id="whitelist" onchange="toggleWhitelist()"><span class="slider"></span></label>
-    </div>
-    <div class="form-group" id="whitelistInput" style="display:none;">
-      <label>المواقع المسموحة (فاصلة):</label>
-      <input type="text" id="allowedSites" placeholder="example.com">
-    </div>
-    
-    <div class="toggle-group">
-      <div><strong>HTTPS (SSL/TLS)</strong><small>اتصال آمن</small></div>
-      <label class="toggle"><input type="checkbox" id="ssl" checked><span class="slider"></span></label>
-    </div>
-    
-    <div class="form-group">
-      <label>علامة الأمان:</label>
-      <input type="text" id="securityTag" readonly>
-    </div>
-    
-    <div class="toggle-group">
-      <div><strong>Auto-Resize</strong><small>تعديل الارتفاع تلقائياً</small></div>
-      <label class="toggle"><input type="checkbox" id="autoResize" checked><span class="slider"></span></label>
-    </div>
-    
-    <div class="form-group">
-      <label>العرض (px):</label>
-      <input type="number" id="width" value="400" min="200" max="800">
-    </div>
-    <div class="form-group">
-      <label>الارتفاع (px):</label>
-      <input type="number" id="height" value="500" min="300" max="1000">
-    </div>
-    
-    <button class="btn btn-primary" onclick="generateCode()">💾 توليد الكود</button>
-  </div>
-  
-  <div class="content-section">
-    <h2>📝 رمز التضمين</h2>
-    <div class="form-group">
-      <label>نوع الكود:</label>
-      <select id="codeType" onchange="generateCode()">
-        <option value="iframe">Iframe (موصى به)</option>
-        <option value="script">Script Widget</option>
-      </select>
-    </div>
-    <div class="code-box" id="codeOutput">اختر صندوق أولاً...</div>
-    <button class="btn btn-success" onclick="copyCode()"> نسخ الكود</button>
-  </div>
-  
-  <div class="content-section">
-    <h2> تعليمات التثبيت</h2>
-    <div class="info-msg">
-      <ol style="padding-right:20px; line-height:2;">
-        <li>انسخ الكود من الصندوق أعلاه</li>
-        <li>افتح محرر HTML لموقعك</li>
-        <li>الصق الكود في المكان المناسب</li>
-        <li>احفظ وانشر الصفحة</li>
-        <li>افتح موقعك للتحقق</li>
-      </ol>
+<body id="mainbody">
+
+<div id="mask"></div>
+
+<div id="bodywrap">
+  <div id="header">
+    <div class="wrap">
+      <a id="logo" href="/">
+        <img src="/cbox-files/logo400.png" alt="NexusBox" width="200" height="86" border="0">
+      </a>
+      <div id="headerExtras">
+        <span id="userWelcome">Loading...</span>
+        <a href="/admin/index.html">My Cboxes</a>
+        <a href="/admin/account.html">My Account</a>
+        <a href="/admin/support.html">Support</a>
+        <a href="#" onclick="logout()">Log out</a>
+      </div>
     </div>
   </div>
-  
-  <div class="content-section">
-    <h2>👁️ معاينة مباشرة</h2>
-    <div id="preview" style="border:2px solid #ddd; border-radius:8px; padding:10px; background:#f8f9fa;">
-      <p style="color:#888; text-align:center;">اختر صندوق لرؤية المعاينة</p>
+
+  <div id="subbar">
+    <div class="wrap">
+      <a href="/admin/index.html" class="submenuitem"><b>MYBOX</b></a>
+      <a href="/admin/publish.html" class="submenuitem">Publish</a>
+      <a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel</a>
+      <a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options</a>
+      <a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users</a>
+      <a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages</a>
     </div>
+  </div>
+
+  <div id="bar3">
+    <div id="hovmenu" class="wrap"><a></a></div>
+  </div>
+
+  <div id="main" class="wrap">
+    <div id="content">
+      <h1>Publish your Cbox</h1>
+      
+      <div class="block_grey">
+        <h2>Embed Code</h2>
+        <p>Copy and paste this code into your website to display your Cbox.</p>
+        
+        <fieldset>
+          <label>Box:</label>
+          <select id="boxSelect" class="txtbox" style="width:70%;">
+            <option value="">-- Select a box --</option>
+          </select>
+          
+          <label>Width (px):</label>
+          <input type="number" id="width" value="400" min="200" max="800" class="txtbox" style="width:100px;">
+          
+          <label>Height (px):</label>
+          <input type="number" id="height" value="500" min="300" max="1000" class="txtbox" style="width:100px;">
+          
+          <label>Code:</label>
+          <textarea id="codeOutput" class="txtarea" readonly style="width:70%; height:100px; font-family:monospace;"></textarea>
+          
+          <input type="button" value="Copy Code" onclick="copyCode()">
+          <div id="m_publish" class="frmmsg1"></div>
+        </fieldset>
+      </div>
+
+      <div class="block_grey">
+        <h2>Preview</h2>
+        <div id="preview" style="border:2px solid #ddd; padding:10px; background:#f8f9fa; min-height:200px;">
+          <p style="color:#888; text-align:center;">Select a box to see preview</p>
+        </div>
+      </div>
+
+      <div class="block_grey">
+        <h2>Installation Instructions</h2>
+        <ol style="padding-right:20px; line-height:2;">
+          <li>Select your box from the dropdown above</li>
+          <li>Adjust width and height if needed</li>
+          <li>Click "Copy Code" button</li>
+          <li>Paste the code into your website's HTML</li>
+          <li>Save and publish your page</li>
+          <li>Visit your website to verify the Cbox appears</li>
+        </ol>
+      </div>
+
+    </div>
+  </div>
+
+  <div id="footer">
+    <a href="/">Home</a>
+    <a href="/admin/support.html">Support</a>
+    <div class="verybottom">&copy; 2026 NexusBox</div>
   </div>
 </div>
-<script src="/assets/js/shared.js"></script>
+
 <script>
-SHARED.init('publish');
-const API = SHARED.API;
+const API = window.location.origin;
 const TOKEN = localStorage.getItem('token');
 let currentBox = null;
 
-window.addEventListener('DOMContentLoaded', async () => {
-  if (!TOKEN) { window.location.href = '/test.html'; return; }
-  const res = await fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-  const data = await res.json();
-  const select = document.getElementById('boxSelect');
-  if (data.success) {
-    select.innerHTML = '<option value="">-- اختر --</option>';
-    data.boxes.forEach(b => { select.innerHTML += `<option value="${b._id}" data-key="${b.embedKey}">${b.name}</option>`; });
-  }
-  // Check URL for key
-  const params = new URLSearchParams(window.location.search);
-  const key = params.get('key');
-  if (key) {
-    setTimeout(() => {
-      const opt = [...select.options].find(o => o.dataset.key === key);
-      if (opt) { select.value = opt.value; loadPublish(); }
-    }, 500);
-  }
-});
-
-async function loadPublish() {
-  const select = document.getElementById('boxSelect');
-  const boxId = select.value;
-  if (!boxId) return;
-  currentBox = select.options[select.selectedIndex].dataset.key;
-  document.getElementById('securityTag').value = currentBox;
-  try {
-    const res = await fetch(API + '/api/embed/' + currentBox, { headers: { 'Authorization': 'Bearer ' + TOKEN } });
-    const data = await res.json();
-    if (data.success && data.box) {
-      const b = data.box;
-      if (b.layout) {
-        document.getElementById('width').value = b.layout.width || 400;
-        document.getElementById('height').value = b.layout.height || 500;
-      }
-      if (b.publish) {
-        document.getElementById('siteUrl').value = b.publish.siteUrl || '';
-        document.getElementById('whitelist').checked = b.publish.whitelistEnabled || false;
-        toggleWhitelist();
-      }
-      generateCode();
+// Load user info
+fetch(API + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success && d.user) {
+      document.getElementById('userWelcome').textContent = d.user.email;
     }
-  } catch(e) {}
-}
+  });
 
-function toggleWhitelist() {
-  document.getElementById('whitelistInput').style.display = document.getElementById('whitelist').checked ? 'block' : 'none';
-}
+// Load boxes
+fetch(API + '/api/boxes', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success && d.boxes) {
+      const select = document.getElementById('boxSelect');
+      select.innerHTML = '<option value="">-- Select a box --</option>';
+      d.boxes.forEach(b => {
+        select.innerHTML += `<option value="${b._id}" data-key="${b.embedKey}">${b.name}</option>`;
+      });
+      
+      // Check URL for key
+      const params = new URLSearchParams(window.location.search);
+      const key = params.get('key');
+      if (key) {
+        const opt = [...select.options].find(o => o.dataset.key === key);
+        if (opt) {
+          select.value = opt.value;
+          generateCode();
+        }
+      }
+    }
+  });
+
+document.getElementById('boxSelect').addEventListener('change', generateCode);
+document.getElementById('width').addEventListener('input', generateCode);
+document.getElementById('height').addEventListener('input', generateCode);
 
 function generateCode() {
-  if (!currentBox) { document.getElementById('codeOutput').textContent = 'اختر صندوق أولاً...'; return; }
+  const select = document.getElementById('boxSelect');
+  const boxId = select.value;
+  
+  if (!boxId) {
+    document.getElementById('codeOutput').value = '';
+    document.getElementById('preview').innerHTML = '<p style="color:#888; text-align:center;">Select a box to see preview</p>';
+    return;
+  }
+  
+  currentBox = select.options[select.selectedIndex].dataset.key;
   const width = document.getElementById('width').value;
   const height = document.getElementById('height').value;
-  const ssl = document.getElementById('ssl').checked;
-  const type = document.getElementById('codeType').value;
-  const protocol = ssl ? 'https' : 'http';
   const domain = window.location.hostname;
-  const url = protocol + '://' + domain + '/embed.html?key=' + currentBox;
+  const url = 'https://' + domain + '/chat.html?key=' + currentBox;
   
-  let code = '';
-  if (type === 'iframe') {
-    code = '<iframe src="' + url + '" width="' + width + '" height="' + height + '" style="border:none; border-radius:10px;"></iframe>';
-  } else {
-    code = '<script src="' + protocol + '://' + domain + '/widget.js" data-box="' + currentBox + '" data-width="' + width + '" data-height="' + height + '"><\/script>';
-  }
-  document.getElementById('codeOutput').textContent = code;
+  const code = '<iframe src="' + url + '" width="' + width + '" height="' + height + '" style="border:none; border-radius:10px;"></iframe>';
   
-  // Preview
+  document.getElementById('codeOutput').value = code;
   document.getElementById('preview').innerHTML = '<iframe src="' + url + '" width="100%" height="' + height + '" style="border:none;"></iframe>';
 }
 
 function copyCode() {
-  const code = document.getElementById('codeOutput').textContent;
-  navigator.clipboard.writeText(code).then(() => SHARED.showSuccess('تم النسخ'));
+  const code = document.getElementById('codeOutput').value;
+  if (!code) {
+    alert('Please select a box first');
+    return;
+  }
+  
+  navigator.clipboard.writeText(code).then(() => {
+    const msg = document.getElementById('m_publish');
+    msg.textContent = 'Code copied!';
+    msg.className = 'frmmsg1 Okay';
+    setTimeout(() => { msg.textContent = ''; msg.className = 'frmmsg1'; }, 3000);
+  });
+}
+
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/';
 }
 </script>
+
 </body>
 </html>
