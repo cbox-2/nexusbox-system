@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>Control Panel · Cbox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta name="description" content="Cbox live chat is an embeddable chat app for online communities, groups, and live-streaming events.">
+<link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
+<link rel="stylesheet" href="Control%20Panel%20%C2%B7%20Cbox%20%20Channels_files/style.css">
+</head>
+<body id="mainbody">
+
+	<script type="text/javascript" async="" src="Control%20Panel%20%C2%B7%20Cbox%20%20Channels_files/js"></script><script async="" src="Control%20Panel%20%C2%B7%20Cbox%20%20Channels_files/analytics.js"></script><script>
+	// Define stub
+	var rcvdformresponse = function () {};
+	</script>
+	
+	<div id="mask"></div>
+
+
+
+<div id="popovr_box">
+	<div class="wrap">
+		<div style="padding: 20px; background-color: #fff">
+			<!--<div style="float:right; font-size: 150%;"><b><a href="javascript:popovr_close()">X</a></b></div>-->
+			<div id="popovr_title">
+				<!-- title -->
+			</div>
+			
+			<div id="popovr_text" style="text-align: left; clear:both">
+				<!-- content -->
+			</div>
+
+			<div id="popovr_t_login" style="display: none; text-align: left; clear:both">
+				<p>
+					Your session has expired. Please log back in to continue.
+				</p>
+				<iframe src="javascript:false" name="t_qlpop" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+				<form name="qlpop" action="/admin_d_login?f=qlpop" target="t_qlpop" method="post" onsubmit="return subsaving(this.name, 'sub', 'logging in...');">
+				<fieldset>
+					<label>Username:</label>
+					<input type="text" name="uname" value="msmsas55@yahoo.com" maxlength="50" class="txtbox">
+					<label>Password:</label>
+					<input type="password" name="pword" value="" maxlength="50" class="txtbox">
+					<input type="submit" name="sub" value=" Log in ">
+					
+					<div id="m_qlpop" class="frmmsg1"></div>
+					<div id="em_qlpop" class="frmmsg2"></div>
+				</fieldset>
+				</form>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<!--[if lte IE 7]>
+	<div class="notice_er notice_top">
+		You are using an old version of Internet Explorer or you are in Compatibility View mode. 
+		This website will not work correctly. 
+		<br>
+		Please upgrade your browser or disable Compatibility View.
+	</div>
+<![endif]-->
+
+
+<div id="bodywrap">
+	<div id="header">
+		<div class="wrap">
+
+			<a id="logo" href="https://www.cbox.ws/">
+				<img src="Control%20Panel%20%C2%B7%20Cbox%20%20Channels_files/logo400.png" alt="Cbox" width="200" height="86" border="0">
+			</a>
+
+			<div id="headerExtras">
+	
+								
+								<span id="userWelcome">msmsas55@yahoo.com</span>
+				<a href="https://www.cbox.ws/admin?switch">My Cboxes</a>
+				<a href="https://www.cbox.ws/admin?acct">My Account</a>
+												<a href="https://www.cbox.ws/help">Support
+				</a><a href="https://www.cbox.ws/admin?preproc=logout" onclick="return logout()">Log out
+				</a>
+							</div>
+		</div>
+	</div>
+
+		<div id="subbar">
+		<div class="wrap">
+			<a href="https://www.cbox.ws/admin?home" class="submenuitem"><b>MSASDWEC2015HKARNO</b>			</a><a href="https://www.cbox.ws/admin?snippet" class="submenuitem">Publish
+			</a><a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel
+			</a><a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options
+			</a><a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users
+			</a><a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages
+			</a>
+		</div>
+	</div>
+	<div id="bar3">
+		<div id="hovmenu" class="wrap"><a></a></div>
+	</div>
+	
+	<div id="wideimg" style="position: relative; width: 100%; left: 0">
+	</div>
+	
+	<div id="main" class="wrap ">
+
+<div id="content">
+
+<script type="text/javascript">
+var noticetogorig = "";
+function noticetoggle(xo, v) {
+  var xo = document.getElementById(xo);
+  z = document.getElementById('notice-more');
+  if (z.style.display == 'none') {
+    z.style.display = '';
+    noticetogorig = xo.innerHTML;
+    xo.innerHTML = v;
+  }
+  else {
+    z.style.display = 'none';
+    xo.innerHTML = noticetogorig;
+  }
+}
+
+function noticeclose(x) {
+  z = document.getElementById('notice');
+  z.style.display = "none";
+  document.cookie = "rnot="+x+";";
+}
+
+function highlighthelp(sec, para, on) {
+	var ico = document.getElementById("hlpico-"+sec+"-"+para);
+  	if (!ico) return;
+  	if (!on) {
+  		ico.style.filter = "alpha(opacity=60)";
+  		ico.style.opacity = 0.6;
+  	}
+  	else {
+  		ico.style.filter = "";
+  		ico.style.opacity = 1;
+  	}
+}
+
+var createBar = function ($elem, isLog, showLimit) {
+
+	var $bar = document.createElement("div");
+	$bar.className = "barFill";
+	
+	var $text = document.createElement("div");
+	$text.className = "barText";
+	
+	$elem.appendChild($bar);
+	$elem.appendChild($text);
+	
+	var minWidth = 5;
+	
+	var format = function (n) {
+		return (n+'').split('').reverse().join('').replace(/([0-9]{3})(?=[0-9])/g, "$1,").split('').reverse().join('');
+	}
+	
+	$bar.style.width = "0%";
+	
+	return {
+		setBarSize: function (val, max) {
+			var over = false;
+			if (val > max) {
+				over = true;
+			}
+			
+
+			var val = Math.min(max, Math.max(0, val));
+			var prop = val / max;
+			
+			$text.innerHTML = format(val) + (over ? "+" : "") + (showLimit ? "/" + max : "");
+
+			var w = (isLog ? (Math.log((prop*1.718 + 1))) : prop) * 100;
+
+			var r = prop/0.7 * 255 + 50;
+			var g = 255 - prop*0.6*255;
+			var b = 80;
+			
+			var comp = (255 / (r*0.9 + g * 1.1)) * 1.4;
+			
+			r = r / comp;
+			g = g / comp;
+			b = b / comp;
+			
+			window.setTimeout(function () {
+				$bar.style.width = Math.max(w, minWidth) + "%";
+				$bar.style.backgroundColor = "rgb("+(r|0)+", "+(g|0)+", "+(b|0)+")";
+			}, 100);			
+			
+		}
+	}
+};
+  		
+</script>
+
+
+
+
+
+<script type="text/javascript">
+function pf(f, t, p) {
+  c = frames[f].document.forms[0];
+  c.act.value = t;
+  if (c.parm) c.parm.value = p;
+  c.submit();
+}
+
+sel = new Array();
+function jselall(f) {
+  c = frames[f].document.forms[0];
+  str = "";
+  for (i = 0; i < c.length; i++) {
+    if (c[i].name.substring(0, 1) == "x") {
+      x = c[i].id;
+      if (sel[x] || !frames[f].document.getElementById(x).checked) {
+        frames[f].t(x.substring(1));
+        sel[x] = false;
+      }
+      else sel[x] = true;
+    }
+  }
+}
+
+function togsrch(f) {
+  d = document.getElementById(f);
+  if (d.style.display == "none") d.style.display = "";
+  else d.style.display = "none";
+}
+
+function reload(f) {
+  f = document.forms[f];
+//  tmp = f.srch.value;
+//  f.srch.value = "";
+  f.submit();
+//  f.srch.value = tmp;
+}
+
+function rsziframe(i) {
+  d = frames[i];
+  c = (d.document && d.document.forms) ? d.document.forms[0].scrollHeight : 0;
+  if (c == 0) return;
+  document.getElementById(i+"_i").style.height = c + 40 + "px"; // would be nice to be able to reference iframe object from the window reference instead. Can it be done?	
+}
+
+
+function chk_bulkdel() {
+  f = document.forms["fquickdel"];
+  
+  
+  a = (f["prunetype"][f["prunetype"].selectedIndex].value == "1")?'delete':'keep';
+  b = (f["prunewhich"][f["prunewhich"].selectedIndex].value == "1")?'newest':'oldest';
+  c = f["prunenum"].value;
+
+
+  if (confirm("You have specified to "+a+" the "+c+" "+b+" messages from your Cbox. Are you sure?")) return subsaving("fquickdel", 'sub', '');
+  else return false;
+}
+
+</script>
+
+
+
+<h1>Channels</h1>
+
+<p>
+Channels allow you to maintain separate Cbox chat threads, to keep 
+conversations organized by topic. Each channel has its own 
+unique embed code and message history, but users and other Cbox settings
+ are shared. Create new channels below or search existing channels and 
+view 
+their messages.
+</p>
+
+<div class="notice">
+Channels are available with Cbox Pro. <a href="https://www.cbox.ws/upgrade?p=2">Unlock now</a>.
+</div>
+
+
+<iframe src="javascript:false" name="t_fthreadadd" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+<form name="fthreadadd" target="t_fthreadadd" method="post" action="/admin_d_submit?f=fthreadadd" onsubmit="return subsaving(this.name, 'sub', '');">
+
+<fieldset>
+	<legend>Create new channel</legend>
+
+	<label>Name: </label>
+	<input type="text" name="nme" maxlength="25" size="35" tabindex="100" class="txtbox">
+	
+	<input type="submit" name="sub" value=" Add " tabindex="102">
+
+	<div id="m_fthreadadd" class="frmmsg1"></div>
+	<div id="em_fthreadadd" class="frmmsg2"></div>
+
+</fieldset>
+</form>
+
+<fieldset>
+	<legend>Channels</legend>
+	
+	<table class="dHead">
+	<tbody><tr>
+		<td>
+			<a href="javascript:jselall('cboxthreads')">Select All</a> | 
+			<a href="javascript:togsrch('srchthreads')">Search</a> | 
+			<a href="javascript:reload('srchthreadsf')">Refresh</a>
+		</td>
+		<td align="right">
+			With selected: 
+			<a href="javascript:pf('cboxthreads', 3);">Toggle direct link</a>
+			| <a href="javascript:if (confirm('Are you sure you want to delete the selected channel(s)?')) {pf('cboxthreads', 2)}">Delete</a>
+		</td>
+	</tr>
+	<tr id="srchthreads" style="display:none">
+		<form name="srchthreadsf" target="cboxthreads" action="/admin_l_threads" method="get"></form>
+		<td colspan="2" align="center"><br>Search for: <input type="text" name="srch" maxlength="100" size="30" class="txtbox"> in <select name="srchin" class="txtbox"><option value="nme" selected="selected">Name</option><option value="id">Channel ID</option><option value="tme">Date created</option></select>&nbsp;<input type="submit" name="find" value=" Find "></td>
+		
+	</tr>
+	</tbody></table>
+	
+	<iframe src="Control%20Panel%20%C2%B7%20Cbox%20%20Channels_files/admin_l_threads.htm" onload="rsziframe(this.name)" marginheight="0" marginwidth="0" scrolling="auto" id="cboxthreads_i" name="cboxthreads" allowtransparency="yes" style="height: 120px;" width="100%" height="600" frameborder="0"></iframe>
+
+</fieldset>
+
+<h2>Channel API</h2>
+
+<p>
+Cbox has an API allowing you to generate channels programmatically.
+<a href="javascript:popwin('threadapi', '/help?id=68', 500, 500)">Find out more</a> about how to use the API. 
+Your secret API URL is as follows. (NB: do not make this address publicly-accessible.)
+</p>
+
+<div class="block_grey code">
+https://www.cbox.ws/apis/threads.php?id=4-4257987-52gxr7&amp;key=1e0b0701f04e0206e9c3dd98e9a738c5&amp;act=mkthread
+</div>
+
+
+
+</div>
+
+
+
+<div style="clear: both"></div>
+</div><!-- /content -->
+
+</div><!-- /bodywrap -->
+
+<div id="siteErrorBar"><div class="wrap" id="siteErrorBarCont">Loading...</div></div>
+
+
+
+<div id="footer">
+
+	<a href="https://www.cbox.ws/">About
+	</a><a href="https://www.cbox.ws/products">Plans &amp; pricing
+	</a><a href="https://www.cbox.ws/terms">Terms &amp; conditions
+	</a><a href="https://www.cbox.ws/privacy">Privacy policy
+	</a><a href="https://www.cbox.ws/notices">Notices
+	</a><a href="https://www.cbox.ws/contact">Contact us
+	</a>
+	<div class="verybottom">
+		© 2004–2026 Cbox Communications (Pty) Ltd, all rights reserved. 
+			0 ms. 
+			83ce		
+	</div>
+
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-242554-2', {
+	'cookieDomain': 'www.cbox.ws'
+});
+ga('send', 'pageview');
+
+</script>
+
+
+<script src="Control%20Panel%20%C2%B7%20Cbox%20%20Channels_files/code.js"></script>
+<script>
+	// Modal / naked mode.
+	if (window.isPopup) {
+		document.body.className = "Popped";
+	}
+	
+	// Only for CP pages
+	upgradeCheckboxes();
+
+var dropCrumb = function () {
+	if (!localStorage) {
+		return;
+	}
+	var bc = getCrumbs();
+	bc.push(location.href);
+	bc.splice(0, bc.length - 5);
+	localStorage.setItem("site:bread", JSON.stringify(bc));
+};
+
+var getCrumbs = function () {
+	if (!localStorage) {
+		return [];
+	}
+	var bcStr = localStorage.getItem("site:bread");
+	var bc = [];
+	if (bcStr) {
+		bc = JSON.parse(bcStr);
+	}
+	
+	return bc;
+}
+
+dropCrumb();
+</script>
+
+
+
+
+
+</body></html>

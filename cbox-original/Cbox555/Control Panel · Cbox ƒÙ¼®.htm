@@ -1,0 +1,992 @@
+<!DOCTYPE html>
+<html lang="en"><head>
+<title>Control Panel · Cbox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta name="description" content="Cbox live chat is an embeddable chat app for online communities, groups, and live-streaming events.">
+<link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
+<link rel="stylesheet" href="Control%20Panel%20%C2%B7%20Cbox%20%D8%A7%D9%86%D8%B4%D8%B1_files/style.css">
+</head>
+<body id="mainbody">
+
+	<script type="text/javascript" async="" src="Control%20Panel%20%C2%B7%20Cbox%20%D8%A7%D9%86%D8%B4%D8%B1_files/js"></script><script async="" src="Control%20Panel%20%C2%B7%20Cbox%20%D8%A7%D9%86%D8%B4%D8%B1_files/analytics.js"></script><script>
+	// Define stub
+	var rcvdformresponse = function () {};
+	</script>
+	
+	<div id="mask"></div>
+
+
+
+<div id="popovr_box">
+	<div class="wrap">
+		<div style="padding: 20px; background-color: #fff">
+			<!--<div style="float:right; font-size: 150%;"><b><a href="javascript:popovr_close()">X</a></b></div>-->
+			<div id="popovr_title">
+				<!-- title -->
+			</div>
+			
+			<div id="popovr_text" style="text-align: left; clear:both">
+				<!-- content -->
+			</div>
+
+			<div id="popovr_t_login" style="display: none; text-align: left; clear:both">
+				<p>
+					Your session has expired. Please log back in to continue.
+				</p>
+				<iframe src="javascript:false" name="t_qlpop" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+				<form name="qlpop" action="/admin_d_login?f=qlpop" target="t_qlpop" method="post" onsubmit="return subsaving(this.name, 'sub', 'logging in...');">
+				<fieldset>
+					<label>Username:</label>
+					<input type="text" name="uname" value="msmsas55@yahoo.com" maxlength="50" class="txtbox">
+					<label>Password:</label>
+					<input type="password" name="pword" value="" maxlength="50" class="txtbox">
+					<input type="submit" name="sub" value=" Log in ">
+					
+					<div id="m_qlpop" class="frmmsg1"></div>
+					<div id="em_qlpop" class="frmmsg2"></div>
+				</fieldset>
+				</form>
+			</div>
+		</div>
+
+	</div>
+</div>
+
+<!--[if lte IE 7]>
+	<div class="notice_er notice_top">
+		You are using an old version of Internet Explorer or you are in Compatibility View mode. 
+		This website will not work correctly. 
+		<br>
+		Please upgrade your browser or disable Compatibility View.
+	</div>
+<![endif]-->
+
+
+<div id="bodywrap">
+	<div id="header">
+		<div class="wrap">
+
+			<a id="logo" href="https://www.cbox.ws/">
+				<img src="Control%20Panel%20%C2%B7%20Cbox%20%D8%A7%D9%86%D8%B4%D8%B1_files/logo400.png" alt="Cbox" width="200" height="86" border="0">
+			</a>
+
+			<div id="headerExtras">
+	
+								
+								<span id="userWelcome">msmsas55@yahoo.com</span>
+				<a href="https://www.cbox.ws/admin?switch">My Cboxes</a>
+				<a href="https://www.cbox.ws/admin?acct">My Account</a>
+												<a href="https://www.cbox.ws/help">Support
+				</a><a href="https://www.cbox.ws/admin?preproc=logout" onclick="return logout()">Log out
+				</a>
+							</div>
+		</div>
+	</div>
+
+		<div id="subbar">
+		<div class="wrap">
+			<a href="https://www.cbox.ws/admin?home" class="submenuitem"><b>MSASDWEC2015HKARNO</b>			</a><a href="https://www.cbox.ws/admin?snippet" class="submenuitem">Publish
+			</a><a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel
+			</a><a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options
+			</a><a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users
+			</a><a href="#" id="hovmenu4" class="submenuitem" onmousedown="return hovmenu(this, 4)">Messages
+			</a>
+		</div>
+	</div>
+	<div id="bar3">
+		<div id="hovmenu" class="wrap"><a></a></div>
+	</div>
+	
+	<div id="wideimg" style="position: relative; width: 100%; left: 0">
+	</div>
+	
+	<div id="main" class="wrap ">
+
+<div id="content">
+
+<script type="text/javascript">
+var noticetogorig = "";
+function noticetoggle(xo, v) {
+  var xo = document.getElementById(xo);
+  z = document.getElementById('notice-more');
+  if (z.style.display == 'none') {
+    z.style.display = '';
+    noticetogorig = xo.innerHTML;
+    xo.innerHTML = v;
+  }
+  else {
+    z.style.display = 'none';
+    xo.innerHTML = noticetogorig;
+  }
+}
+
+function noticeclose(x) {
+  z = document.getElementById('notice');
+  z.style.display = "none";
+  document.cookie = "rnot="+x+";";
+}
+
+function highlighthelp(sec, para, on) {
+	var ico = document.getElementById("hlpico-"+sec+"-"+para);
+  	if (!ico) return;
+  	if (!on) {
+  		ico.style.filter = "alpha(opacity=60)";
+  		ico.style.opacity = 0.6;
+  	}
+  	else {
+  		ico.style.filter = "";
+  		ico.style.opacity = 1;
+  	}
+}
+
+var createBar = function ($elem, isLog, showLimit) {
+
+	var $bar = document.createElement("div");
+	$bar.className = "barFill";
+	
+	var $text = document.createElement("div");
+	$text.className = "barText";
+	
+	$elem.appendChild($bar);
+	$elem.appendChild($text);
+	
+	var minWidth = 5;
+	
+	var format = function (n) {
+		return (n+'').split('').reverse().join('').replace(/([0-9]{3})(?=[0-9])/g, "$1,").split('').reverse().join('');
+	}
+	
+	$bar.style.width = "0%";
+	
+	return {
+		setBarSize: function (val, max) {
+			var over = false;
+			if (val > max) {
+				over = true;
+			}
+			
+
+			var val = Math.min(max, Math.max(0, val));
+			var prop = val / max;
+			
+			$text.innerHTML = format(val) + (over ? "+" : "") + (showLimit ? "/" + max : "");
+
+			var w = (isLog ? (Math.log((prop*1.718 + 1))) : prop) * 100;
+
+			var r = prop/0.7 * 255 + 50;
+			var g = 255 - prop*0.6*255;
+			var b = 80;
+			
+			var comp = (255 / (r*0.9 + g * 1.1)) * 1.4;
+			
+			r = r / comp;
+			g = g / comp;
+			b = b / comp;
+			
+			window.setTimeout(function () {
+				$bar.style.width = Math.max(w, minWidth) + "%";
+				$bar.style.backgroundColor = "rgb("+(r|0)+", "+(g|0)+", "+(b|0)+")";
+			}, 100);			
+			
+		}
+	}
+};
+  		
+</script>
+
+
+
+
+<h1>Publish Your Cbox</h1>
+
+
+
+<script>
+
+function gentag (tag) {
+	var x = document.getElementById("hashtag");
+  	
+  	if (tag) var t = tag;
+  	else {
+  		var t = Math.round(Math.random()*1838265624).toString(35); // base 36 gives too high an upper bound for an integer mt_rand.
+  		t = t.replace('u', 'z');
+		t = t.replace('i', '5');
+		t = t.replace('o', 'w');  
+	}
+	x.value = t;
+}
+
+
+function copytext () {
+  var $ta = document.getElementById("cboxcode_"+curCode);
+  $ta.focus();
+  $ta.select();
+    
+  try {
+    if (!document.execCommand("copy")) {
+		navigator.clipboard.writeText($ta.value);
+	}
+	
+	var $btnCopy = document.getElementById("btnCopy");
+	$btnCopy.value = "Code copied! You can now paste it into your site.";
+		
+  } catch (e) {
+    alert("After clicking OK, press Ctrl+C to copy the code to the clipboard. Then press Ctrl+V to paste the code where you want it to go.");
+  }
+}
+
+var curCode = "default";
+function switchcode() {
+	var f = document.forms["fsnippet2"];
+
+	var v = f.variation[f.variation.selectedIndex].value;
+	var $taCode = document.getElementById("cboxcode_"+v);
+	
+	document.getElementById("cboxcode_"+curCode).style.display = "none";
+	curCode = v;
+	
+	$taCode.style.display = "";
+}
+
+function toggle(m) {
+  if (document.getElementById("set"+m).style.display == "") document.getElementById("set"+m).style.display = "none";
+  else document.getElementById("set"+m).style.display = "";
+}
+
+
+var curInstructions = "generic";
+function updateinst() {
+	var f = document.forms["fsnippet2"];
+	var a = f.sitetype[f.sitetype.selectedIndex].value;
+  
+	document.getElementById("ii_"+curInstructions).style.display = "none";
+	document.getElementById("ii_"+a).style.display = "";
+
+	curInstructions = a;
+}
+
+</script>
+
+<p>
+If you run your own site, you can embed Cbox directly into the pages of your site.
+</p>
+
+<iframe src="javascript:false" name="t_fsnippet" onload="rcvdformresponse(this.name)" class="frmiframe" width="1" height="1"></iframe>
+<form name="fsnippet" target="t_fsnippet" method="post" action="/admin_d_submit?f=fsnippet" onsubmit="return subsaving(this.name, 'sub', '');">
+
+<fieldset class="Med WithSuffix"><div class="fsInlineHelp"><a href="javascript:popwin('help', '/admin_p_help?sec=5#0',%20500,%20600)" title="Get help on this section"></a></div><legend>Embed options</legend>
+
+	<label>Your website URL:</label>
+	<input type="text" name="site" size="35" maxlength="100" class="txtbox">
+
+	<label for="privchk" id="privlbl"> Enable site whitelist: </label>
+	
+
+	<div class="slideThree"><input type="checkbox" name="private" value="1" id="privchk"><label></label></div><textarea id="moreaddr" name="whitelist" cols="20" rows="6" class="txtbox" placeholder="Enter URLs for whitelist, one per line." onkeyup="if (this.value.length > 6000) this.value = this.value.substring(0, 6000);" style="display: none;"></textarea>
+
+		<label for="codessl">Use secure HTTP (TLS/SSL):</label>
+	
+		
+	<div class="slideThree"><input type="checkbox" name="codessl" value="1" id="codessl"><label></label></div><label>Security tag:</label>
+	<input type="text" name="hashtag" id="hashtag" size="10" maxlength="6" class="txtbox" value="52gxr7">
+
+	<a href="javascript:void(0);" onclick="gentag()">&nbsp;[generate new]</a>
+
+	
+		
+	<input type="submit" name="sub" value=" Save ">
+
+	<div id="m_fsnippet" class="frmmsg1"></div>
+	<div id="em_fsnippet" class="frmmsg2"></div>
+	
+</fieldset>
+
+</form>
+
+<script>
+var privchk = document.getElementById("privchk");
+privchk.onchange = function () {
+	var whitelist = document.getElementById("moreaddr");
+	if (privchk.checked) {
+		whitelist.style.display = "block";
+	}
+	else {
+		whitelist.style.display = "none";
+	}
+}
+
+privchk.onchange();
+
+</script>
+
+<form name="fsnippet2" action="/admin?snippet" method="post">
+
+<fieldset>
+	<legend>Get your embed code </legend>
+
+	<label>Code variation: </label>
+	<select name="variation" class="txtbox" onchange="switchcode()">
+	<optgroup label="Standard codes">
+		<option value="default" selected="selected">Standard inline</option>
+		<option value="pop">Popup link</option>
+		<option value="bar">Fixed button</option>
+		<option value="defer">Deferred load</option>
+	</optgroup>
+	<optgroup label="Platform-specific codes">
+		<option value="myleague">MyLeague site</option>
+		<!--<option value="xanga" >Xanga site</option>-->
+	</optgroup>
+	</select>
+
+	<textarea cols="70" rows="8" spellcheck="false" class="txtarea" id="cboxcode_v10_inline" style="display: none; width: 100%">&lt;iframe
+ src="https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7" 
+width="400" height="400" allowtransparency="yes" allow="autoplay" 
+frameborder="0" marginheight="0" marginwidth="0" 
+scrolling="auto"&gt;&lt;/iframe&gt;	</textarea>
+	<textarea cols="70" rows="8" spellcheck="false" class="txtarea" id="cboxcode_v10_button" style="display: none; width: 100%">&lt;script&gt;
+window['CboxReady'] = function (Cbox) {
+	Cbox('button', '4-4257987-52gxr7');
+}
+&lt;/script&gt;
+&lt;script src="https://static.cbox.ws/embed/2.js" async&gt;&lt;/script&gt;
+	</textarea>
+	
+	<textarea cols="70" rows="16" spellcheck="false" class="txtarea" id="cboxcode_default" style="width: 100%;">&lt;!--
+ BEGIN CBOX - www.cbox.ws - v4.3 --&gt;
+&lt;div id="cboxdiv" style="position: relative; margin: 0 auto; width: 
+400px; font-size: 0; line-height: 0;"&gt;
+&lt;div style="position: relative; height: 293px; overflow: auto; 
+overflow-y: auto; -webkit-overflow-scrolling: touch; border: 0px 
+solid;"&gt;&lt;iframe 
+src="https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7&amp;sec=main"
+ marginheight="0" marginwidth="0" frameborder="0" width="100%" 
+height="100%" scrolling="auto" allowtransparency="yes" 
+name="cboxmain4-4257987" 
+id="cboxmain4-4257987"&gt;&lt;/iframe&gt;&lt;/div&gt;
+&lt;div style="position: relative; height: 107px; overflow: hidden; 
+border: 0px solid; border-top: 0px;"&gt;&lt;iframe 
+src="https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7&amp;sec=form"
+ allow="autoplay" marginheight="0" marginwidth="0" frameborder="0" 
+width="100%" height="100%" scrolling="no" allowtransparency="yes" 
+name="cboxform4-4257987" 
+id="cboxform4-4257987"&gt;&lt;/iframe&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- END CBOX --&gt;	</textarea>
+
+	<textarea cols="70" rows="16" spellcheck="false" class="txtarea" id="cboxcode_defer" style="display: none; width: 100%">&lt;div
+ id="cboxwrap"&gt;&lt;/div&gt;
+
+&lt;script&gt;
+/*
+*	Cbox dynamic loader v.2
+*/
+(function () {
+	var showByDefault = true;
+	var cboxContainer = document.getElementById("cboxwrap");
+	var cboxToggleButton = document.getElementById("cboxbutton");
+	var buttonStringOpen = "Open Cbox";
+	var buttonStringClose = "Close Cbox";
+	var lsKey = "cbox:isOpen";
+
+	var cboxHTML = '&lt;!-- BEGIN CBOX - www.cbox.ws - v4.3 --&gt;'
+	+'&lt;div id="cboxdiv" style="position: relative; margin: 0 auto; 
+width: 400px; font-size: 0; line-height: 0;"&gt;'
+	+'&lt;div style="position: relative; height: 293px; overflow: auto; 
+overflow-y: auto; -webkit-overflow-scrolling: touch; border: 0px 
+solid;"&gt;&lt;iframe 
+src="https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7&amp;sec=main"
+ marginheight="0" marginwidth="0" frameborder="0" width="100%" 
+height="100%" scrolling="auto" allowtransparency="yes" 
+name="cboxmain4-4257987" 
+id="cboxmain4-4257987"&gt;&lt;/iframe&gt;&lt;/div&gt;'
+	+'&lt;div style="position: relative; height: 107px; overflow: hidden; 
+border: 0px solid; border-top: 0px;"&gt;&lt;iframe 
+src="https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7&amp;sec=form"
+ allow="autoplay" marginheight="0" marginwidth="0" frameborder="0" 
+width="100%" height="100%" scrolling="no" allowtransparency="yes" 
+name="cboxform4-4257987" 
+id="cboxform4-4257987"&gt;&lt;/iframe&gt;&lt;/div&gt;'
+	+'&lt;/div&gt;'
+	+'&lt;!-- END CBOX --&gt;';
+
+	var htmlInjected = false;
+	var isVisible = false;
+	var toggleCbox = function (show) {
+		
+		if (!show) {
+			cboxContainer.style.display = "none";
+			if (cboxToggleButton) {
+				cboxToggleButton.innerHTML = buttonStringOpen;
+			}
+			
+		}
+		else {
+			cboxContainer.style.display = "block";
+			if (cboxToggleButton) {
+				cboxToggleButton.innerHTML = buttonStringClose;
+			}
+		}
+		
+		if (show &amp;&amp; !htmlInjected) {
+			cboxContainer.innerHTML = cboxHTML;
+			htmlInjected = true;
+		}
+		
+		isVisible = show;
+	}
+
+	if (localStorage &amp;&amp; lsKey &amp;&amp; typeof 
+localStorage.getItem(lsKey) === "string") {
+		toggleCbox((localStorage.getItem(lsKey) === "yes"));
+	}
+	else {
+		toggleCbox(showByDefault);
+	}
+
+	if (cboxToggleButton) {
+		cboxToggleButton.onclick = function () {
+			toggleCbox(!isVisible);
+			
+			if (localStorage &amp;&amp; lsKey) {
+				localStorage.setItem(lsKey, isVisible ? "yes" : "no");
+			}
+		}
+	}
+})();
+
+&lt;/script&gt;	</textarea>
+
+	<textarea cols="70" rows="16" spellcheck="false" class="txtarea" id="cboxcode_pop" style="display: none; width: 100%">&lt;script&gt;
+function
+ popcbox(tid, tkey) {
+	var baseurl = 
+"https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7",
+		baseid = '4-4257987',
+		fontop = 0;
+		turl = '',
+		tid = tid || 0,
+		tkey = tkey || "",
+		html = [],
+		width = 400,
+		height = 400,
+		fheight = 107;
+
+	if (tid &amp;&amp; tkey) {
+		turl = '&amp;tid='+tid+'&amp;tkey='+tkey;
+	}
+		
+	var htmlform = '&lt;frame src="'+baseurl+turl+'&amp;sec=form" 
+marginwidth="0" marginheight="0" noresize="true" scrolling="auto" 
+name="cboxform'+baseid+'-'+tid+'"&gt;';
+	var htmlmain = '&lt;frame src="'+baseurl+turl+'&amp;sec=main" 
+marginwidth="0" marginheight="0" noresize="true" scrolling="no" 
+name="cboxmain'+baseid+'-'+tid+'"&gt;';
+	var prows = (fontop) ? (fheight+',*') : ('*,'+fheight);
+	
+	html.push('&lt;!DOCTYPE 
+html&gt;&lt;html&gt;&lt;head&gt;&lt;title&gt;Cbox&lt;/title&gt;&lt;meta 
+name="viewport" content="width=device-width, 
+user-scalable=no"&gt;&lt;meta http-equiv="X-UA-Compatible" 
+content="IE=edge"&gt;&lt;/head&gt;&lt;frameset rows="'+prows+'" 
+frameborder="0" framespacing="0"&gt;');
+	html.push(fontop ? htmlform : htmlmain);
+	html.push(fontop ? htmlmain : htmlform);
+	html.push('&lt;/frameset&gt;&lt;noframes&gt;Frames 
+required&lt;/noframes&gt;&lt;/html&gt;');
+	
+	var cboxwin = 
+window.open("","Cbox-"+baseid+"-"+tid,"width="+width+",height="+height+",toolbar=no,scrollbars=no,status=no,resizable=yes");
+
+	cboxwin.document.open();
+	cboxwin.document.write(html.join(''));
+	try {
+		x = screen.width;
+		y = screen.height;
+		cboxwin.moveTo(Math.max((x - width)/2, 0), Math.max((y - height)/2, 
+0));
+		cboxwin.focus();
+	} catch (e) {};
+}
+&lt;/script&gt;
+
+&lt;a href="JavaScript:popcbox('', '');"&gt;Pop up my Cbox&lt;/a&gt;	</textarea>
+
+	<textarea cols="70" rows="16" spellcheck="false" class="txtarea" id="cboxcode_bar" style="display: none; width: 100%">&lt;div
+ id="cboxbutton" style="position: fixed; bottom: 8px; right: 16px; 
+padding: 3px 20px; text-align: center; cursor: pointer; 
+background-color: #EDF3F7; border:#C3D7E5 1px solid;border-radius: 3px; 
+font-family: Tahoma, sans-serif; font-size: 14px; font-weight: 
+bold"&gt;&lt;/div&gt;
+&lt;div id="cboxwrap" style="position: fixed; bottom: 48px; right: 16px;
+ background: #EDF3F7; padding: 3px; border:#C3D7E5 1px 
+solid;border-radius: 3px;"&gt;&lt;/div&gt;
+
+&lt;script&gt;
+/*
+*	Cbox dynamic loader v.2
+*/
+(function () {
+	var showByDefault = true;
+	var cboxContainer = document.getElementById("cboxwrap");
+	var cboxToggleButton = document.getElementById("cboxbutton");
+	var buttonStringOpen = "Open Cbox";
+	var buttonStringClose = "Close Cbox";
+	var lsKey = "cbox:isOpen";
+
+	var cboxHTML = '&lt;!-- BEGIN CBOX - www.cbox.ws - v4.3 --&gt;'
+	+'&lt;div id="cboxdiv" style="position: relative; margin: 0 auto; 
+width: 400px; font-size: 0; line-height: 0;"&gt;'
+	+'&lt;div style="position: relative; height: 293px; overflow: auto; 
+overflow-y: auto; -webkit-overflow-scrolling: touch; border: 0px 
+solid;"&gt;&lt;iframe 
+src="https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7&amp;sec=main"
+ marginheight="0" marginwidth="0" frameborder="0" width="100%" 
+height="100%" scrolling="auto" allowtransparency="yes" 
+name="cboxmain4-4257987" 
+id="cboxmain4-4257987"&gt;&lt;/iframe&gt;&lt;/div&gt;'
+	+'&lt;div style="position: relative; height: 107px; overflow: hidden; 
+border: 0px solid; border-top: 0px;"&gt;&lt;iframe 
+src="https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7&amp;sec=form"
+ allow="autoplay" marginheight="0" marginwidth="0" frameborder="0" 
+width="100%" height="100%" scrolling="no" allowtransparency="yes" 
+name="cboxform4-4257987" 
+id="cboxform4-4257987"&gt;&lt;/iframe&gt;&lt;/div&gt;'
+	+'&lt;/div&gt;'
+	+'&lt;!-- END CBOX --&gt;';
+
+	var htmlInjected = false;
+	var isVisible = false;
+	var toggleCbox = function (show) {
+		
+		if (!show) {
+			cboxContainer.style.display = "none";
+			if (cboxToggleButton) {
+				cboxToggleButton.innerHTML = buttonStringOpen;
+			}
+			
+		}
+		else {
+			cboxContainer.style.display = "block";
+			if (cboxToggleButton) {
+				cboxToggleButton.innerHTML = buttonStringClose;
+			}
+		}
+		
+		if (show &amp;&amp; !htmlInjected) {
+			cboxContainer.innerHTML = cboxHTML;
+			htmlInjected = true;
+		}
+		
+		isVisible = show;
+	}
+
+	if (localStorage &amp;&amp; lsKey &amp;&amp; typeof 
+localStorage.getItem(lsKey) === "string") {
+		toggleCbox((localStorage.getItem(lsKey) === "yes"));
+	}
+	else {
+		toggleCbox(showByDefault);
+	}
+
+	if (cboxToggleButton) {
+		cboxToggleButton.onclick = function () {
+			toggleCbox(!isVisible);
+			
+			if (localStorage &amp;&amp; lsKey) {
+				localStorage.setItem(lsKey, isVisible ? "yes" : "no");
+			}
+		}
+	}
+})();
+
+&lt;/script&gt;	</textarea>
+
+	<textarea cols="70" rows="16" spellcheck="false" class="txtarea" id="cboxcode_myleague" style="display: none; width: 100%">&lt;!--
+ BEGIN CBOX - www.cbox.ws - v4.3 --&gt;
+&lt;div id="cboxdiv" style="position: relative; margin: 0 auto; width: 
+400px; font-size: 0; line-height: 0;"&gt;
+&lt;div style="position: relative; height: 293px; overflow: auto; 
+overflow-y: auto; -webkit-overflow-scrolling: touch; border: 0px 
+solid;"&gt;&lt;iframe 
+src="https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7&amp;sec=main"
+ marginheight="0" marginwidth="0" frameborder="0" width="100%" 
+height="100%" scrolling="auto" allowtransparency="yes" 
+name="cboxmain4-4257987" 
+id="cboxmain4-4257987"&gt;&lt;/iframe&gt;&lt;/div&gt;
+&lt;div style="position: relative; height: 107px; overflow: hidden; 
+border: 0px solid; border-top: 0px;"&gt;&lt;iframe 
+src="https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7&amp;sec=form&amp;nme=[cbox_name]&amp;key=[cbox_key_8i9if550i3k4a2ck]&amp;pic=[cbox_pic]&amp;lnk=[cbox_lnk]&amp;ath=[cbox_auth]"
+ allow="autoplay" marginheight="0" marginwidth="0" frameborder="0" 
+width="100%" height="100%" scrolling="no" allowtransparency="yes" 
+name="cboxform4-4257987" 
+id="cboxform4-4257987"&gt;&lt;/iframe&gt;&lt;/div&gt;
+&lt;/div&gt;
+&lt;!-- END CBOX --&gt;	</textarea>
+
+	<div style="float:right;">
+		<input type="button" name="cpy" id="btnCopy" value="Copy to clipboard" onclick="copytext()">
+	</div>
+
+</fieldset>
+
+<span style="float: right">Instructions for: 
+	<select name="sitetype" class="txtbox" onchange="updateinst()">
+	<option value="generic">Any site</option>
+	<option value="forum">Forums</option>
+	<option value="blogger" selected="selected">Blogger / Blogspot</option>
+	<option value="ee16">ExpressionEngine 1.6.x</option>
+	<option value="joomla">Joomla</option>
+	<option value="myleague">MyLeague.com</option>
+	<option value="phpbb3">phpBB 3.x</option>
+	<option value="smf">Simple Machines Forum (SMF)</option>
+	<option value="webs">Webs.com</option>
+	<option value="winlive">Windows Live Spaces</option>
+	<!--<option value="xanga" >Xanga.com</option>-->
+	</select>
+</span>
+
+<h2>Embed instructions</h2>
+
+
+<div id="ii_generic_v10">
+<ol>
+<li>Copy your code to the clipboard by clicking the button above.
+</li><li>Open the page or template editor for your site. 
+</li><li>Switch to HTML or raw editing mode.
+</li><li>Paste your code into the editor.
+</li><li>Save and publish your changes. 
+</li></ol>
+
+<h2>Problems installing?</h2>
+<p>
+If you see code on your page instead of your Cbox, your editor may be stripping or 
+sanitizing Cbox HTML.
+</p><p>
+If your platform supports apps or widgets, you may be able to find one that allows you to embed your Cbox. 
+Search for an "iframe" or "embed" app or widget. 
+</p><p>
+If the app or widget requires a URL, enter <code>https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7</code>.
+</p><p>
+On some platforms it may not be possible to embed Cbox into the page. Remember that you 
+can always use your Quick Link to publish your Cbox anywhere that you can post a link. 
+Your link is: <a href="https://my.cbox.ws/MSASDWEC2015HKARNO" target="_new">https://my.cbox.ws/MSASDWEC2015HKARNO</a>
+
+</p></div>
+
+
+<div id="ii_wix_v10" style="display:none">
+<ol>
+<li>Open your site editor at <a href="https://editor.wix.com/" target="_blank">Wix.com</a>
+</li><li>Open the app market and search for "HTML iFrame/Embed".
+</li><li>In the app details page, click "Add to Site"
+</li><li>In your site editor, open the iframe app configuration (click "Enter Website Address")
+</li><li>Enter this address: <code>https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7</code>
+</li><li>You can now resize and position your Cbox as you wish.
+</li></ol>
+</div>
+
+<div id="ii_googlesites_v10" style="display:none">
+<ol>
+<li>Open the page you want to place your Cbox on. 
+</li><li>Go to Edit &gt; Insert &gt; More Gadgets&amp;ellips; &gt; Featured &amp;ellips; and select the 'Include gadget (iframe)'
+</li><li>Paste URL to content: <code>https://www4.cbox.ws/box/?boxid=4257987&amp;boxtag=52gxr7</code>
+</li><li>Save the page.
+</li></ol>
+</div>
+
+<div id="ii_blogger_v10" style="display:none">
+<ol>
+<li>Open your Blogger editor.
+</li><li>Select Layout from the menu.
+</li><li>In the area you want to your Cbox to be shown, click "Add a Gadget".
+</li><li>Select "HTML/JavaScript" from the Basics category.
+</li><li>In the "Content" section, paste your Cbox embed code. 
+</li><li>Save your changes. 
+</li></ol>
+</div>
+
+<div id="ii_weebly_v10" style="display:none">
+<ol>
+<li>Open your <a href="https://www.weebly.com/editor/" target="_blank">Weebly editor</a>.
+</li><li>Locate Embed Code in the Basic Elements toolbar.
+</li><li>Drag the Embed Code element into your template. 
+</li><li>Click the new embed and paste your Cbox embed code into the HTML.
+</li><li>Preview and Publish your changes. 
+</li></ol>
+</div>
+
+
+<div id="ii_tumblr_v10" style="display:none">
+<ol>
+<li>Open your <a href="https://www.tumblr.com/settings/blog/" target="_blank">blog settings</a>.
+</li><li>Click "Edit theme".
+</li><li>Select "Edit HTML" in your theme editor.
+</li><li>Paste your Cbox embed code into your theme. You may need to experiement with where you paste the code.  
+</li><li>Update the Preview and Save when finished. 
+</li><li>If you are having difficulty with the layout, try the <b>Button</b> code variation above. 
+</li></ol>
+</div>
+
+
+<div id="ii_wordpress_v10" style="display:none">
+<p>
+<b>Note:</b> if you have a site hosted by Wordpress.com, embeds are restricted unless you have VIP. See 
+<a href="https://vip.wordpress.com/documentation/embedding-rich-media-from-around-the-web-with-protected-embeds/" target="_blank">this page</a> 
+for more information. The following instructions are for a self-hosted Wordpress site (Wordpress.org). 
+</p>
+<ol>
+<li>Log in to your Wordpress admin dashboard
+</li><li>Select Appearance &gt; Customize
+</li><li>Select Widgets and Add a Widget
+</li><li>Choose the "Custom HTML" widget
+</li><li>Paste your Cbox embed code into the widget content box. 
+</li><li>Confirm that your Cbox appears in the preview, then Save &amp; Publish.
+</li></ol>
+</div>
+
+
+
+<div id="ii_generic" style="display: none;">
+<ol>
+<li>Copy your code to the clipboard by clicking the button above.
+</li><li>Open the webpage you want to place Cbox on, in your editor. 
+</li><li>Go into HTML editing mode, if possible.
+</li><li>Find the place in your layout where you want your Cbox to be, and press Ctrl+V to paste the code there.
+</li><li>Save the webpage and upload as necessary.
+</li><li>Repeat for all pages you want your Cbox visible on.
+</li></ol>
+</div>
+
+<div id="ii_xanga" style="display:none">
+<ol>
+<li>Copy your code to the clipboard by clicking the button above.
+</li><li>Go to your Xanga site and sign in. 
+</li><li>Go to your <i>Look &amp; Feel</i> page.
+</li><li>Press Ctrl+V to paste the code into the box.
+</li><li>Save your Look &amp; Feel settings.
+</li></ol>
+</div>
+
+
+<div id="ii_blogger" style="">
+<ol>
+<li>Copy your code to the clipboard by clicking the button above.
+</li><li>Sign in at blogger.com / blogspot.com.
+</li><li>On your blog, click on <b>Design</b>.
+</li><li>Click <b>Add a Gadget</b>.
+</li><li>Choose <b>HTML/JavaScript</b>, click the content box and paste your code in it by pressing Ctrl+V.
+</li><li>Save the changes.
+</li></ol>
+</div>
+
+<div id="ii_ee16" style="display:none">
+<ol>
+<li>Copy your code to the clipboard by clicking the button above.
+</li><li>Log in to your ExpressionEngine Control Panel.
+</li><li>Go to the <b>Templates</b> section. </li>
+<li>Click your <b>index</b> template to edit it.</li>
+<li>Choose the location for your Cbox. You may want to place it somewhere after the tag <pre>&lt;div id="sidebar"&gt;</pre></li>
+<li>Paste your Cbox HTML code by pressing Ctrl+V.</li>
+<li>Click <b>Update</b> to save the changes.</li>
+</ol>
+Cbox supports User Integration on ExpressionEngine. For more information, see <a href="https://www.cbox.ws/admin?userint">this page</a>. 
+</div>
+
+
+<div id="ii_joomla" style="display:none">
+<ol>
+<li>Copy your code to the clipboard by clicking the button above.
+</li><li>Download our <a href="https://www.cbox.ws/extmodules/mod_cbox_joomla15.zip"><img src="Control%20Panel%20%C2%B7%20Cbox%20%D8%A7%D9%86%D8%B4%D8%B1_files/disk.gif" style="text-align: bottom" width="12" height="12" border="0"> Cbox on Joomla</a> module to your computer.</li>
+<li>In your Joomla administrator menu, go to <b>Extensions</b> -&gt; <b>Install/Uninstall</b></li>
+<li>Use the <b>Upload Package File</b> tool to upload the Cbox on Joomla module you downloaded from us.
+</li><li>Then go to <b>Extensions -&gt; Module Manager</b> and click on <b>Cbox</b> on the list that appears.</li>
+<li>Now set <b>Enabled</b> to <code>Yes</code>, and paste your code into the box on the right.</li>
+<li>Click <b>Save</b></li>
+</ol>
+Cbox supports User Integration on Joomla. For more information, see <a href="https://www.cbox.ws/admin?userint">this page</a>. 
+</div>
+
+
+<div id="ii_forum" style="display:none">
+<ol>
+<li>Copy your code to the clipboard by clicking the button above.
+</li><li>If you are using a hosted forum, sign in at your forum's control panel.
+</li><li>Find your "footer" editor, and paste your code there by pressing Ctrl+V.
+</li><li>If you are hosting the forum yourself, you can insert your code into the template files directly.
+</li></ol>
+</div>
+
+
+<div id="ii_phpbb3" style="display:none">
+<ol>
+<li>Copy your code to the clipboard by clicking the button above.</li>
+<li>Go into your phpBB admin control panel. </li>
+<li>Click the <b>Styles</b> tab, choose the <b>Templates</b> side bar item and for the current template, click <b>Edit</b>.</li>
+<li>Choose a location for your Cbox. Recommended files are overall_footer.html or overall_header.html.</li>
+<li>Paste your Cbox HTML code into your chosen template by pressing Ctrl + V.</li>
+<li><b>Important: </b> remove the &lt;!-- BEGIN CBOX --&gt; and &lt;!-- 
+END CBOX --&gt; tags from your code. These will cause an error on your 
+template. 
+</li><li>Save, and refresh your forum to confirm your Cbox is installed.</li>
+</ol>
+Cbox supports User Integration on phpBB 3.x. For more information, see <a href="https://www.cbox.ws/admin?userint">this page</a>. 
+</div>
+
+<div id="ii_webs" style="display:none">
+<ol>
+<li>In the Site Builder, open the page you want to place Cbox on, or create a new page. 
+</li><li>Click the HTML button, in the text editing bar near the top of the screen.
+</li><li>Paste your Cbox HTML code into the box and hit "insert".
+</li><li>Publish your changes and enjoy your new Cbox!
+</li></ol>
+</div>
+
+
+<div id="ii_myleague" style="display:none">
+<ol>
+<li>Copy your code to the clipboard by clicking the button above.
+</li><li>Go to your MyLeague Administration and Log in
+</li><li>Under League Settings -&gt; Look &amp; Feel -&gt; Edit Modules, Select "Front Page Top"
+</li><li>Turn on HTML Source view by clicking the "&lt;&gt;" button, second-from-right.
+</li><li>Paste your code at the bottom of the section by pressing Ctrl + V.
+</li><li>Turn off HTML Source view and then click the Save button, at the left.
+</li><li>Your Cbox should now be visible on your league page.
+</li></ol>
+Cboxes on MyLeague.com are automatically integrated with MyLeague 
+members. If you would prefer to handle user registration yourself, 
+select "General" from the 
+drop-down list above.
+
+</div>
+
+<div id="ii_smf" style="display:none">
+<ol>
+<li>Copy your code to the clipboard by clicking the button above.
+</li><li>Download our SMF module for your version of SMF: <a href="https://www.cbox.ws/extmodules/mod_cbox_smf2rc11.zip"><img src="Control%20Panel%20%C2%B7%20Cbox%20%D8%A7%D9%86%D8%B4%D8%B1_files/disk.gif" style="text-align: bottom" width="12" height="12" border="0"> Cbox on SMF 2 rc1</a> or <a href="https://www.cbox.ws/extmodules/mod_cbox_smf11.tar.gz"><img src="Control%20Panel%20%C2%B7%20Cbox%20%D8%A7%D9%86%D8%B4%D8%B1_files/disk.gif" style="text-align: bottom" width="12" height="12" border="0"> Cbox on SMF 1.1.x</a></li>
+<li>Go to the SMF Administration, and click on <b>Packages</b>.</li>
+<li>Click on the <b>Download Packages</b> tab.</li>
+<li>At <b>Upload a Package</b> at the bottom of the page, choose the <code>mod_cbox_smf11.tar.gz</code> file you just downloaded, and click <b>Upload</b>.</li>
+<li>The message "Package has been downloaded successfully" is displayed. Click <b>Apply Mod</b> beneath it.</li>
+<li>Click <b>Install Now</b>. You should then see "The package was installed successfully".</li>
+<li>Go to <b>Features and Options</b> under the Configuration heading on the menu to your left (or click on Features and Options on the Admin main page).</li>
+<li>Scroll down to locate the Cbox options. Paste your code and choose where to place your Cbox (header or footer).</li>
+<li>Save changes.</li>
+</ol>
+Cbox supports User Integration on SMF. For more information, see <a href="https://www.cbox.ws/admin?userint">this page</a>. 
+</div>
+
+
+<div id="ii_winlive" style="display:none">
+You will first need to obtain the "HTML Sandbox by enriike" module from the gadgets gallery. To do this: 
+<ol>
+<li>Go to "Personalize"</li>
+<li>Select "Add modules"</li>
+<li>Locate the "Gadgets" section and click "add gadgets from Windows Live Gallery"</li>
+<li>Search in the Gallery for the "HTML Sandbox" gadget</li>
+<li>You will be asked where you want your gadget placed. Select "Spaces"</li>
+<li>Then click the "Install" button when confirmation is requested</li>
+<li>Once the gadget is installed, locate and click the "Save" button</li>
+</ol>
+You will then be able to edit the HTML Sandbox gadget and paste your 
+Cbox HTML code into the space. Your Cbox HTML code is above.
+
+</div>
+
+<script>
+switchcode();
+updateinst();
+</script>
+
+
+</form>
+
+
+
+
+</div>
+
+
+
+<div style="clear: both"></div>
+</div><!-- /content -->
+
+</div><!-- /bodywrap -->
+
+<div id="siteErrorBar"><div class="wrap" id="siteErrorBarCont">Loading...</div></div>
+
+
+
+<div id="footer">
+
+	<a href="https://www.cbox.ws/">About
+	</a><a href="https://www.cbox.ws/products">Plans &amp; pricing
+	</a><a href="https://www.cbox.ws/terms">Terms &amp; conditions
+	</a><a href="https://www.cbox.ws/privacy">Privacy policy
+	</a><a href="https://www.cbox.ws/notices">Notices
+	</a><a href="https://www.cbox.ws/contact">Contact us
+	</a>
+	<div class="verybottom">
+		© 2004–2026 Cbox Communications (Pty) Ltd, all rights reserved. 
+			1 ms. 
+			83ce		
+	</div>
+
+</div>
+
+
+<script>
+(function(i,s,o,g,r,a,m){i['GoogleAnalyticsObject']=r;i[r]=i[r]||function(){
+(i[r].q=i[r].q||[]).push(arguments)},i[r].l=1*new Date();a=s.createElement(o),
+m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
+})(window,document,'script','//www.google-analytics.com/analytics.js','ga');
+ga('create', 'UA-242554-2', {
+	'cookieDomain': 'www.cbox.ws'
+});
+ga('send', 'pageview');
+
+</script>
+
+
+<script src="Control%20Panel%20%C2%B7%20Cbox%20%D8%A7%D9%86%D8%B4%D8%B1_files/code.js"></script>
+<script>
+	// Modal / naked mode.
+	if (window.isPopup) {
+		document.body.className = "Popped";
+	}
+	
+	// Only for CP pages
+	upgradeCheckboxes();
+
+var dropCrumb = function () {
+	if (!localStorage) {
+		return;
+	}
+	var bc = getCrumbs();
+	bc.push(location.href);
+	bc.splice(0, bc.length - 5);
+	localStorage.setItem("site:bread", JSON.stringify(bc));
+};
+
+var getCrumbs = function () {
+	if (!localStorage) {
+		return [];
+	}
+	var bcStr = localStorage.getItem("site:bread");
+	var bc = [];
+	if (bcStr) {
+		bc = JSON.parse(bcStr);
+	}
+	
+	return bc;
+}
+
+dropCrumb();
+</script>
+
+
+
+
+
+</body></html>
