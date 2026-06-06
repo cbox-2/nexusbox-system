@@ -6,89 +6,54 @@
 <title>NexusBox - نظام الصناديق البريدية</title>
 <link rel="stylesheet" href="/assets/css/admin-theme.css">
 <style>
-.hero {
-  background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  color: white;
-  padding: 60px 20px;
-  text-align: center;
-  margin-bottom: 40px;
-}
-.hero h1 {
-  font-size: 48px;
-  margin-bottom: 20px;
-}
-.hero p {
-  font-size: 20px;
-  margin-bottom: 30px;
-  color: rgba(255,255,255,0.9);
-}
-.hero-buttons {
-  display: flex;
-  gap: 20px;
-  justify-content: center;
-  flex-wrap: wrap;
-}
-.feature-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-  gap: 30px;
-  margin: 40px 0;
-}
-.feature-card {
-  background: white;
-  padding: 30px;
-  border-radius: 10px;
-  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-  text-align: center;
-}
-.feature-card h3 {
-  color: #667eea;
-  font-size: 24px;
-  margin-bottom: 15px;
-}
-.feature-card p {
-  color: #666;
-  line-height: 1.6;
-}
+.hero { background: linear-gradient(135deg, #667eea 0%, #764ba2 100%); color: white; padding: 60px 20px; text-align: center; margin-bottom: 40px; }
+.hero h1 { font-size: 48px; margin-bottom: 20px; }
+.hero p { font-size: 20px; margin-bottom: 30px; opacity: 0.9; }
+.hero-buttons { display: flex; gap: 20px; justify-content: center; flex-wrap: wrap; }
+.feature-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); gap: 30px; margin: 40px 0; }
+.feature-card { background: white; padding: 30px; border-radius: 10px; box-shadow: 0 4px 15px rgba(0,0,0,0.1); text-align: center; }
+.feature-card h3 { color: #667eea; font-size: 24px; margin-bottom: 15px; }
+.feature-card p { color: #666; line-height: 1.6; }
+.steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin: 30px 0; }
+.step { text-align: center; padding: 20px; }
+.step-num { background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 15px; }
 </style>
 </head>
 <body>
 
 <!-- Top Black Bar -->
 <div class="topbar">
+  <div class="topbar-right">
+    <a href="/admin/account.html">حسابي</a>
+    <a href="/admin/index.html">صناديق بريدي</a>
+    <a href="/admin/support.html">الدعم</a>
+    <a href="/test.html" id="loginBtn">تسجيل الخروج</a>
+    <span class="user-email" id="userEmail">زائر</span>
+  </div>
   <div class="logo-area">
-    <a href="/" class="logo-text">NexusBox</a>
-  </div>
-  
-  <div class="topbar-user">
-    <div class="user-info" id="userEmail">زائر</div>
-    <div class="topbar-links">
-      <a href="/dashboard/account.html">حسابي</a>
-      <a href="/dashboard/index.html">صناديقي</a>
-      <a href="/dashboard/support.html">الدعم</a>
-      <a href="/test.html" id="loginBtn">تسجيل الدخول</a>
-    </div>
+    <a href="/">NexusBox</a>
   </div>
 </div>
 
-<!-- Second Navigation Bar -->
+<!-- Second Nav Bar -->
 <div class="navbar">
-  <div class="navbar-links">
-    <a href="/dashboard/messages.html">رسائل</a>
-    <a href="/dashboard/users.html">المستخدمون</a>
-    <a href="/dashboard/options.html">خيارات</a>
-    <a href="/dashboard/lookfeel.html">المظهر والملمس</a>
-    <a href="/dashboard/publish.html">نشر</a>
+  <div class="navbar-right">
+    <a href="/admin/messages.html">رسائل</a>
+    <a href="/admin/users.html">المستخدمون</a>
+    <a href="/admin/options.html">خيارات</a>
+    <a href="/admin/lookfeel.html">المظهر والملمس</a>
+    <a href="/admin/publish.html">انشر</a>
+    <span class="navbar-brand">NexusBox</span>
   </div>
 </div>
 
-<!-- Hero Section -->
+<!-- Hero -->
 <div class="hero">
-  <h1>📦 NexusBox</h1>
+  <h1>NexusBox 📦</h1>
   <p>نظام الصناديق البريدية الاحترافي - أنشئ صندوق بريدك الإلكتروني وضمّنه في موقعك</p>
   <div class="hero-buttons">
-    <a href="/dashboard/create-box.html" class="btn btn-success" style="font-size:18px; padding:15px 40px">🚀 إنشاء صندوق جديد</a>
-    <a href="/test.html" class="btn btn-secondary" style="font-size:18px; padding:15px 40px">📊 لوحة التحكم</a>
+    <a href="/admin/create-box.html" class="btn btn-success" style="font-size:18px; padding:15px 40px;">إنشاء صندوق جديد</a>
+    <a href="/admin/index.html" class="btn btn-secondary" style="font-size:18px; padding:15px 40px;">لوحة التحكم</a>
   </div>
 </div>
 
@@ -98,62 +63,53 @@
   <!-- Features -->
   <div class="feature-grid">
     <div class="feature-card">
-      <h3>📦 صناديق متعددة</h3>
+      <h3>صناديق متعددة</h3>
       <p>أنشئ عدد غير محدود من الصناديق البريدية لكل غرض استخدام مختلف</p>
     </div>
-    
     <div class="feature-card">
-      <h3>🎨 تخصيص كامل</h3>
+      <h3>تخصيص كامل</h3>
       <p>تحكم في الألوان، الأبعاد، والمظهر ليناسب تصميم موقعك</p>
     </div>
-    
     <div class="feature-card">
-      <h3>🔒 أمان عالي</h3>
+      <h3>أمان عالي</h3>
       <p>حماية كاملة لبياناتك مع خيارات whitelist و HTTPS</p>
     </div>
-    
     <div class="feature-card">
-      <h3>⚡ سرعة فائقة</h3>
+      <h3>سرعة فائقة</h3>
       <p>أداء عالي مع تحميل سريع وتجربة مستخدم سلسة</p>
     </div>
-    
     <div class="feature-card">
-      <h3>📱 متجاوب</h3>
+      <h3>متجاوب</h3>
       <p>يعمل بشكل مثالي على جميع الأجهزة والشاشات</p>
     </div>
-    
     <div class="feature-card">
-      <h3>🔧 سهولة التضمين</h3>
+      <h3>سهولة التضمين</h3>
       <p>انسخ الكود والصقه في موقعك - جاهز خلال دقائق</p>
     </div>
   </div>
 
-  <!-- Quick Start -->
+  <!-- Steps -->
   <div class="content-section">
-    <h1>🚀 ابدأ الآن في 3 خطوات</h1>
-    
-    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 30px;">
-      <div style="text-align: center; padding: 20px;">
-        <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 15px;">1</div>
-        <h3 style="color: #333; margin-bottom: 10px;">سجل دخولك</h3>
-        <p style="color: #666;">أنشئ حساباً جديداً أو سجل دخول لحسابك الموجود</p>
+    <h1>ابدأ الآن في 3 خطوات</h1>
+    <div class="steps">
+      <div class="step">
+        <div class="step-num">1</div>
+        <h3>سجل دخولك</h3>
+        <p>أنشئ حساباً جديداً أو سجل دخول لحسابك الموجود</p>
       </div>
-      
-      <div style="text-align: center; padding: 20px;">
-        <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 15px;">2</div>
-        <h3 style="color: #333; margin-bottom: 10px;">أنشئ صندوقك</h3>
-        <p style="color: #666;">صمم صندوقك الخاص مع كل الخيارات التي تحتاجها</p>
+      <div class="step">
+        <div class="step-num">2</div>
+        <h3>أنشئ صندوقك</h3>
+        <p>صمم صندوقك الخاص مع كل الخيارات التي تحتاجها</p>
       </div>
-      
-      <div style="text-align: center; padding: 20px;">
-        <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 15px;">3</div>
-        <h3 style="color: #333; margin-bottom: 10px;">ضمّنه في موقعك</h3>
-        <p style="color: #666;">انسخ الكود والصقه في موقعك الإلكتروني</p>
+      <div class="step">
+        <div class="step-num">3</div>
+        <h3>ضمّنه في موقعك</h3>
+        <p>انسخ الكود والصقه في موقعك الإلكتروني</p>
       </div>
     </div>
-    
-    <div style="text-align: center; margin-top: 40px;">
-      <a href="/test.html" class="btn btn-primary" style="font-size: 18px; padding: 15px 50px;">البدء الآن</a>
+    <div style="text-align:center; margin-top:30px;">
+      <a href="/test.html" class="btn btn-primary" style="font-size:18px; padding:15px 50px;">البدء الآن</a>
     </div>
   </div>
 
@@ -165,13 +121,14 @@
 </div>
 
 <script>
-// Check if user is logged in
 const TOKEN = localStorage.getItem('token');
 if (TOKEN) {
-  document.getElementById('loginBtn').textContent = 'لوحة التحكم';
-  document.getElementById('loginBtn').href = '/dashboard/index.html';
+  document.getElementById('loginBtn').textContent = 'تسجيل الخروج';
+  document.getElementById('loginBtn').onclick = function() {
+    localStorage.removeItem('token');
+    window.location.href = '/';
+  };
   
-  // Load user info
   fetch(window.location.origin + '/api/auth/me', {
     headers: { 'Authorization': 'Bearer ' + TOKEN }
   })
