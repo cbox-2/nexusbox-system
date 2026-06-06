@@ -1,68 +1,189 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="ar" dir="rtl">
 <head>
-<meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:title" content="NexusBox - Control Panel">
-<meta name="twitter:description" content="NexusBox - Professional chat platform">
-<meta property="og:title" content="NexusBox - Control Panel">
-<meta property="og:description" content="NexusBox - Control Panel - Professional chat platform">
-<meta property="og:type" content="website">
-<meta property="og:url" content="https://nexusbox-system-production-c290.up.railway.app/">
-
-<meta name="description" content="NexusBox - Control Panel - Professional chat platform by NexusBox">
-<link rel="canonical" href="https://nexusbox-system-production-c290.up.railway.app/">
-<link rel="icon" type="image/svg+xml" href="/shared/favicon.svg">
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>NexusBox - Control Panel</title>
-<link rel="stylesheet" href="/shared/toolbar.css">
-<link rel="stylesheet" href="/shared/buttons.css">
+<title>NexusBox - نظام الصناديق البريدية</title>
+<link rel="stylesheet" href="/assets/css/admin-theme.css">
 <style>
-body {
+.hero {
   background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-  min-height: 100vh;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  font-family: Tahoma, Arial, sans-serif;
-}
-.container {
-  background: white;
-  padding: 40px;
-  border-radius: 10px;
-  box-shadow: 0 10px 40px rgba(0,0,0,0.3);
+  color: white;
+  padding: 60px 20px;
   text-align: center;
-  max-width: 400px;
+  margin-bottom: 40px;
 }
-h1 {
-  color: #333;
+.hero h1 {
+  font-size: 48px;
   margin-bottom: 20px;
 }
-p {
-  color: #666;
+.hero p {
+  font-size: 20px;
   margin-bottom: 30px;
+  color: rgba(255,255,255,0.9);
 }
-.btn {
-  display: inline-block;
-  padding: 12px 30px;
-  background: #667eea;
-  color: white;
-  text-decoration: none;
-  border-radius: 5px;
-  font-size: 16px;
-  transition: background 0.3s;
+.hero-buttons {
+  display: flex;
+  gap: 20px;
+  justify-content: center;
+  flex-wrap: wrap;
 }
-.btn:hover {
-  background: #764ba2;
+.feature-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+  gap: 30px;
+  margin: 40px 0;
+}
+.feature-card {
+  background: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+  text-align: center;
+}
+.feature-card h3 {
+  color: #667eea;
+  font-size: 24px;
+  margin-bottom: 15px;
+}
+.feature-card p {
+  color: #666;
+  line-height: 1.6;
 }
 </style>
 </head>
 <body>
-<div class="container">
-  <h1>🚀 NexusBox</h1>
-  <p>Welcome to NexusBox Control Panel</p>
-  <a href="/dashboard/index.html" class="btn">Go to Dashboard</a>
+
+<!-- Top Black Bar -->
+<div class="topbar">
+  <div class="logo-area">
+    <a href="/" class="logo-text">NexusBox</a>
+  </div>
+  
+  <div class="topbar-user">
+    <div class="user-info" id="userEmail">زائر</div>
+    <div class="topbar-links">
+      <a href="/dashboard/account.html">حسابي</a>
+      <a href="/dashboard/index.html">صناديقي</a>
+      <a href="/dashboard/support.html">الدعم</a>
+      <a href="/test.html" id="loginBtn">تسجيل الدخول</a>
+    </div>
+  </div>
 </div>
-<script src="/shared/nav.js"></script>
+
+<!-- Second Navigation Bar -->
+<div class="navbar">
+  <div class="navbar-links">
+    <a href="/dashboard/messages.html">رسائل</a>
+    <a href="/dashboard/users.html">المستخدمون</a>
+    <a href="/dashboard/options.html">خيارات</a>
+    <a href="/dashboard/lookfeel.html">المظهر والملمس</a>
+    <a href="/dashboard/publish.html">نشر</a>
+  </div>
+</div>
+
+<!-- Hero Section -->
+<div class="hero">
+  <h1>📦 NexusBox</h1>
+  <p>نظام الصناديق البريدية الاحترافي - أنشئ صندوق بريدك الإلكتروني وضمّنه في موقعك</p>
+  <div class="hero-buttons">
+    <a href="/dashboard/create-box.html" class="btn btn-success" style="font-size:18px; padding:15px 40px">🚀 إنشاء صندوق جديد</a>
+    <a href="/test.html" class="btn btn-secondary" style="font-size:18px; padding:15px 40px">📊 لوحة التحكم</a>
+  </div>
+</div>
+
+<!-- Main Container -->
+<div class="main-container">
+
+  <!-- Features -->
+  <div class="feature-grid">
+    <div class="feature-card">
+      <h3>📦 صناديق متعددة</h3>
+      <p>أنشئ عدد غير محدود من الصناديق البريدية لكل غرض استخدام مختلف</p>
+    </div>
+    
+    <div class="feature-card">
+      <h3>🎨 تخصيص كامل</h3>
+      <p>تحكم في الألوان، الأبعاد، والمظهر ليناسب تصميم موقعك</p>
+    </div>
+    
+    <div class="feature-card">
+      <h3>🔒 أمان عالي</h3>
+      <p>حماية كاملة لبياناتك مع خيارات whitelist و HTTPS</p>
+    </div>
+    
+    <div class="feature-card">
+      <h3>⚡ سرعة فائقة</h3>
+      <p>أداء عالي مع تحميل سريع وتجربة مستخدم سلسة</p>
+    </div>
+    
+    <div class="feature-card">
+      <h3>📱 متجاوب</h3>
+      <p>يعمل بشكل مثالي على جميع الأجهزة والشاشات</p>
+    </div>
+    
+    <div class="feature-card">
+      <h3>🔧 سهولة التضمين</h3>
+      <p>انسخ الكود والصقه في موقعك - جاهز خلال دقائق</p>
+    </div>
+  </div>
+
+  <!-- Quick Start -->
+  <div class="content-section">
+    <h1>🚀 ابدأ الآن في 3 خطوات</h1>
+    
+    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 30px; margin-top: 30px;">
+      <div style="text-align: center; padding: 20px;">
+        <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 15px;">1</div>
+        <h3 style="color: #333; margin-bottom: 10px;">سجل دخولك</h3>
+        <p style="color: #666;">أنشئ حساباً جديداً أو سجل دخول لحسابك الموجود</p>
+      </div>
+      
+      <div style="text-align: center; padding: 20px;">
+        <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 15px;">2</div>
+        <h3 style="color: #333; margin-bottom: 10px;">أنشئ صندوقك</h3>
+        <p style="color: #666;">صمم صندوقك الخاص مع كل الخيارات التي تحتاجها</p>
+      </div>
+      
+      <div style="text-align: center; padding: 20px;">
+        <div style="background: #667eea; color: white; width: 60px; height: 60px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 28px; font-weight: bold; margin: 0 auto 15px;">3</div>
+        <h3 style="color: #333; margin-bottom: 10px;">ضمّنه في موقعك</h3>
+        <p style="color: #666;">انسخ الكود والصقه في موقعك الإلكتروني</p>
+      </div>
+    </div>
+    
+    <div style="text-align: center; margin-top: 40px;">
+      <a href="/test.html" class="btn btn-primary" style="font-size: 18px; padding: 15px 50px;">البدء الآن</a>
+    </div>
+  </div>
+
+</div>
+
+<!-- Footer -->
+<div class="footer">
+  <p>&copy; 2026 NexusBox - جميع الحقوق محفوظة</p>
+</div>
+
+<script>
+// Check if user is logged in
+const TOKEN = localStorage.getItem('token');
+if (TOKEN) {
+  document.getElementById('loginBtn').textContent = 'لوحة التحكم';
+  document.getElementById('loginBtn').href = '/dashboard/index.html';
+  
+  // Load user info
+  fetch(window.location.origin + '/api/auth/me', {
+    headers: { 'Authorization': 'Bearer ' + TOKEN }
+  })
+  .then(res => res.json())
+  .then(data => {
+    if (data.success && data.user) {
+      document.getElementById('userEmail').textContent = data.user.email || data.user.username;
+    }
+  })
+  .catch(() => {});
+}
+</script>
+
 </body>
 </html>
