@@ -690,3 +690,26 @@ app.post('/api/embed/:embedKey/messages', async (req, res) => {
     res.status(500).json({ success: false, error: error.message });
   }
 });
+
+// ===== PAGE ROUTES =====
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
+
+app.get('/admin', (req, res) => {
+  res.redirect('/admin/index.html');
+});
+
+app.get('/admin/*', (req, res) => {
+  const page = req.params[0];
+  const filePath = path.join(__dirname, 'public', 'admin', page + '.html');
+  res.sendFile(filePath, (err) => {
+    if (err) {
+      res.status(404).send('Page not found');
+    }
+  });
+});
+
+app.get('/logout', (req, res) => {
+  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+});
