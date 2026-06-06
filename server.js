@@ -5,39 +5,36 @@ const jwt = require('jsonwebtoken');
 const cors = require('cors');
 const path = require('path');
 const crypto = require('crypto');
+const http = require('http');
+const { Server } = require('socket.io');
+const multer = require('multer');
 
 const app = express();
+const server = http.createServer(app);
+const io = new Server(server, { cors: { origin: '*' } });
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'nexusbox_secret_key_2026';
 
-// Middleware
 app.use(cors());
-app.use(express.json());
-app.use(express.urlencoded({ extended: true }));
+app.use(express.json({ limit: '10mb' }));
+app.use(express.urlencoded({ extended: true, limit: '10mb' }));
 app.use(express.static('public'));
 
-// MongoDB Connection
-mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/nexusbox', {
-  useNewUrlParser: true,
-  useUnifiedTopology: true
-}).then(() => console.log('✅ MongoDB connected'))
-  .catch(err => console.error('❌ MongoDB error:', err));
+mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/nexusbox').then(() => console.log('✅ MongoDB connected')).catch(err => console.error('❌ MongoDB error:', err));
 
-// ===== MODELS =====
-
-// User Model
 const userSchema = new mongoose.Schema({
   username: { type: String, required: true, unique: true },
   email: { type: String, required: true, unique: true },
   password: { type: String, required: true },
   role: { type: String, default: 'user' },
   status: { type: String, default: 'active' },
+  emailVerified: { type: Boolean, default: false },
+  resetToken: String,
+  resetTokenExpiry: Date,
   createdAt: { type: Date, default: Date.now }
 });
-
 const User = mongoose.model('User', userSchema);
 
-// Box Model
 const boxSchema = new mongoose.Schema({
   name: { type: String, required: true },
   slug: { type: String, unique: true },
@@ -46,16 +43,21 @@ const boxSchema = new mongoose.Schema({
   status: { type: String, default: 'active' },
   theme: {
     primaryColor: { type: String, default: '#667eea' },
+    secondaryColor: { type: String, default: '#764ba2' },
     backgroundColor: { type: String, default: '#ffffff' },
     textColor: { type: String, default: '#333333' },
+    headerBg: { type: String, default: '#667eea' },
+    headerText: { type: String, default: '#ffffff' },
     customCss: { type: String, default: '' }
   },
   layout: {
     width: { type: Number, default: 400 },
-    height: { type: Number, default: 400 },
+    height: { type: Number, default: 500 },
     formHeight: { type: Number, default: 107 },
     formOnTop: { type: Boolean, default: false },
-    narrowLayout: { type: Boolean, default: false }
+    narrowLayout: { type: Boolean, default: false },
+    showHeader: { type: Boolean, default: true },
+    showFooter: { type: Boolean, default: true }
   },
   settings: {
     allowGuestPost: { type: Boolean, default: true },
@@ -65,8 +67,28 @@ const boxSchema = new mongoose.Schema({
     sortDirection: { type: Number, default: 1 },
     language: { type: String, default: 'ar' },
     timezone: { type: String, default: 'Asia/Baghdad' },
+    requireCaptcha: { type: Boolean, default: false }
+  },
+  dateSettings: {
     dateFormat: { type: String, default: 'DD/MM/YYYY' },
-    timeFormat: { type: String, default: '24h' }
+    timeFormat: { type: String, default: '24h' },
+    showDate: { type: Boolean, default: true },
+    showTime: { type: Boolean, default: true },
+    relativeTime: { type: Boolean, default: false }
+  },
+  emojiSettings: {
+    enabled: { type: Boolean, default: true },
+    allowed: { type: [String], default: [':)', ':(', ':D', ';)', ':P', ':O', '<3'] },
+    customEmojis: { type: [String], default: [] }
+  },
+  filterSettings: {
+    enabled: { type: Boolean, default: true },
+    bannedWords: { type: [String], default: [] },
+    filterLinks: { type: Boolean, default: false },
+    filterSpam: { type: Boolean, default: true },
+    htmlMode: { type: Boolean, default: false },
+    maxMessageLength: { type: Number, default: 500 },
+    floodInterval: { type: Number, default: 3 }
   },
   posting: {
     allowEmail: { type: Boolean, default: true },
@@ -93,122 +115,115 @@ const boxSchema = new mongoose.Schema({
   },
   webhook: {
     url: { type: String, default: '' },
-    enabled: { type: Boolean, default: false }
+    enabled: { type: Boolean, default: false },
+    events: { type: [String], default: ['message', 'user_join'] }
   },
-  filter: {
-    enabled: { type: Boolean, default: true },
-    bannedWords: { type: [String], default: [] },
-    filterLinks: { type: Boolean, default: false },
-    filterSpam: { type: Boolean, default: true },
-    htmlMode: { type: Boolean, default: false }
-  },
-  emoji: {
-    enabled: { type: Boolean, default: true },
-    allowed: { type: [String], default: [] }
+  integration: {
+    type: { type: String, default: 'none' },
+    loginUrl: { type: String, default: '' },
+    logoutUrl: { type: String, default: '' },
+    syncUsers: { type: Boolean, default: false }
   },
   stats: {
     totalMessages: { type: Number, default: 0 },
     totalViews: { type: Number, default: 0 },
-    totalUsers: { type: Number, default: 0 }
+    totalUsers: { type: Number, default: 0 },
+    activeUsers: { type: Number, default: 0 }
   },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
 
-// Auto-generate slug and embedKey
 boxSchema.pre('save', function(next) {
   if (!this.slug && this.name) {
     this.slug = this.name.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '');
     if (!this.slug) this.slug = 'box-' + Date.now().toString(36);
   }
-  if (!this.embedKey) {
-    this.embedKey = crypto.randomBytes(16).toString('hex');
-  }
+  if (!this.embedKey) this.embedKey = crypto.randomBytes(16).toString('hex');
   this.updatedAt = new Date();
   next();
 });
-
 const Box = mongoose.model('Box', boxSchema);
 
-// Message Model
 const messageSchema = new mongoose.Schema({
   boxId: { type: mongoose.Schema.Types.ObjectId, ref: 'Box', required: true },
   content: { type: String, required: true },
   author: {
     id: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
-    username: { type: String, default: 'Guest' }
+    username: { type: String, default: 'Guest' },
+    avatar: { type: String, default: '' }
   },
   channel: { type: String, default: 'general' },
   isSticky: { type: Boolean, default: false },
   isArchived: { type: Boolean, default: false },
   isDeleted: { type: Boolean, default: false },
   ip: { type: String },
+  attachments: [{ type: String }],
   createdAt: { type: Date, default: Date.now }
 });
-
 const Message = mongoose.model('Message', messageSchema);
 
-// Channel Model
 const channelSchema = new mongoose.Schema({
   boxId: { type: mongoose.Schema.Types.ObjectId, ref: 'Box', required: true },
   name: { type: String, required: true },
   description: { type: String, default: '' },
+  isDefault: { type: Boolean, default: false },
   createdAt: { type: Date, default: Date.now }
 });
-
 const Channel = mongoose.model('Channel', channelSchema);
 
-// BoxUser Model (Registered users for a box)
 const boxUserSchema = new mongoose.Schema({
   boxId: { type: mongoose.Schema.Types.ObjectId, ref: 'Box', required: true },
   username: { type: String, required: true },
   password: { type: String, required: true },
-  level: { type: Number, default: 2 }, // 2=user, 3=mod, 4=admin, 5=owner
-  registeredAt: { type: Date, default: Date.now }
+  email: { type: String, default: '' },
+  level: { type: Number, default: 2 },
+  avatar: { type: String, default: '' },
+  registeredAt: { type: Date, default: Date.now },
+  lastLogin: { type: Date }
 });
-
 const BoxUser = mongoose.model('BoxUser', boxUserSchema);
 
-// Ban Model
 const banSchema = new mongoose.Schema({
   boxId: { type: mongoose.Schema.Types.ObjectId, ref: 'Box', required: true },
   target: { type: String, required: true },
+  targetType: { type: String, default: 'username' },
   reason: { type: String, default: '' },
-  duration: { type: Number, default: 0 }, // hours, 0 = permanent
+  duration: { type: Number, default: 0 },
   expiresAt: { type: Date },
   createdAt: { type: Date, default: Date.now }
 });
-
 banSchema.pre('save', function(next) {
-  if (this.duration > 0) {
-    this.expiresAt = new Date(Date.now() + this.duration * 60 * 60 * 1000);
-  }
+  if (this.duration > 0) this.expiresAt = new Date(Date.now() + this.duration * 60 * 60 * 1000);
   next();
 });
-
 const Ban = mongoose.model('Ban', banSchema);
 
-// WebLink Model
 const webLinkSchema = new mongoose.Schema({
   boxId: { type: mongoose.Schema.Types.ObjectId, ref: 'Box', required: true },
   title: { type: String, required: true },
   url: { type: String, required: true },
   createdAt: { type: Date, default: Date.now }
 });
-
 const WebLink = mongoose.model('WebLink', webLinkSchema);
 
-// ===== AUTH MIDDLEWARE =====
+const supportTicketSchema = new mongoose.Schema({
+  userId: { type: mongoose.Schema.Types.ObjectId, ref: 'User' },
+  subject: { type: String, required: true },
+  description: { type: String, required: true },
+  type: { type: String, default: 'bug' },
+  status: { type: String, default: 'open' },
+  createdAt: { type: Date, default: Date.now }
+});
+const SupportTicket = mongoose.model('SupportTicket', supportTicketSchema);
 
 const auth = async (req, res, next) => {
   try {
     const token = req.header('Authorization')?.replace('Bearer ', '');
     if (!token) return res.status(401).json({ success: false, error: 'No token' });
-    
     const decoded = jwt.verify(token, JWT_SECRET);
     const user = await User.findById(decoded.id);
     if (!user) return res.status(401).json({ success: false, error: 'User not found' });
-    
     req.user = user;
     req.userId = user._id;
     next();
@@ -218,94 +233,90 @@ const auth = async (req, res, next) => {
 };
 
 // ===== AUTH ROUTES =====
-
 app.post('/api/auth/signup', async (req, res) => {
   try {
     const { username, email, password } = req.body;
-    
-    if (!username || !email || !password) {
-      return res.status(400).json({ success: false, error: 'All fields required' });
-    }
-    
-    const existingUser = await User.findOne({ $or: [{ email }, { username }] });
-    if (existingUser) {
-      return res.status(400).json({ success: false, error: 'User already exists' });
-    }
-    
-    const hashedPassword = await bcrypt.hash(password, 10);
-    const user = new User({ username, email, password: hashedPassword });
+    if (!username || !email || !password) return res.status(400).json({ success: false, error: 'All fields required' });
+    const existing = await User.findOne({ $or: [{ email }, { username }] });
+    if (existing) return res.status(400).json({ success: false, error: 'User already exists' });
+    const hashed = await bcrypt.hash(password, 10);
+    const user = new User({ username, email, password: hashed });
     await user.save();
-    
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' });
-    
-    res.status(201).json({
-      success: true,
-      token,
-      user: { id: user._id, username: user.username, email: user.email }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+    res.status(201).json({ success: true, token, user: { id: user._id, username: user.username, email: user.email } });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.post('/api/auth/login', async (req, res) => {
   try {
     const { email, password } = req.body;
-    
-    const user = await User.findOne({ email });
-    if (!user) {
-      return res.status(400).json({ success: false, error: 'Invalid credentials' });
-    }
-    
+    const user = await User.findOne({ $or: [{ email }, { username: email }] });
+    if (!user) return res.status(400).json({ success: false, error: 'Invalid credentials' });
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) {
-      return res.status(400).json({ success: false, error: 'Invalid credentials' });
-    }
-    
+    if (!isMatch) return res.status(400).json({ success: false, error: 'Invalid credentials' });
     const token = jwt.sign({ id: user._id }, JWT_SECRET, { expiresIn: '7d' });
-    
-    res.json({
-      success: true,
-      token,
-      user: { id: user._id, username: user.username, email: user.email, role: user.role }
-    });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+    res.json({ success: true, token, user: { id: user._id, username: user.username, email: user.email, role: user.role } });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/auth/me', auth, async (req, res) => {
   try {
     const user = await User.findById(req.userId).select('-password');
     res.json({ success: true, user });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/auth/change-password', auth, async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const user = await User.findById(req.userId);
+    const isMatch = await bcrypt.compare(currentPassword, user.password);
+    if (!isMatch) return res.status(400).json({ success: false, error: 'Current password incorrect' });
+    user.password = await bcrypt.hash(newPassword, 10);
+    await user.save();
+    res.json({ success: true, message: 'Password updated' });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/auth/forgot-password', async (req, res) => {
+  try {
+    const { email } = req.body;
+    const user = await User.findOne({ email });
+    if (!user) return res.json({ success: true, message: 'If email exists, reset link sent' });
+    const resetToken = crypto.randomBytes(32).toString('hex');
+    user.resetToken = resetToken;
+    user.resetTokenExpiry = Date.now() + 3600000;
+    await user.save();
+    res.json({ success: true, message: 'Reset link sent', resetToken });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/auth/verify-email', async (req, res) => {
+  try {
+    const { token } = req.body;
+    const user = await User.findOne({ resetToken: token, resetTokenExpiry: { $gt: Date.now() } });
+    if (!user) return res.status(400).json({ success: false, error: 'Invalid token' });
+    user.emailVerified = true;
+    user.resetToken = undefined;
+    await user.save();
+    res.json({ success: true, message: 'Email verified' });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 // ===== BOX ROUTES =====
-
 app.post('/api/boxes', auth, async (req, res) => {
   try {
-    const box = new Box({
-      ...req.body,
-      ownerId: req.userId
-    });
+    const box = new Box({ ...req.body, ownerId: req.userId });
     await box.save();
-    
     res.status(201).json({ success: true, box });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/boxes', auth, async (req, res) => {
   try {
     const boxes = await Box.find({ ownerId: req.userId });
     res.json({ success: true, boxes });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/boxes/:id', auth, async (req, res) => {
@@ -313,57 +324,176 @@ app.get('/api/boxes/:id', auth, async (req, res) => {
     const box = await Box.findOne({ _id: req.params.id, ownerId: req.userId });
     if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
     res.json({ success: true, box });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.put('/api/boxes/:id', auth, async (req, res) => {
   try {
-    const box = await Box.findOneAndUpdate(
-      { _id: req.params.id, ownerId: req.userId },
-      { $set: req.body },
-      { new: true }
-    );
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: req.body }, { new: true });
     if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
     res.json({ success: true, box });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.delete('/api/boxes/:id', auth, async (req, res) => {
   try {
     const box = await Box.findOneAndDelete({ _id: req.params.id, ownerId: req.userId });
     if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    await Message.deleteMany({ boxId: box._id });
+    await Channel.deleteMany({ boxId: box._id });
+    await BoxUser.deleteMany({ boxId: box._id });
+    await Ban.deleteMany({ boxId: box._id });
     res.json({ success: true, message: 'Box deleted' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
-// ===== EMBED ROUTE =====
+// ===== BOX SETTINGS ROUTES =====
+app.get('/api/boxes/:id/settings', auth, async (req, res) => {
+  try {
+    const box = await Box.findOne({ _id: req.params.id, ownerId: req.userId });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, settings: box.settings });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
 
+app.put('/api/boxes/:id/settings', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { settings: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/boxes/:id/layout', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { layout: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/boxes/:id/theme', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { theme: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/boxes/:id/publish', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { publish: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/boxes/:id/webhook', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { webhook: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/boxes/:id/date-settings', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { dateSettings: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/boxes/:id/emoji-settings', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { emojiSettings: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/boxes/:id/filter-settings', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { filterSettings: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/boxes/:id/integration', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { integration: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.get('/api/boxes/:id/stats', auth, async (req, res) => {
+  try {
+    const box = await Box.findOne({ _id: req.params.id, ownerId: req.userId });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    const totalMessages = await Message.countDocuments({ boxId: box._id, isDeleted: false });
+    const totalUsers = await BoxUser.countDocuments({ boxId: box._id });
+    const totalChannels = await Channel.countDocuments({ boxId: box._id });
+    const totalBans = await Ban.countDocuments({ boxId: box._id });
+    res.json({ success: true, stats: { totalMessages, totalUsers, totalChannels, totalBans, totalViews: box.stats.totalViews, activeUsers: box.stats.activeUsers } });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ===== EMBED ROUTES =====
 app.get('/api/embed/:embedKey', async (req, res) => {
   try {
     const box = await Box.findOne({ embedKey: req.params.embedKey, status: 'active' });
     if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
-    
     await Box.findByIdAndUpdate(box._id, { $inc: { 'stats.totalViews': 1 } });
-    
     res.json({ success: true, box });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.get('/api/embed/:embedKey/messages', async (req, res) => {
+  try {
+    const box = await Box.findOne({ embedKey: req.params.embedKey, status: 'active' });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    const messages = await Message.find({ boxId: box._id, isDeleted: false, isArchived: false })
+      .sort({ isSticky: -1, createdAt: -1 }).limit(50);
+    res.json({ success: true, messages });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.post('/api/embed/:embedKey/messages', async (req, res) => {
+  try {
+    const box = await Box.findOne({ embedKey: req.params.embedKey, status: 'active' });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    if (!box.settings.allowGuestPost && !req.body.userId) {
+      return res.status(403).json({ success: false, error: 'Guest posting not allowed' });
+    }
+    let content = req.body.content || '';
+    if (box.filterSettings.enabled && box.filterSettings.bannedWords) {
+      box.filterSettings.bannedWords.forEach(word => {
+        if (word) content = content.replace(new RegExp(word, 'gi'), '***');
+      });
+    }
+    if (content.length > (box.filterSettings.maxMessageLength || 500)) {
+      return res.status(400).json({ success: false, error: 'Message too long' });
+    }
+    const message = new Message({
+      boxId: box._id,
+      content: content,
+      author: { id: req.body.userId || null, username: req.body.username || 'زائر', avatar: req.body.avatar || '' },
+      channel: req.body.channel || 'general'
+    });
+    await message.save();
+    await Box.findByIdAndUpdate(box._id, { $inc: { 'stats.totalMessages': 1 } });
+    io.to('box_' + box._id.toString()).emit('new_message', message);
+    res.status(201).json({ success: true, message });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 // ===== MESSAGE ROUTES =====
-
 app.post('/api/boxes/:boxId/messages', auth, async (req, res) => {
   try {
     const box = await Box.findOne({ _id: req.params.boxId, ownerId: req.userId });
     if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
-    
     const message = new Message({
       boxId: box._id,
       content: req.body.content,
@@ -372,99 +502,82 @@ app.post('/api/boxes/:boxId/messages', auth, async (req, res) => {
       isSticky: req.body.isSticky || false
     });
     await message.save();
-    
     await Box.findByIdAndUpdate(box._id, { $inc: { 'stats.totalMessages': 1 } });
-    
+    io.to('box_' + box._id.toString()).emit('new_message', message);
     res.status(201).json({ success: true, message });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/boxes/:boxId/messages', auth, async (req, res) => {
   try {
     const query = { boxId: req.params.boxId, isDeleted: false };
-    
     if (req.query.archived === 'true') query.isArchived = true;
     else query.isArchived = false;
-    
     if (req.query.sticky === 'true') query.isSticky = true;
     if (req.query.channel) query.channel = req.query.channel;
-    
-    const messages = await Message.find(query)
-      .sort({ createdAt: -1 })
-      .limit(parseInt(req.query.limit) || 50);
-    
+    if (req.query.search) query.content = { $regex: req.query.search, $options: 'i' };
+    const messages = await Message.find(query).sort({ createdAt: -1 }).limit(parseInt(req.query.limit) || 50);
     res.json({ success: true, messages });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.put('/api/messages/:id', auth, async (req, res) => {
   try {
-    const message = await Message.findByIdAndUpdate(
-      req.params.id,
-      { $set: req.body },
-      { new: true }
-    );
+    const message = await Message.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
     if (!message) return res.status(404).json({ success: false, error: 'Message not found' });
     res.json({ success: true, message });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.delete('/api/messages/:id', auth, async (req, res) => {
   try {
-    const message = await Message.findByIdAndUpdate(
-      req.params.id,
-      { isDeleted: true },
-      { new: true }
-    );
+    const message = await Message.findByIdAndUpdate(req.params.id, { isDeleted: true }, { new: true });
     if (!message) return res.status(404).json({ success: false, error: 'Message not found' });
     res.json({ success: true, message: 'Message deleted' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.get('/api/boxes/:boxId/messages/export', auth, async (req, res) => {
+  try {
+    const format = req.query.format || 'json';
+    const messages = await Message.find({ boxId: req.params.boxId, isDeleted: false });
+    if (format === 'csv') {
+      let csv = 'ID,Content,Author,Date,Channel\n';
+      messages.forEach(m => {
+        csv += `"${m._id}","${m.content.replace(/"/g, '""')}","${m.author.username}","${m.createdAt}","${m.channel}"\n`;
+      });
+      res.setHeader('Content-Type', 'text/csv');
+      res.setHeader('Content-Disposition', 'attachment; filename=messages.csv');
+      return res.send(csv);
+    }
+    res.json({ success: true, messages });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 // ===== CHANNEL ROUTES =====
-
 app.post('/api/boxes/:boxId/channels', auth, async (req, res) => {
   try {
-    const channel = new Channel({
-      boxId: req.params.boxId,
-      name: req.body.name,
-      description: req.body.description
-    });
+    const channel = new Channel({ boxId: req.params.boxId, name: req.body.name, description: req.body.description });
     await channel.save();
     res.status(201).json({ success: true, channel });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/boxes/:boxId/channels', auth, async (req, res) => {
   try {
     const channels = await Channel.find({ boxId: req.params.boxId });
     res.json({ success: true, channels });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.delete('/api/channels/:id', auth, async (req, res) => {
   try {
     await Channel.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Channel deleted' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 // ===== USER ROUTES =====
-
 app.post('/api/boxes/:boxId/users', auth, async (req, res) => {
   try {
     const hashedPassword = await bcrypt.hash(req.body.password, 10);
@@ -472,244 +585,159 @@ app.post('/api/boxes/:boxId/users', auth, async (req, res) => {
       boxId: req.params.boxId,
       username: req.body.username,
       password: hashedPassword,
+      email: req.body.email || '',
       level: req.body.level || 2
     });
     await user.save();
     res.status(201).json({ success: true, user });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/boxes/:boxId/users', auth, async (req, res) => {
   try {
     const users = await BoxUser.find({ boxId: req.params.boxId });
     res.json({ success: true, users });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.put('/api/users/:id', auth, async (req, res) => {
   try {
+    if (req.body.password) req.body.password = await bcrypt.hash(req.body.password, 10);
     const user = await BoxUser.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
     if (!user) return res.status(404).json({ success: false, error: 'User not found' });
     res.json({ success: true, user });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.delete('/api/users/:id', auth, async (req, res) => {
   try {
     await BoxUser.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'User deleted' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 // ===== BAN ROUTES =====
-
 app.post('/api/boxes/:boxId/bans', auth, async (req, res) => {
   try {
     const ban = new Ban({
       boxId: req.params.boxId,
       target: req.body.target,
+      targetType: req.body.targetType || 'username',
       reason: req.body.reason,
       duration: req.body.duration || 0
     });
     await ban.save();
     res.status(201).json({ success: true, ban });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/boxes/:boxId/bans', auth, async (req, res) => {
   try {
     const bans = await Ban.find({ boxId: req.params.boxId });
     res.json({ success: true, bans });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.delete('/api/bans/:id', auth, async (req, res) => {
   try {
     await Ban.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Ban removed' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 // ===== WEBLINK ROUTES =====
-
 app.post('/api/boxes/:boxId/weblinks', auth, async (req, res) => {
   try {
-    const link = new WebLink({
-      boxId: req.params.boxId,
-      title: req.body.title,
-      url: req.body.url
-    });
+    const link = new WebLink({ boxId: req.params.boxId, title: req.body.title, url: req.body.url });
     await link.save();
     res.status(201).json({ success: true, link });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.get('/api/boxes/:boxId/weblinks', auth, async (req, res) => {
   try {
     const links = await WebLink.find({ boxId: req.params.boxId });
     res.json({ success: true, links });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
 app.delete('/api/weblinks/:id', auth, async (req, res) => {
   try {
     await WebLink.findByIdAndDelete(req.params.id);
     res.json({ success: true, message: 'Link deleted' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
-// ===== SETTINGS ROUTES =====
-
-app.post('/api/settings/date', auth, async (req, res) => {
+// ===== SUPPORT ROUTES =====
+app.post('/api/support/bug-report', auth, async (req, res) => {
   try {
-    res.json({ success: true, message: 'Date settings saved' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+    const ticket = new SupportTicket({
+      userId: req.userId,
+      subject: req.body.subject,
+      description: req.body.description,
+      type: req.body.type || 'bug'
+    });
+    await ticket.save();
+    res.status(201).json({ success: true, ticket });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
-app.post('/api/settings/emoji', auth, async (req, res) => {
+// ===== UPLOAD ROUTE =====
+const storage = multer.memoryStorage();
+const upload = multer({ storage, limits: { fileSize: 5 * 1024 * 1024 } });
+app.post('/api/upload', auth, upload.single('file'), async (req, res) => {
   try {
-    res.json({ success: true, message: 'Emoji settings saved' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+    if (!req.file) return res.status(400).json({ success: false, error: 'No file' });
+    const base64 = req.file.buffer.toString('base64');
+    const dataUrl = 'data:' + req.file.mimetype + ';base64,' + base64;
+    res.json({ success: true, url: dataUrl, filename: req.file.originalname });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
 
-app.post('/api/settings/filter', auth, async (req, res) => {
-  try {
-    res.json({ success: true, message: 'Filter settings saved' });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
+// ===== WEBSOCKET =====
+io.on('connection', (socket) => {
+  console.log('✅ Client connected:', socket.id);
+  socket.on('join_box', (boxId) => {
+    socket.join('box_' + boxId);
+    console.log('Socket ' + socket.id + ' joined box ' + boxId);
+  });
+  socket.on('leave_box', (boxId) => {
+    socket.leave('box_' + boxId);
+  });
+  socket.on('typing', (data) => {
+    socket.to('box_' + data.boxId).emit('user_typing', { username: data.username });
+  });
+  socket.on('disconnect', () => {
+    console.log('❌ Client disconnected:', socket.id);
+  });
 });
 
 // ===== HEALTH CHECK =====
-
 app.get('/api/health', (req, res) => {
   res.json({
     success: true,
     status: 'running',
-    version: '2.0.0',
-    timestamp: new Date().toISOString()
+    version: '3.0.0',
+    timestamp: new Date().toISOString(),
+    features: ['websocket', 'upload', 'search', 'export', 'webhook']
   });
 });
 
-// ===== START SERVER =====
-
-app.listen(PORT, () => {
-  console.log(`🚀 NexusBox server running on port ${PORT}`);
-  console.log(`📍 http://localhost:${PORT}`);
-});
-
-// ===== PUBLIC CHAT ROUTES =====
-
-app.get('/api/embed/:embedKey/messages', async (req, res) => {
-  try {
-    const box = await Box.findOne({ embedKey: req.params.embedKey, status: 'active' });
-    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
-    
-    const messages = await Message.find({ 
-      boxId: box._id, 
-      isDeleted: false,
-      isArchived: false 
-    })
-    .sort({ createdAt: -1 })
-    .limit(50);
-    
-    res.json({ success: true, messages });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
-app.post('/api/embed/:embedKey/messages', async (req, res) => {
-  try {
-    const box = await Box.findOne({ embedKey: req.params.embedKey, status: 'active' });
-    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
-    
-    // Check if guest posting is allowed
-    if (!box.settings.allowGuestPost && !req.body.userId) {
-      return res.status(403).json({ success: false, error: 'Guest posting not allowed' });
-    }
-    
-    const message = new Message({
-      boxId: box._id,
-      content: req.body.content,
-      author: {
-        id: req.body.userId || null,
-        username: req.body.username || 'زائر'
-      },
-      channel: req.body.channel || 'general'
-    });
-    
-    await message.save();
-    await Box.findByIdAndUpdate(box._id, { $inc: { 'stats.totalMessages': 1 } });
-    
-    // Send webhook if enabled
-    if (box.webhook.enabled && box.webhook.url) {
-      try {
-        const fetch = require('node-fetch');
-        await fetch(box.webhook.url, {
-          method: 'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({
-            content: message.content,
-            author: message.author.username,
-            box: box.name,
-            timestamp: message.createdAt
-          })
-        });
-      } catch(e) {
-        console.error('Webhook error:', e);
-      }
-    }
-    
-    res.status(201).json({ success: true, message });
-  } catch (error) {
-    res.status(500).json({ success: false, error: error.message });
-  }
-});
-
 // ===== PAGE ROUTES =====
-app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
-});
-
-app.get('/admin', (req, res) => {
-  res.redirect('/admin/index.html');
-});
-
+app.get('/', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
+app.get('/admin', (req, res) => res.redirect('/admin/index.html'));
 app.get('/admin/*', (req, res) => {
   const page = req.params[0];
   const filePath = path.join(__dirname, 'public', 'admin', page + '.html');
   res.sendFile(filePath, (err) => {
-    if (err) {
-      res.status(404).send('Page not found');
-    }
+    if (err) res.status(404).send('Page not found');
   });
 });
+app.get('/logout', (req, res) => res.sendFile(path.join(__dirname, 'public', 'index.html')));
 
-app.get('/logout', (req, res) => {
-  res.sendFile(path.join(__dirname, 'public', 'index.html'));
+// ===== START SERVER =====
+server.listen(PORT, () => {
+  console.log('🚀 NexusBox server running on port ' + PORT);
+  console.log('📍 http://localhost:' + PORT);
+  console.log('🔌 WebSocket enabled');
 });
