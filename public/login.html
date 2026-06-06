@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Login · NexusBox</title>
+<meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<meta name="description" content="Login to your NexusBox account">
+<link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
+<link rel="stylesheet" href="/cbox-files/style.css">
+<script src="/cbox-files/code.js"></script>
+<style>
+.login-container {
+  max-width: 500px;
+  margin: 50px auto;
+  padding: 20px;
+}
+.login-box {
+  background: #fff;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  padding: 30px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.login-header {
+  text-align: center;
+  margin-bottom: 30px;
+}
+.login-header h1 {
+  color: #667eea;
+  margin: 0;
+  font-size: 28px;
+}
+.login-header p {
+  color: #666;
+  margin: 10px 0 0 0;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 5px;
+  font-weight: bold;
+  color: #333;
+}
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.form-group input:focus {
+  border-color: #667eea;
+  outline: none;
+  box-shadow: 0 0 5px rgba(102,126,234,0.3);
+}
+.btn-login {
+  width: 100%;
+  padding: 12px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 4px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.btn-login:hover {
+  background: #5568d3;
+}
+.login-footer {
+  text-align: center;
+  margin-top: 20px;
+  padding-top: 20px;
+  border-top: 1px solid #ddd;
+}
+.login-footer a {
+  color: #667eea;
+  text-decoration: none;
+}
+.login-footer a:hover {
+  text-decoration: underline;
+}
+.frmmsg1 {
+  margin-top: 15px;
+  padding: 10px;
+  border-radius: 4px;
+  text-align: center;
+}
+.frmmsg1.Error {
+  background: #fee;
+  color: #c33;
+  border: 1px solid #fcc;
+}
+.frmmsg1.Okay {
+  background: #efe;
+  color: #3c3;
+  border: 1px solid #cfc;
+}
+</style>
+</head>
+<body id="mainbody">
+
+<div id="mask"></div>
+
+<div id="bodywrap">
+  <div id="header">
+    <div class="wrap">
+      <a id="logo" href="/">
+        <img src="/cbox-files/logo400.png" alt="NexusBox" width="200" height="86" border="0">
+      </a>
+      <div id="headerExtras">
+        <a href="/">Home</a>
+        <a href="/admin/index.html">My Cboxes</a>
+        <a href="/admin/support.html">Support</a>
+      </div>
+    </div>
+  </div>
+
+  <div id="main" class="wrap">
+    <div class="login-container">
+      <div class="login-box">
+        <div class="login-header">
+          <h1>Login to NexusBox</h1>
+          <p>Enter your credentials to access your account</p>
+        </div>
+
+        <form id="loginForm">
+          <div class="form-group">
+            <label for="email">Email or Username:</label>
+            <input type="text" id="email" name="email" required autofocus>
+          </div>
+
+          <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" name="password" required>
+          </div>
+
+          <button type="submit" class="btn-login">Log in</button>
+          
+          <div id="m_login" class="frmmsg1"></div>
+        </form>
+
+        <div class="login-footer">
+          <p>Don't have an account? <a href="/signup.html">Sign up</a></p>
+          <p><a href="/">Back to Home</a></p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div id="footer">
+    <a href="/">Home</a>
+    <a href="/admin/support.html">Support</a>
+    <div class="verybottom">&copy; 2026 NexusBox</div>
+  </div>
+</div>
+
+<script>
+const API = window.location.origin;
+
+// Check if already logged in
+const existingToken = localStorage.getItem('token');
+if (existingToken) {
+  window.location.href = '/admin/index.html';
+}
+
+document.getElementById('loginForm').addEventListener('submit', async function(e) {
+  e.preventDefault();
+  
+  const email = document.getElementById('email').value;
+  const password = document.getElementById('password').value;
+  const msgDiv = document.getElementById('m_login');
+  
+  msgDiv.textContent = 'Logging in...';
+  msgDiv.className = 'frmmsg1';
+  
+  try {
+    const response = await fetch(API + '/api/auth/login', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ email, password })
+    });
+    
+    const data = await response.json();
+    
+    if (data.success && data.token) {
+      localStorage.setItem('token', data.token);
+      msgDiv.textContent = 'Login successful! Redirecting...';
+      msgDiv.className = 'frmmsg1 Okay';
+      
+      setTimeout(() => {
+        window.location.href = '/admin/index.html';
+      }, 1000);
+    } else {
+      msgDiv.textContent = data.error || 'Invalid credentials';
+      msgDiv.className = 'frmmsg1 Error';
+    }
+  } catch (error) {
+    msgDiv.textContent = 'Connection error. Please try again.';
+    msgDiv.className = 'frmmsg1 Error';
+  }
+});
+</script>
+
+</body>
+</html>
