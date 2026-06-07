@@ -1,68 +1,199 @@
 <!DOCTYPE html>
 <html lang="ar" dir="rtl">
 <head>
+<title>إنشاء صندوق جديد · NexusBox</title>
 <meta charset="UTF-8">
-<title>إنشاء صندوق - NexusBox</title>
-<link rel="stylesheet" href="/assets/css/admin-theme.css">
+<meta content="width=device-width, initial-scale=1" name="viewport">
+<link rel="stylesheet" href="/cbox-files/style.css">
+<style>
+.create-box-container {
+  max-width: 600px;
+  margin: 50px auto;
+  padding: 30px;
+  background: white;
+  border-radius: 10px;
+  box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+}
+.create-box-container h1 {
+  color: #667eea;
+  margin-bottom: 30px;
+  text-align: center;
+}
+.form-group {
+  margin-bottom: 20px;
+}
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  font-weight: bold;
+  color: #333;
+}
+.form-group input {
+  width: 100%;
+  padding: 12px;
+  border: 1px solid #ddd;
+  border-radius: 5px;
+  font-size: 14px;
+  box-sizing: border-box;
+}
+.btn-create {
+  width: 100%;
+  padding: 15px;
+  background: #667eea;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s;
+}
+.btn-create:hover {
+  background: #5568d3;
+}
+.message {
+  margin-top: 20px;
+  padding: 15px;
+  border-radius: 5px;
+  text-align: center;
+}
+.message.success {
+  background: #d4edda;
+  color: #155724;
+  border: 1px solid #c3e6cb;
+}
+.message.error {
+  background: #f8d7da;
+  color: #721c24;
+  border: 1px solid #f5c6cb;
+}
+</style>
 </head>
 <body>
-<div id="successMsg" class="success-msg"></div>
-<div class="main-container">
-  <div class="content-section">
-    <h1>➕ إنشاء صندوق جديد</h1>
-    <div class="form-group">
-      <label>اسم الصندوق:</label>
-      <input type="text" id="boxName" placeholder="اسم الصندوق">
+<div id="bodywrap">
+  <div id="header">
+    <div class="wrap">
+      <a id="logo" href="/"><img src="/cbox-files/logo400.png" alt="NexusBox" width="200" height="86" border="0"></a>
+      <div id="headerExtras">
+        <span id="userWelcome">Loading...</span>
+        <a href="/admin/index.html">My Cboxes</a>
+        <a href="/admin/account.html">My Account</a>
+        <a href="/admin/support.html">Support</a>
+        <a href="#" onclick="logout()">Log out</a>
+      </div>
     </div>
-    <div class="form-group">
-      <label>اللون الأساسي:</label>
-      <input type="color" id="primaryColor" value="#667eea">
+  </div>
+  
+  <div id="main" class="wrap">
+    <div class="create-box-container">
+      <h1>➕ إنشاء صندوق جديد</h1>
+      
+      <form id="createBoxForm">
+        <div class="form-group">
+          <label>اسم الصندوق:</label>
+          <input type="text" id="boxName" required placeholder="مثال: دردشة الموقع">
+        </div>
+        
+        <div class="form-group">
+          <label>اللون الأساسي:</label>
+          <input type="color" id="primaryColor" value="#667eea">
+        </div>
+        
+        <div class="form-group">
+          <label>العرض (px):</label>
+          <input type="number" id="width" value="400" min="200" max="1000">
+        </div>
+        
+        <div class="form-group">
+          <label>الارتفاع (px):</label>
+          <input type="number" id="height" value="500" min="300" max="1000">
+        </div>
+        
+        <button type="submit" class="btn-create">إنشاء الصندوق</button>
+        
+        <div id="message" class="message" style="display:none;"></div>
+      </form>
     </div>
-    <div class="form-group">
-      <label>العرض:</label>
-      <input type="number" id="width" value="400">
-    </div>
-    <div class="form-group">
-      <label>الارتفاع:</label>
-      <input type="number" id="height" value="500">
-    </div>
-    <button class="btn btn-primary" onclick="createBox()">إنشاء الصندوق</button>
-    <div id="result" style="margin-top:20px;"></div>
+  </div>
+  
+  <div id="footer">
+    <a href="/">Home</a>
+    <a href="/admin/support.html">Support</a>
+    <div class="verybottom">&copy; 2026 NexusBox</div>
   </div>
 </div>
-<script src="/assets/js/shared.js"></script>
+
 <script>
-SHARED.init('');
-const API = SHARED.API;
+const API = window.location.origin;
 const TOKEN = localStorage.getItem('token');
 
-async function createBox() {
-  if (!TOKEN) { alert('سجل دخول'); window.location.href = '/test.html'; return; }
-  const name = document.getElementById('boxName').value;
-  if (!name) { alert('أدخل الاسم'); return; }
-  try {
-    const res = await fetch(API + '/api/boxes', {
-      method: 'POST',
-      headers: SHARED.getAuthHeaders(),
-      body: JSON.stringify({
-        name,
-        theme: { primaryColor: document.getElementById('primaryColor').value },
-        layout: { width: parseInt(document.getElementById('width').value), height: parseInt(document.getElementById('height').value) }
-      })
-    });
-    const data = await res.json();
-    if (data.success) {
-      document.getElementById('result').innerHTML = `
-        <div class="info-msg">
-          <h3>✅ تم الإنشاء!</h3>
-          <p>Embed Key: ${data.box.embedKey}</p>
-          <a href="/admin/publish.html?key=${data.box.embedKey}" class="btn btn-success">الحصول على كود التضمين</a>
-        </div>
-      `;
-    } else { SHARED.showError(data.error); }
-  } catch(e) { SHARED.showError('خطأ'); }
+// Check auth
+if (!TOKEN) {
+  window.location.href = '/login.html';
 }
+
+// Load user info
+fetch(API + '/api/auth/me', { headers: { 'Authorization': 'Bearer ' + TOKEN } })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success && d.user) {
+      document.getElementById('userWelcome').textContent = d.user.email;
+    }
+  });
+
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/';
+}
+
+// Create box
+document.getElementById('createBoxForm').addEventListener('submit', function(e) {
+  e.preventDefault();
+  
+  const msgDiv = document.getElementById('message');
+  msgDiv.style.display = 'none';
+  
+  const data = {
+    name: document.getElementById('boxName').value,
+    theme: {
+      primaryColor: document.getElementById('primaryColor').value
+    },
+    layout: {
+      width: parseInt(document.getElementById('width').value),
+      height: parseInt(document.getElementById('height').value)
+    }
+  };
+  
+  fetch(API + '/api/boxes', {
+    method: 'POST',
+    headers: {
+      'Authorization': 'Bearer ' + TOKEN,
+      'Content-Type': 'application/json'
+    },
+    body: JSON.stringify(data)
+  })
+  .then(r => r.json())
+  .then(d => {
+    if (d.success && d.box) {
+      msgDiv.textContent = '✅ تم إنشاء الصندوق بنجاح! جاري التحويل...';
+      msgDiv.className = 'message success';
+      msgDiv.style.display = 'block';
+      
+      setTimeout(() => {
+        window.location.href = '/admin/index.html';
+      }, 2000);
+    } else {
+      msgDiv.textContent = '❌ ' + (d.error || 'حدث خطأ');
+      msgDiv.className = 'message error';
+      msgDiv.style.display = 'block';
+    }
+  })
+  .catch(err => {
+    msgDiv.textContent = '❌ خطأ في الاتصال';
+    msgDiv.className = 'message error';
+    msgDiv.style.display = 'block';
+  });
+});
 </script>
-<script src="/cbox-files/activate.js"></script>
 </body>
 </html>
