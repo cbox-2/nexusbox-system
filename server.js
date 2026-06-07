@@ -19,9 +19,16 @@ const io = new Server(server, { cors: { origin: process.env.ALLOWED_ORIGINS ? pr
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'nexusbox_secret_key_2026';
 
+app.use(helmet({
+  contentSecurityPolicy: false,
+  crossOriginEmbedderPolicy: false
+}));
+app.use(mongoSanitize());
 app.use(cors());
 app.use(express.json({ limit: '10mb' }));
 app.use(express.urlencoded({ extended: true, limit: '10mb' }));
+app.use(sanitizeInputs);
+app.use(requestLogger);
 app.use(express.static('public'));
 
 mongoose.connect(process.env.MONGODB_URI || 'mongodb://localhost:27017/nexusbox').then(() => console.log('✅ MongoDB connected')).catch(err => console.error('❌ MongoDB error:', err));
@@ -295,7 +302,6 @@ const requestLogger = (req, res, next) => {
 };
 
 // Use logger for all routes
-app.use(requestLogger);
 
 
 // ===== AUTH ROUTES =====
