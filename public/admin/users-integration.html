@@ -1,12 +1,12 @@
 <!DOCTYPE html>
 <html lang="en"><head>
-<title>Control Panel · Cbox</title>
+<title>NexusBox - users-integration.html</title>
 <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
 <meta http-equiv="X-UA-Compatible" content="IE=edge">
 <meta content="width=device-width, initial-scale=1" name="viewport">
 <meta name="description" content="Cbox live chat is an embeddable chat app for online communities, groups, and live-streaming events.">
 <link href="data:image/x-icon;base64,AAABAAEAEBACAAAAAACwAAAAFgAAACgAAAAQAAAAIAAAAAEAAQAAAAAAQAAAAAAAAAAAAAAAAgAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA//8AAP//AAD//wAA" rel="icon" type="image/x-icon">
-<link rel="stylesheet" href="Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/style.css">
+<link rel="stylesheet" href="/cbox-files/style.css">
 </head>
 <body id="mainbody">
 
@@ -68,18 +68,18 @@
 	<div id="header">
 		<div class="wrap">
 
-			<a id="logo" href="https://www.cbox.ws/">
-				<img src="Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/logo400.png" alt="Cbox" width="200" height="86" border="0">
+			<a id="logo" href="/">
+				<img src="/cbox-files/logo400.png" alt="NexusBox" width="200" height="86" border="0">
 			</a>
 
 			<div id="headerExtras">
 	
 								
 								<span id="userWelcome">msmsas55@yahoo.com</span>
-				<a href="https://www.cbox.ws/admin?switch">My Cboxes</a>
-				<a href="https://www.cbox.ws/admin?acct">My Account</a>
-												<a href="https://www.cbox.ws/help">Support
-				</a><a href="https://www.cbox.ws/admin?preproc=logout" onclick="return logout()">Log out
+				<a href="/admin/index.html">My Cboxes</a>
+				<a href="/admin/account.html">My Account</a>
+												<a href="/admin/support.html">Support
+				</a><a href="#" onclick="logout()" onclick="return logout()">Log out
 				</a>
 							</div>
 		</div>
@@ -87,7 +87,7 @@
 
 		<div id="subbar">
 		<div class="wrap">
-			<a href="https://www.cbox.ws/admin?home" class="submenuitem"><b>MSASDWEC2015HKARNO</b>			</a><a href="https://www.cbox.ws/admin?snippet" class="submenuitem">Publish
+			<a href="/admin/index.html" class="submenuitem"><b>MSASDWEC2015HKARNO</b>			</a><a href="/admin/publish.html" class="submenuitem">Publish
 			</a><a href="#" id="hovmenu1" class="submenuitem" onmousedown="return hovmenu(this, 1)">Look &amp; feel
 			</a><a href="#" id="hovmenu2" class="submenuitem" onmousedown="return hovmenu(this, 2)">Options
 			</a><a href="#" id="hovmenu3" class="submenuitem" onmousedown="return hovmenu(this, 3)">Users
@@ -214,13 +214,13 @@ Integration to achieve single sign-on. Users can log in on your site and
 logged-in to your Cbox. 
 </p>
 <p>
-Users authenticated via Integration can be given mod and other permissions at your <a href="https://www.cbox.ws/admin?users">Users page</a>. Enable auto-registration so that you 
+Users authenticated via Integration can be given mod and other permissions at your <a href="/admin/users.html">Users page</a>. Enable auto-registration so that you 
 do not have to manually register your users names in your Cbox in order to assign them permissions.
 </p>
 
 
 <div class="notice">
-User integration is available with <a href="https://www.cbox.ws/upgrade?p=2">Cbox Pro</a>. 
+User integration is available with <a href="/upgrade?p=2">Cbox Pro</a>. 
 </div>
 
 <div class="col1_2">
@@ -304,7 +304,7 @@ function updateint() {
 
 <div id="int_generic">
 <p>
-If your site is PHP-based, alter your Cbox <a href="https://www.cbox.ws/admin?snippet">embed code</a> in the following way:
+If your site is PHP-based, alter your Cbox <a href="/admin/publish.html">embed code</a> in the following way:
 </p>
 <pre>...&amp;sec=form&amp;nme=&lt;?php echo urlencode($name)?&gt;&amp;nmekey=&lt;?php echo md5('8i9if550i3k4a2ck'.$name)?&gt;
 </pre>
@@ -336,7 +336,7 @@ can skip the following steps and go straight to the Integration guide.
 </li><li>Go to the <b>Templates</b> section. </li>
 <li>Click your <b>index</b> template to edit it.</li>
 <li>Choose the location for your Cbox. You may want to place it somewhere after the tag <pre>&lt;div id="sidebar"&gt;</pre></li>
-<li>Paste your <a href="https://www.cbox.ws/admin?snippet">Cbox HTML code</a> and click <b>Update</b>.</li>
+<li>Paste your <a href="/admin/publish.html">Cbox HTML code</a> and click <b>Update</b>.</li>
 </ol>
 <p></p>
 
@@ -347,7 +347,7 @@ Confirm your Cbox appears on your site before proceeding with integration:
 <p>
 <b>Integration guide: </b>
 </p><ol>
-<li>Download our <a href="https://www.cbox.ws/extmodules/mod_cbox_ee16.zip"><img src="Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/disk.gif" style="text-align: bottom" width="12" height="12" border="0"> Cbox on ExpressionEngine</a> module to your computer.</li>
+<li>Download our <a href="/extmodules/mod_cbox_ee16.zip"><img src="Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/disk.gif" style="text-align: bottom" width="12" height="12" border="0"> Cbox on ExpressionEngine</a> module to your computer.</li>
 <li>Extract the module files to the <b>./system</b> directory in your 
 ExpressionEngine installation (this may have been renamed). Note that 
 the mcp.cbox.php and mod.cbox.php files go in the ./system/modules 
@@ -378,11 +378,11 @@ You'll need to have a <a href="http://www.joomla.org/">Joomla</a>-based website 
 Once you have Joomla running it's very easy to get Cbox integrated with your Joomla userbase. Here are the steps:
 </p>
 <ol>
-<li>First download our <a href="https://www.cbox.ws/extmodules/mod_cbox_joomla15.zip"><img src="Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/disk.gif" style="text-align: bottom" width="12" height="12" border="0"> Cbox on Joomla</a> module to your computer.</li>
+<li>First download our <a href="/extmodules/mod_cbox_joomla15.zip"><img src="Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/disk.gif" style="text-align: bottom" width="12" height="12" border="0"> Cbox on Joomla</a> module to your computer.</li>
 <li>In your Joomla administrator menu, go to <b>Extensions</b> -&gt; <b>Install/Uninstall</b></li>
 <li>Use the <b>Upload Package File</b> tool to upload the Cbox on Joomla module you downloaded from us.
 </li><li>Then go to <b>Extensions -&gt; Module Manager</b> and click on <b>Cbox</b> on the list that appears.</li>
-<li>Now set <b>Enabled</b> to <code>Yes</code>, and paste your snippet (from <a href="https://www.cbox.ws/admin?snippet">here</a>) and private key (see below, required for integration) into the parameter fields on the right</li>
+<li>Now set <b>Enabled</b> to <code>Yes</code>, and paste your snippet (from <a href="/admin/publish.html">here</a>) and private key (see below, required for integration) into the parameter fields on the right</li>
 <li>Click <b>Save</b></li>
 <li>And finally, click <b>Enable</b> lower down on this page to turn user integration on. </li>
 </ol>
@@ -412,7 +412,7 @@ These steps will integrate your Cbox with your phpBB3 userbase.
 <li>If your Cbox is installed already, choose the template file in which
  you placed it. If Cbox is not installed, choose a location. Recommended
  files are overall_footer.html or overall_header.html.
-</li><li>Paste your Cbox HTML code into the template file. (Your Cbox HTML code is at <a href="https://www.cbox.ws/admin?snippet">this page</a>.)
+</li><li>Paste your Cbox HTML code into the template file. (Your Cbox HTML code is at <a href="/admin/publish.html">this page</a>.)
 </li><li>In your Cbox HTML code, find: <code>sec=form</code> and immediately after, paste: <code>&amp;nme={CBOX_USERNAME}&amp;nmekey={CBOX_USERKEY}</code></li>
 <li><b>Important: </b> remove the &lt;!-- BEGIN CBOX --&gt; and &lt;!-- 
 END CBOX --&gt; tags from your code. These will cause an error on your 
@@ -430,14 +430,14 @@ You'll need to have a <a href="http://www.simplemachines.org/">Simple Machines F
 The Cbox SMF module will get Cbox on your SMF template easily, and it'll also integrate your SMF users with Cbox.
 </p>
 <ol>
-<li>First download our <a href="https://www.cbox.ws/extmodules/mod_cbox_smf11.tar.gz"><img src="Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/disk.gif" style="text-align: bottom" width="12" height="12" border="0"> Cbox on SMF</a> module to your computer.</li>
+<li>First download our <a href="/extmodules/mod_cbox_smf11.tar.gz"><img src="Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/disk.gif" style="text-align: bottom" width="12" height="12" border="0"> Cbox on SMF</a> module to your computer.</li>
 <li>Go to the SMF Administration, and click on <b>Packages</b>.</li>
 <li>Click on the <b>Download Packages</b> tab.</li>
 <li>At <b>Upload a Package</b> at the bottom of the page, choose the <code>mod_cbox_smf11.tar.gz</code> file you just downloaded, and click <b>Upload</b>.</li>
 <li>The message "Package has been downloaded successfully" is displayed. Click <b>Apply Mod</b> beneath it.</li>
 <li>Click <b>Install Now</b>. You should then see "The package was installed successfully".</li>
 <li>Go to <b>Features and Options</b> under the Configuration heading on the menu to your left (or click on Features and Options on the Admin main page).</li>
-<li>Scroll down to locate the Cbox options. Paste your code snippet (from <a href="https://www.cbox.ws/admin?snippet">here</a>), private key (see below, required for integration) and choose where to place the box (header or footer).</li>
+<li>Scroll down to locate the Cbox options. Paste your code snippet (from <a href="/admin/publish.html">here</a>), private key (see below, required for integration) and choose where to place the box (header or footer).</li>
 <li>Save changes.</li>
 <li>And finally, click <b>Enable</b> lower down on this page to turn user integration on. </li>
 </ol>
@@ -450,14 +450,14 @@ You'll need to have a <a href="http://www.simplemachines.org/">Simple Machines F
 The Cbox SMF module will get Cbox on your SMF template easily, and it'll also integrate your SMF users with Cbox.
 </p>
 <ol>
-<li>First download our <a href="https://www.cbox.ws/extmodules/mod_cbox_smf2rc11.zip"><img src="Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/disk.gif" style="text-align: bottom" width="12" height="12" border="0"> Cbox on SMF</a> module to your computer.</li>
+<li>First download our <a href="/extmodules/mod_cbox_smf2rc11.zip"><img src="Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/disk.gif" style="text-align: bottom" width="12" height="12" border="0"> Cbox on SMF</a> module to your computer.</li>
 <li>Go to the SMF Administration, and click on <b>Packages</b>.</li>
 <li>Click on the <b>Download Packages</b> tab.</li>
 <li>At <b>Upload a Package</b> at the bottom of the page, choose the <code>mod_cbox_smf11.tar.gz</code> file you just downloaded, and click <b>Upload</b>.</li>
 <li>The message "Package has been downloaded successfully" is displayed. Click <b>Apply Mod</b> beneath it.</li>
 <li>Click <b>Install Now</b>. You should then see "The package was installed successfully".</li>
 <li>Go to <b>Features and Options</b> under the Configuration heading on the menu to your left (or click on Features and Options on the Admin main page).</li>
-<li>Scroll down to locate the Cbox options. Paste your code snippet (from <a href="https://www.cbox.ws/admin?snippet">here</a>), private key (see below, required for integration) and choose where to place the box (header or footer).</li>
+<li>Scroll down to locate the Cbox options. Paste your code snippet (from <a href="/admin/publish.html">here</a>), private key (see below, required for integration) and choose where to place the box (header or footer).</li>
 <li>Save changes.</li>
 <li>And finally, click <b>Enable</b> lower down on this page to turn user integration on. </li>
 </ol>
@@ -498,7 +498,7 @@ You'll need to have a Wordpress-based website up and running before proceeding w
 &lt;?php if ( $user_ID ) : ?&gt;
 [your Cbox HTML code]
 &lt;?php endif;  ?&gt;</pre></li>
-<li>Where it says [your Cbox HTML code] above, replace with your <a href="https://www.cbox.ws/admin?snippet">Cbox HTML code</a>.</li>
+<li>Where it says [your Cbox HTML code] above, replace with your <a href="/admin/publish.html">Cbox HTML code</a>.</li>
 <li>In your Cbox HTML code, find: <code>sec=form</code> and immediately after, paste: 
 <pre>&amp;nme=&lt;?php echo urlencode($user_identity)?&gt;&amp;nmekey=&lt;?php echo md5('8i9if550i3k4a2ck'.$user_identity)?&gt;</pre></li>
 <li>Save.</li>
@@ -522,7 +522,7 @@ confirm you can post on your Cbox using the name you are registered with
  at your site. 
 If you get a message saying your Cbox may be misconfigured, click 
 Disable above and 
-re-check your installation. If the problem persists, <a href="https://www.cbox.ws/contact">contact us</a>.
+re-check your installation. If the problem persists, <a href="/contact">contact us</a>.
 </p>
 
 
@@ -536,7 +536,7 @@ Paste the following code after implementing the standard integration code:
 </pre>
 <p>
 Change $avatar_url and $profile_url to the correct variables for the context. Note that they both appear twice. You will 
-need to enable the email/URL field and avatars at <a href="https://www.cbox.ws/admin?settings">Posting Options</a> if you haven't already.
+need to enable the email/URL field and avatars at <a href="/admin/options.html">Posting Options</a> if you haven't already.
 </p>
 
 </div>
@@ -554,12 +554,12 @@ need to enable the email/URL field and avatars at <a href="https://www.cbox.ws/a
 
 <div id="footer">
 
-	<a href="https://www.cbox.ws/">About
-	</a><a href="https://www.cbox.ws/products">Plans &amp; pricing
-	</a><a href="https://www.cbox.ws/terms">Terms &amp; conditions
-	</a><a href="https://www.cbox.ws/privacy">Privacy policy
-	</a><a href="https://www.cbox.ws/notices">Notices
-	</a><a href="https://www.cbox.ws/contact">Contact us
+	<a href="/">About
+	</a><a href="/products">Plans &amp; pricing
+	</a><a href="/terms">Terms &amp; conditions
+	</a><a href="/privacy">Privacy policy
+	</a><a href="/notices">Notices
+	</a><a href="/contact">Contact us
 	</a>
 	<div class="verybottom">
 		© 2004–2026 Cbox Communications (Pty) Ltd, all rights reserved. 
@@ -576,14 +576,14 @@ need to enable the email/URL field and avatars at <a href="https://www.cbox.ws/a
 m=s.getElementsByTagName(o)[0];a.async=1;a.src=g;m.parentNode.insertBefore(a,m)
 })(window,document,'script','//www.google-analytics.com/analytics.js','ga');
 ga('create', 'UA-242554-2', {
-	'cookieDomain': 'www.cbox.ws'
+	'cookieDomain': 'localhost'
 });
 ga('send', 'pageview');
 
 </script>
 
 
-<script src="Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/code.js"></script>
+<script src="/cbox-files/code.js"></script>
 <script>
 	// Modal / naked mode.
 	if (window.isPopup) {
@@ -623,5 +623,13 @@ dropCrumb();
 
 
 
-<script src="/cbox-files/cbox-bridge.js"></script>
+
+<script>
+function logout() {
+  localStorage.removeItem('token');
+  window.location.href = '/';
+}
+</script>
+<script src="/cbox-files/activate.js"></script>
+<script src="/cbox-files/pages-activate.js"></script>
 </body></html>
