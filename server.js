@@ -769,3 +769,110 @@ server.listen(PORT, () => {
   console.log('📍 http://localhost:' + PORT);
   console.log('🔌 WebSocket enabled');
 });
+
+
+// ===== MISSING ENDPOINTS (ADDED) =====
+
+// ARCHIVE SETTINGS
+app.get('/api/boxes/:id/archive-settings', auth, async (req, res) => {
+  try {
+    const box = await Box.findOne({ _id: req.params.id, ownerId: req.userId });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, archiveSettings: box.archiveSettings || {} });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/boxes/:id/archive-settings', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { archiveSettings: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// ARCHIVED MESSAGES
+app.get('/api/boxes/:id/messages/archived', auth, async (req, res) => {
+  try {
+    const messages = await Message.find({ boxId: req.params.id, isArchived: true }).sort({ createdAt: -1 }).limit(500);
+    res.json({ success: true, messages });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/messages/:id/archive', auth, async (req, res) => {
+  try {
+    const msg = await Message.findByIdAndUpdate(req.params.id, { $set: { isArchived: req.body.isArchived !== false } }, { new: true });
+    if (!msg) return res.status(404).json({ success: false, error: 'Message not found' });
+    res.json({ success: true, message: msg });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// USER SETTINGS
+app.get('/api/boxes/:id/user-settings', auth, async (req, res) => {
+  try {
+    const box = await Box.findOne({ _id: req.params.id, ownerId: req.userId });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, userSettings: box.userSettings || {} });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/boxes/:id/user-settings', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { userSettings: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// BAN POLICY
+app.get('/api/boxes/:id/ban-policy', auth, async (req, res) => {
+  try {
+    const box = await Box.findOne({ _id: req.params.id, ownerId: req.userId });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, banPolicy: box.banPolicy || {} });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+app.put('/api/boxes/:id/ban-policy', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { banPolicy: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// PUBLISH ADVANCED
+app.put('/api/boxes/:id/publish-advanced', auth, async (req, res) => {
+  try {
+    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { publishAdvanced: req.body } }, { new: true });
+    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
+    res.json({ success: true, box });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// CHANNEL UPDATE
+app.put('/api/channels/:id', auth, async (req, res) => {
+  try {
+    const channel = await Channel.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
+    if (!channel) return res.status(404).json({ success: false, error: 'Channel not found' });
+    res.json({ success: true, channel });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// STICKY MESSAGE UPDATE
+app.put('/api/messages/:id/sticky', auth, async (req, res) => {
+  try {
+    const msg = await Message.findByIdAndUpdate(req.params.id, { $set: { content: req.body.content, isSticky: true } }, { new: true });
+    if (!msg) return res.status(404).json({ success: false, error: 'Message not found' });
+    res.json({ success: true, message: msg });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+
+// STICKY MESSAGE DELETE
+app.delete('/api/messages/:id/sticky', auth, async (req, res) => {
+  try {
+    const msg = await Message.findByIdAndDelete(req.params.id);
+    if (!msg) return res.status(404).json({ success: false, error: 'Message not found' });
+    res.json({ success: true });
+  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
+});
+// ===== END OF MISSING ENDPOINTS =====
