@@ -115,8 +115,8 @@ function populatePageData() {
   if (path.includes('options-date.html')) {
     const f = document.forms['dateopt'];
     if (f) {
-      if (f.dateformat) f.dateformat.value = box.dateSettings?.dateFormat || 'DD/MM/YYYY';
-      if (f.timeformat) f.timeformat.value = box.dateSettings?.timeFormat || '24h';
+      if (f.dformat) f.dformat.value = box.dateSettings?.dateFormat || 'DD/MM/YYYY';
+      if (f.tformat) f.tformat.value = box.dateSettings?.timeFormat || '24h';
     }
   }
   
@@ -133,8 +133,8 @@ function populatePageData() {
   if (path.includes('options-filter.html')) {
     const f = document.forms['ffilter'];
     if (f) {
-      if (f.filter_enabled) f.filter_enabled.checked = box.filterSettings?.enabled !== false;
-      if (f.bannedwords) f.bannedwords.value = (box.filterSettings?.bannedWords || []).join('\n');
+      if (f.filter) f.filter.checked = box.filterSettings?.enabled !== false;
+      if (f.wordsub) f.wordsub.value = (box.filterSettings?.bannedWords || []).join('\n');
       if (f.filterlinks) f.filterlinks.checked = box.filterSettings?.filterLinks || false;
     }
   }
@@ -510,8 +510,8 @@ function interceptForms() {
         method: 'PUT',
         headers: { 'Authorization': 'Bearer ' + TOKEN, 'Content-Type': 'application/json' },
         body: JSON.stringify({
-          enabled: this.filter_enabled?.checked || false,
-          bannedWords: (this.bannedwords?.value || '').split('\n').filter(x => x.trim()),
+          enabled: this.filter?.checked || false,
+          bannedWords: (this.wordsub?.value || '').split('\n').filter(x => x.trim()),
           filterLinks: this.filterlinks?.checked || false
         })
       }).then(() => alert('Filter settings saved!')).catch(() => alert('Error saving'));
