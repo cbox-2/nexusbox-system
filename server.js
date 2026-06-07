@@ -1,4 +1,5 @@
 const express = require('express');
+const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
@@ -259,6 +260,16 @@ const auth = async (req, res, next) => {
     res.status(401).json({ success: false, error: 'Invalid token' });
   }
 };
+
+// Request Logger
+const requestLogger = (req, res, next) => {
+  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - User: ${req.user ? req.user._id : "anonymous"}`);
+  next();
+};
+
+// Use logger for all routes
+app.use(requestLogger);
+
 
 // ===== AUTH ROUTES =====
 app.post('/api/auth/signup', async (req, res) => {
