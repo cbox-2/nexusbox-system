@@ -1,12 +1,8 @@
 const express = require('express');
-const rateLimit = require('express-rate-limit');
 const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
-const helmet = require('helmet');
-const xss = require('xss');
-const mongoSanitize = require('express-mongo-sanitize');
 const path = require('path');
 const crypto = require('crypto');
 const http = require('http');
@@ -15,7 +11,7 @@ const multer = require('multer');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : '*', credentials: true } });
+const io = new Server(server, { cors: { origin: '*' } });
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'nexusbox_secret_key_2026';
 
@@ -35,36 +31,8 @@ const userSchema = new mongoose.Schema({
   emailVerified: { type: Boolean, default: false },
   resetToken: String,
   resetTokenExpiry: Date,
-  archiveSettings: { type: Object, default: {} },
-  userSettings: { type: Object, default: {} },
-  banPolicy: { type: Object, default: {} },
-  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
-
-
-// ===== DATABASE INDEXES =====
-userSchema.index({ email: 1 }, { unique: true });
-userSchema.index({ username: 1 }, { unique: true });
-userSchema.index({ role: 1 });
-userSchema.index({ status: 1 });
-
-boxSchema.index({ ownerId: 1 });
-boxSchema.index({ slug: 1 }, { unique: true });
-boxSchema.index({ embedKey: 1 }, { unique: true });
-
-messageSchema.index({ boxId: 1, createdAt: -1 });
-messageSchema.index({ boxId: 1, isArchived: 1 });
-messageSchema.index({ boxId: 1, isSticky: 1 });
-messageSchema.index({ author: 1 });
-
-channelSchema.index({ boxId: 1 });
-channelSchema.index({ boxId: 1, name: 1 }, { unique: true });
-
-banSchema.index({ boxId: 1 });
-banSchema.index({ target: 1 });
-banSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
-
 const User = mongoose.model('User', userSchema);
 
 const boxSchema = new mongoose.Schema({
@@ -162,10 +130,6 @@ const boxSchema = new mongoose.Schema({
     totalUsers: { type: Number, default: 0 },
     activeUsers: { type: Number, default: 0 }
   },
-  archiveSettings: { type: Object, default: {} },
-  userSettings: { type: Object, default: {} },
-  banPolicy: { type: Object, default: {} },
-  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
@@ -195,10 +159,6 @@ const messageSchema = new mongoose.Schema({
   isDeleted: { type: Boolean, default: false },
   ip: { type: String },
   attachments: [{ type: String }],
-  archiveSettings: { type: Object, default: {} },
-  userSettings: { type: Object, default: {} },
-  banPolicy: { type: Object, default: {} },
-  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
 const Message = mongoose.model('Message', messageSchema);
@@ -208,10 +168,6 @@ const channelSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, default: '' },
   isDefault: { type: Boolean, default: false },
-  archiveSettings: { type: Object, default: {} },
-  userSettings: { type: Object, default: {} },
-  banPolicy: { type: Object, default: {} },
-  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
 const Channel = mongoose.model('Channel', channelSchema);
@@ -235,10 +191,6 @@ const banSchema = new mongoose.Schema({
   reason: { type: String, default: '' },
   duration: { type: Number, default: 0 },
   expiresAt: { type: Date },
-  archiveSettings: { type: Object, default: {} },
-  userSettings: { type: Object, default: {} },
-  banPolicy: { type: Object, default: {} },
-  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
 banSchema.pre('save', function(next) {
@@ -251,10 +203,6 @@ const webLinkSchema = new mongoose.Schema({
   boxId: { type: mongoose.Schema.Types.ObjectId, ref: 'Box', required: true },
   title: { type: String, required: true },
   url: { type: String, required: true },
-  archiveSettings: { type: Object, default: {} },
-  userSettings: { type: Object, default: {} },
-  banPolicy: { type: Object, default: {} },
-  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
 const WebLink = mongoose.model('WebLink', webLinkSchema);
@@ -265,10 +213,6 @@ const supportTicketSchema = new mongoose.Schema({
   description: { type: String, required: true },
   type: { type: String, default: 'bug' },
   status: { type: String, default: 'open' },
-  archiveSettings: { type: Object, default: {} },
-  userSettings: { type: Object, default: {} },
-  banPolicy: { type: Object, default: {} },
-  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
 const SupportTicket = mongoose.model('SupportTicket', supportTicketSchema);
@@ -288,133 +232,7 @@ const auth = async (req, res, next) => {
   }
 };
 
-// Request Logger
-const requestLogger = (req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - User: ${req.user ? req.user._id : "anonymous"}`);
-  next();
-};
-
-// Use logger for all routes
-app.use(requestLogger);
-
-
 // ===== AUTH ROUTES =====
-
-
-// ===== ADMIN MIDDLEWARE =====
-const isAdmin = (req, res, next) => {
-  if (req.user && (req.user.role === 'admin' || req.user.role === 'superadmin')) {
-    next();
-  } else {
-    res.status(403).json({ success: false, error: 'Admin access required' });
-  }
-};
-
-const isSuperAdmin = (req, res, next) => {
-  if (req.user && req.user.role === 'superadmin') {
-    next();
-  } else {
-    res.status(403).json({ success: false, error: 'Super Admin access required' });
-  }
-};
-
-// ===== SANITIZE HELPER =====
-const sanitize = (str) => {
-  if (typeof str !== 'string') return str;
-  return xss(str.trim());
-};
-
-const sanitizeObject = (obj) => {
-  if (!obj || typeof obj !== 'object') return obj;
-  const sanitized = {};
-  for (const key in obj) {
-    if (typeof obj[key] === 'string') {
-      sanitized[key] = sanitize(obj[key]);
-    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
-      sanitized[key] = sanitizeObject(obj[key]);
-    } else {
-      sanitized[key] = obj[key];
-    }
-  }
-  return sanitized;
-};
-
-// ===== VALIDATION HELPERS =====
-const validateObjectId = (req, res, next) => {
-  const { id } = req.params;
-  if (id && !id.match(/^[0-9a-fA-F]{24}$/)) {
-    return res.status(400).json({ success: false, error: 'Invalid ID format' });
-  }
-  next();
-};
-
-const validateBoxData = (req, res, next) => {
-  const { name } = req.body;
-  if (!name || name.length < 3 || name.length > 50) {
-    return res.status(400).json({ success: false, error: 'Box name must be between 3 and 50 characters' });
-  }
-  req.body.name = sanitize(name);
-  next();
-};
-
-const validateUserData = (req, res, next) => {
-  const { username, email, password } = req.body;
-  const errors = [];
-  
-  if (!username || username.length < 3 || username.length > 30) {
-    errors.push('Username must be between 3 and 30 characters');
-  } else {
-    req.body.username = sanitize(username);
-  }
-  
-  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-    errors.push('Invalid email format');
-  } else {
-    req.body.email = sanitize(email);
-  }
-  
-  if (!password || password.length < 6) {
-    errors.push('Password must be at least 6 characters');
-  }
-  
-  if (errors.length > 0) {
-    return res.status(400).json({ success: false, errors });
-  }
-  next();
-};
-
-const validateMessageData = (req, res, next) => {
-  const { content } = req.body;
-  if (!content || content.length === 0 || content.length > 1000) {
-    return res.status(400).json({ success: false, error: 'Message must be between 1 and 1000 characters' });
-  }
-  req.body.content = sanitize(content);
-  next();
-};
-
-// ===== AUDIT LOG =====
-const auditLog = async (userId, action, resource, details = {}) => {
-  try {
-    console.log(`[AUDIT] User: ${userId} | Action: ${action} | Resource: ${resource} | Details: ${JSON.stringify(details)}`);
-    // يمكن حفظها في قاعدة البيانات لاحقاً
-  } catch (error) {
-    console.error('Audit log error:', error);
-  }
-};
-
-// ===== REQUEST ENHANCER (Sanitize all inputs) =====
-const sanitizeInputs = (req, res, next) => {
-  if (req.body) req.body = sanitizeObject(req.body);
-  if (req.query) {
-    for (const key in req.query) {
-      if (typeof req.query[key] === 'string') {
-        req.query[key] = sanitize(req.query[key]);
-      }
-    }
-  }
-  next();
-};
-
 app.post('/api/auth/signup', async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -496,7 +314,7 @@ app.post('/api/boxes', auth, async (req, res) => {
 
 app.get('/api/boxes', auth, async (req, res) => {
   try {
-    const boxes = await Box.find({ ownerId: req.userId }).populate("ownerId", "username email");
+    const boxes = await Box.find({ ownerId: req.userId });
     res.json({ success: true, boxes });
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
@@ -923,110 +741,3 @@ server.listen(PORT, () => {
   console.log('📍 http://localhost:' + PORT);
   console.log('🔌 WebSocket enabled');
 });
-
-
-// ===== MISSING ENDPOINTS (ADDED) =====
-
-// ARCHIVE SETTINGS
-app.get('/api/boxes/:id/archive-settings', auth, async (req, res) => {
-  try {
-    const box = await Box.findOne({ _id: req.params.id, ownerId: req.userId });
-    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
-    res.json({ success: true, archiveSettings: box.archiveSettings || {} });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-
-app.put('/api/boxes/:id/archive-settings', auth, async (req, res) => {
-  try {
-    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { archiveSettings: req.body } }, { new: true });
-    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
-    res.json({ success: true, box });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-
-// ARCHIVED MESSAGES
-app.get('/api/boxes/:id/messages/archived', auth, async (req, res) => {
-  try {
-    const messages = await Message.find({ boxId: req.params.id, isArchived: true }).sort({ createdAt: -1 }).limit(500);
-    res.json({ success: true, messages });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-
-app.put('/api/messages/:id/archive', auth, async (req, res) => {
-  try {
-    const msg = await Message.findByIdAndUpdate(req.params.id, { $set: { isArchived: req.body.isArchived !== false } }, { new: true });
-    if (!msg) return res.status(404).json({ success: false, error: 'Message not found' });
-    res.json({ success: true, message: msg });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-
-// USER SETTINGS
-app.get('/api/boxes/:id/user-settings', auth, async (req, res) => {
-  try {
-    const box = await Box.findOne({ _id: req.params.id, ownerId: req.userId });
-    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
-    res.json({ success: true, userSettings: box.userSettings || {} });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-
-app.put('/api/boxes/:id/user-settings', auth, async (req, res) => {
-  try {
-    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { userSettings: req.body } }, { new: true });
-    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
-    res.json({ success: true, box });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-
-// BAN POLICY
-app.get('/api/boxes/:id/ban-policy', auth, async (req, res) => {
-  try {
-    const box = await Box.findOne({ _id: req.params.id, ownerId: req.userId });
-    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
-    res.json({ success: true, banPolicy: box.banPolicy || {} });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-
-app.put('/api/boxes/:id/ban-policy', auth, async (req, res) => {
-  try {
-    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { banPolicy: req.body } }, { new: true });
-    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
-    res.json({ success: true, box });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-
-// PUBLISH ADVANCED
-app.put('/api/boxes/:id/publish-advanced', auth, async (req, res) => {
-  try {
-    const box = await Box.findOneAndUpdate({ _id: req.params.id, ownerId: req.userId }, { $set: { publishAdvanced: req.body } }, { new: true });
-    if (!box) return res.status(404).json({ success: false, error: 'Box not found' });
-    res.json({ success: true, box });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-
-// CHANNEL UPDATE
-app.put('/api/channels/:id', auth, async (req, res) => {
-  try {
-    const channel = await Channel.findByIdAndUpdate(req.params.id, { $set: req.body }, { new: true });
-    if (!channel) return res.status(404).json({ success: false, error: 'Channel not found' });
-    res.json({ success: true, channel });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-
-// STICKY MESSAGE UPDATE
-app.put('/api/messages/:id/sticky', auth, async (req, res) => {
-  try {
-    const msg = await Message.findByIdAndUpdate(req.params.id, { $set: { content: req.body.content, isSticky: true } }, { new: true });
-    if (!msg) return res.status(404).json({ success: false, error: 'Message not found' });
-    res.json({ success: true, message: msg });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-
-// STICKY MESSAGE DELETE
-app.delete('/api/messages/:id/sticky', auth, async (req, res) => {
-  try {
-    const msg = await Message.findByIdAndDelete(req.params.id);
-    if (!msg) return res.status(404).json({ success: false, error: 'Message not found' });
-    res.json({ success: true });
-  } catch (error) { res.status(500).json({ success: false, error: error.message }); }
-});
-// ===== END OF MISSING ENDPOINTS =====
