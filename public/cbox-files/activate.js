@@ -113,7 +113,7 @@ function populatePageData() {
   
   // Date options
   if (path.includes('options-date.html')) {
-    const f = document.forms['dateopts'];
+    const f = document.forms['dateopt'];
     if (f) {
       if (f.dateformat) f.dateformat.value = box.dateSettings?.dateFormat || 'DD/MM/YYYY';
       if (f.timeformat) f.timeformat.value = box.dateSettings?.timeFormat || '24h';
@@ -122,7 +122,7 @@ function populatePageData() {
   
   // Emoji options
   if (path.includes('options-emoji.html')) {
-    const f = document.forms['emojiopts'];
+    const f = document.forms['fsmilies'];
     if (f) {
       if (f.emoji_enabled) f.emoji_enabled.checked = box.emojiSettings?.enabled !== false;
       if (f.emoji_list) f.emoji_list.value = (box.emojiSettings?.allowed || []).join('\n');
@@ -131,7 +131,7 @@ function populatePageData() {
   
   // Filter options
   if (path.includes('options-filter.html')) {
-    const f = document.forms['filteropts'];
+    const f = document.forms['ffilter'];
     if (f) {
       if (f.filter_enabled) f.filter_enabled.checked = box.filterSettings?.enabled !== false;
       if (f.bannedwords) f.bannedwords.value = (box.filterSettings?.bannedWords || []).join('\n');
@@ -149,7 +149,7 @@ function populatePageData() {
   
   // Look & Feel - Layout
   if (path.includes('lookfeel-layout.html')) {
-    const f = document.forms['layout'];
+    const f = document.forms['flayout'];
     if (f) {
       if (f.width) f.width.value = box.layout?.width || 400;
       if (f.height) f.height.value = box.layout?.height || 500;
@@ -432,7 +432,7 @@ function interceptForms() {
   }
   
   // Layout form
-  const layoutForm = document.forms['layout'];
+  const layoutForm = document.forms['flayout'];
   if (layoutForm) {
     layoutForm.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -467,7 +467,7 @@ function interceptForms() {
   }
   
   // Date options
-  const dateForm = document.forms['dateopts'];
+  const dateForm = document.forms['dateopt'];
   if (dateForm) {
     dateForm.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -484,7 +484,7 @@ function interceptForms() {
   }
   
   // Emoji options
-  const emojiForm = document.forms['emojiopts'];
+  const emojiForm = document.forms['fsmilies'];
   if (emojiForm) {
     emojiForm.addEventListener('submit', function(e) {
       e.preventDefault();
@@ -501,7 +501,7 @@ function interceptForms() {
   }
   
   // Filter options
-  const filterForm = document.forms['filteropts'];
+  const filterForm = document.forms['ffilter'];
   if (filterForm) {
     filterForm.addEventListener('submit', function(e) {
       e.preventDefault();
