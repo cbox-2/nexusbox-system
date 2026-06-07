@@ -19,6 +19,41 @@ const io = new Server(server, { cors: { origin: process.env.ALLOWED_ORIGINS ? pr
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'nexusbox_secret_key_2026';
 
+// ===== SANITIZE INPUTS MIDDLEWARE =====
+const sanitizeInputs = (req, res, next) => {
+  const sanitize = (str) => {
+    if (typeof str !== "string") return str;
+    return xss(str.trim());
+  };
+  const sanitizeObject = (obj) => {
+    if (!obj || typeof obj !== "object") return obj;
+    const result = {};
+    for (const key in obj) {
+      if (typeof obj[key] === "string") result[key] = sanitize(obj[key]);
+      else if (typeof obj[key] === "object") result[key] = sanitizeObject(obj[key]);
+      else result[key] = obj[key];
+    }
+    return result;
+  };
+  if (req.body) req.body = sanitizeObject(req.body);
+  if (req.query) {
+    for (const key in req.query) {
+      if (typeof req.query[key] === "string") req.query[key] = sanitize(req.query[key]);
+    }
+  }
+  next();
+};
+
+// ===== REQUEST LOGGER =====
+const requestLogger = (req, res, next) => {
+  const start = Date.now();
+  res.on("finish", () => {
+    const duration = Date.now() - start;
+    console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} ${res.statusCode} ${duration}ms`);
+  });
+  next();
+};
+
 app.use(helmet({
   contentSecurityPolicy: false,
   crossOriginEmbedderPolicy: false
@@ -296,10 +331,6 @@ const auth = async (req, res, next) => {
 };
 
 // Request Logger
-const requestLogger = (req, res, next) => {
-  console.log(`[${new Date().toISOString()}] ${req.method} ${req.url} - User: ${req.user ? req.user._id : "anonymous"}`);
-  next();
-};
 
 // Use logger for all routes
 
@@ -413,17 +444,6 @@ const sanitizeInputs = (req, res, next) => {
   if (req.body) req.body = sanitizeObject(req.body);
   if (req.query) {
     for (const key in req.query) {
-      if (typeof req.query[key] === 'string') {
-        req.query[key] = sanitize(req.query[key]);
-      }
-    }
-  }
-  next();
-};
-
-app.post('/api/auth/signup', async (req, res) => {
-  try {
-    const { username, email, password } = req.body;
     if (!username || !email || !password) return res.status(400).json({ success: false, error: 'All fields required' });
     const existing = await User.findOne({ $or: [{ email }, { username }] });
     if (existing) return res.status(400).json({ success: false, error: 'User already exists' });
