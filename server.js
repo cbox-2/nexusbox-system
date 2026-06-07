@@ -4,6 +4,9 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const cors = require('cors');
+const helmet = require('helmet');
+const xss = require('xss');
+const mongoSanitize = require('express-mongo-sanitize');
 const path = require('path');
 const crypto = require('crypto');
 const http = require('http');
@@ -12,7 +15,7 @@ const multer = require('multer');
 
 const app = express();
 const server = http.createServer(app);
-const io = new Server(server, { cors: { origin: '*' } });
+const io = new Server(server, { cors: { origin: process.env.ALLOWED_ORIGINS ? process.env.ALLOWED_ORIGINS.split(',') : '*', credentials: true } });
 const PORT = process.env.PORT || 3000;
 const JWT_SECRET = process.env.JWT_SECRET || 'nexusbox_secret_key_2026';
 
@@ -38,6 +41,30 @@ const userSchema = new mongoose.Schema({
   publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
+
+
+// ===== DATABASE INDEXES =====
+userSchema.index({ email: 1 }, { unique: true });
+userSchema.index({ username: 1 }, { unique: true });
+userSchema.index({ role: 1 });
+userSchema.index({ status: 1 });
+
+boxSchema.index({ ownerId: 1 });
+boxSchema.index({ slug: 1 }, { unique: true });
+boxSchema.index({ embedKey: 1 }, { unique: true });
+
+messageSchema.index({ boxId: 1, createdAt: -1 });
+messageSchema.index({ boxId: 1, isArchived: 1 });
+messageSchema.index({ boxId: 1, isSticky: 1 });
+messageSchema.index({ author: 1 });
+
+channelSchema.index({ boxId: 1 });
+channelSchema.index({ boxId: 1, name: 1 }, { unique: true });
+
+banSchema.index({ boxId: 1 });
+banSchema.index({ target: 1 });
+banSchema.index({ expiresAt: 1 }, { expireAfterSeconds: 0 });
+
 const User = mongoose.model('User', userSchema);
 
 const boxSchema = new mongoose.Schema({
@@ -272,6 +299,122 @@ app.use(requestLogger);
 
 
 // ===== AUTH ROUTES =====
+
+
+// ===== ADMIN MIDDLEWARE =====
+const isAdmin = (req, res, next) => {
+  if (req.user && (req.user.role === 'admin' || req.user.role === 'superadmin')) {
+    next();
+  } else {
+    res.status(403).json({ success: false, error: 'Admin access required' });
+  }
+};
+
+const isSuperAdmin = (req, res, next) => {
+  if (req.user && req.user.role === 'superadmin') {
+    next();
+  } else {
+    res.status(403).json({ success: false, error: 'Super Admin access required' });
+  }
+};
+
+// ===== SANITIZE HELPER =====
+const sanitize = (str) => {
+  if (typeof str !== 'string') return str;
+  return xss(str.trim());
+};
+
+const sanitizeObject = (obj) => {
+  if (!obj || typeof obj !== 'object') return obj;
+  const sanitized = {};
+  for (const key in obj) {
+    if (typeof obj[key] === 'string') {
+      sanitized[key] = sanitize(obj[key]);
+    } else if (typeof obj[key] === 'object' && obj[key] !== null) {
+      sanitized[key] = sanitizeObject(obj[key]);
+    } else {
+      sanitized[key] = obj[key];
+    }
+  }
+  return sanitized;
+};
+
+// ===== VALIDATION HELPERS =====
+const validateObjectId = (req, res, next) => {
+  const { id } = req.params;
+  if (id && !id.match(/^[0-9a-fA-F]{24}$/)) {
+    return res.status(400).json({ success: false, error: 'Invalid ID format' });
+  }
+  next();
+};
+
+const validateBoxData = (req, res, next) => {
+  const { name } = req.body;
+  if (!name || name.length < 3 || name.length > 50) {
+    return res.status(400).json({ success: false, error: 'Box name must be between 3 and 50 characters' });
+  }
+  req.body.name = sanitize(name);
+  next();
+};
+
+const validateUserData = (req, res, next) => {
+  const { username, email, password } = req.body;
+  const errors = [];
+  
+  if (!username || username.length < 3 || username.length > 30) {
+    errors.push('Username must be between 3 and 30 characters');
+  } else {
+    req.body.username = sanitize(username);
+  }
+  
+  if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+    errors.push('Invalid email format');
+  } else {
+    req.body.email = sanitize(email);
+  }
+  
+  if (!password || password.length < 6) {
+    errors.push('Password must be at least 6 characters');
+  }
+  
+  if (errors.length > 0) {
+    return res.status(400).json({ success: false, errors });
+  }
+  next();
+};
+
+const validateMessageData = (req, res, next) => {
+  const { content } = req.body;
+  if (!content || content.length === 0 || content.length > 1000) {
+    return res.status(400).json({ success: false, error: 'Message must be between 1 and 1000 characters' });
+  }
+  req.body.content = sanitize(content);
+  next();
+};
+
+// ===== AUDIT LOG =====
+const auditLog = async (userId, action, resource, details = {}) => {
+  try {
+    console.log(`[AUDIT] User: ${userId} | Action: ${action} | Resource: ${resource} | Details: ${JSON.stringify(details)}`);
+    // يمكن حفظها في قاعدة البيانات لاحقاً
+  } catch (error) {
+    console.error('Audit log error:', error);
+  }
+};
+
+// ===== REQUEST ENHANCER (Sanitize all inputs) =====
+const sanitizeInputs = (req, res, next) => {
+  if (req.body) req.body = sanitizeObject(req.body);
+  if (req.query) {
+    for (const key in req.query) {
+      if (typeof req.query[key] === 'string') {
+        req.query[key] = sanitize(req.query[key]);
+      }
+    }
+  }
+  next();
+};
+
 app.post('/api/auth/signup', async (req, res) => {
   try {
     const { username, email, password } = req.body;
@@ -353,7 +496,7 @@ app.post('/api/boxes', auth, async (req, res) => {
 
 app.get('/api/boxes', auth, async (req, res) => {
   try {
-    const boxes = await Box.find({ ownerId: req.userId });
+    const boxes = await Box.find({ ownerId: req.userId }).populate("ownerId", "username email");
     res.json({ success: true, boxes });
   } catch (error) { res.status(500).json({ success: false, error: error.message }); }
 });
