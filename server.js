@@ -31,6 +31,10 @@ const userSchema = new mongoose.Schema({
   emailVerified: { type: Boolean, default: false },
   resetToken: String,
   resetTokenExpiry: Date,
+  archiveSettings: { type: Object, default: {} },
+  userSettings: { type: Object, default: {} },
+  banPolicy: { type: Object, default: {} },
+  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
 const User = mongoose.model('User', userSchema);
@@ -130,6 +134,10 @@ const boxSchema = new mongoose.Schema({
     totalUsers: { type: Number, default: 0 },
     activeUsers: { type: Number, default: 0 }
   },
+  archiveSettings: { type: Object, default: {} },
+  userSettings: { type: Object, default: {} },
+  banPolicy: { type: Object, default: {} },
+  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now },
   updatedAt: { type: Date, default: Date.now }
 });
@@ -159,6 +167,10 @@ const messageSchema = new mongoose.Schema({
   isDeleted: { type: Boolean, default: false },
   ip: { type: String },
   attachments: [{ type: String }],
+  archiveSettings: { type: Object, default: {} },
+  userSettings: { type: Object, default: {} },
+  banPolicy: { type: Object, default: {} },
+  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
 const Message = mongoose.model('Message', messageSchema);
@@ -168,6 +180,10 @@ const channelSchema = new mongoose.Schema({
   name: { type: String, required: true },
   description: { type: String, default: '' },
   isDefault: { type: Boolean, default: false },
+  archiveSettings: { type: Object, default: {} },
+  userSettings: { type: Object, default: {} },
+  banPolicy: { type: Object, default: {} },
+  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
 const Channel = mongoose.model('Channel', channelSchema);
@@ -191,6 +207,10 @@ const banSchema = new mongoose.Schema({
   reason: { type: String, default: '' },
   duration: { type: Number, default: 0 },
   expiresAt: { type: Date },
+  archiveSettings: { type: Object, default: {} },
+  userSettings: { type: Object, default: {} },
+  banPolicy: { type: Object, default: {} },
+  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
 banSchema.pre('save', function(next) {
@@ -203,6 +223,10 @@ const webLinkSchema = new mongoose.Schema({
   boxId: { type: mongoose.Schema.Types.ObjectId, ref: 'Box', required: true },
   title: { type: String, required: true },
   url: { type: String, required: true },
+  archiveSettings: { type: Object, default: {} },
+  userSettings: { type: Object, default: {} },
+  banPolicy: { type: Object, default: {} },
+  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
 const WebLink = mongoose.model('WebLink', webLinkSchema);
@@ -213,6 +237,10 @@ const supportTicketSchema = new mongoose.Schema({
   description: { type: String, required: true },
   type: { type: String, default: 'bug' },
   status: { type: String, default: 'open' },
+  archiveSettings: { type: Object, default: {} },
+  userSettings: { type: Object, default: {} },
+  banPolicy: { type: Object, default: {} },
+  publishAdvanced: { type: Object, default: {} },
   createdAt: { type: Date, default: Date.now }
 });
 const SupportTicket = mongoose.model('SupportTicket', supportTicketSchema);
