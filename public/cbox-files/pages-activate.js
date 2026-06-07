@@ -544,3 +544,61 @@ window.addEventListener('DOMContentLoaded', function() {
     loadBoxes();
   }
 });
+
+// ===== عرض اسم الصندوق في التصميم الأصلي =====
+function showBoxNameInUI() {
+  if (!currentBoxId || allBoxes.length === 0) return;
+  
+  const currentBox = allBoxes.find(b => b._id === currentBoxId);
+  if (!currentBox) return;
+  
+  const boxName = currentBox.name;
+  
+  // 1. تحديث عنوان submenu (MY CBOXES)
+  const submenuItems = document.querySelectorAll('.submenuitem');
+  submenuItems.forEach(item => {
+    const bold = item.querySelector('b');
+    if (bold && (bold.textContent.includes('MY CBOXES') || bold.textContent.includes('CBOXES'))) {
+      bold.textContent = boxName.toUpperCase();
+    }
+  });
+  
+  // 2. تحديث أي عنصر يحتوي على اسم الصندوق
+  const boxNameElements = document.querySelectorAll('.boxname, #boxname, [data-boxname]');
+  boxNameElements.forEach(el => {
+    el.textContent = boxName;
+  });
+  
+  // 3. تحديث عنوان الصفحة
+  if (document.title && !document.title.includes(boxName)) {
+    document.title = boxName + ' · ' + document.title.split('·')[0].trim();
+  }
+  
+  // 4. إضافة قائمة اختيار الصندوق في الهيدر
+  const headerExtras = document.getElementById('headerExtras');
+  if (headerExtras && !document.getElementById('boxSelector')) {
+    let selectorHtml = '<select id="boxSelector" onchange="switchBox(this.value)" style="margin-right:10px;padding:5px;border-radius:3px;border:1px solid #ddd;">';
+    allBoxes.forEach(b => {
+      const selected = b._id === currentBoxId ? 'selected' : '';
+      selectorHtml += '<option value="' + b._id + '" ' + selected + '>' + b.name + '</option>';
+    });
+    selectorHtml += '</select>';
+    headerExtras.insertAdjacentHTML('afterbegin', selectorHtml);
+  }
+  
+  console.log('✅ Box name set to:', boxName);
+}
+
+function switchBox(newBoxId) {
+  currentBoxId = newBoxId;
+  localStorage.setItem('currentBoxId', newBoxId);
+  loadCurrentBox();
+  setTimeout(() => location.reload(), 500);
+}
+
+// استدعاء الدالة بعد تحميل البيانات
+const originalPopulatePage = populatePage;
+populatePage = function() {
+  originalPopulatePage();
+  showBoxNameInUI();
+};
