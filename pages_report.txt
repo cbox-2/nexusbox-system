@@ -1,0 +1,261 @@
+
+============================================================
+📄 account.html
+============================================================
+🔷 Input Fields: currentPassword, newPassword, confirmPassword
+ Buttons: Update Password
+🔷 JS Functions: logout
+🔷 External Scripts: /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 create-box.html
+============================================================
+🔷 JS Functions: createBox
+🔷 External Scripts: /assets/js/shared.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 dashboard.html
+============================================================
+🔷 JS Functions: load
+🔷 External Scripts: /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 index.html
+============================================================
+
+ Forms: qlpop
+🔷 Form Actions: /admin_d_login?f=qlpop
+🔷 Input Fields: uname, pword, sub
+ Buttons:  Log in 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox_files/js, Control%20Panel%20%C2%B7%20Cbox_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 lookfeel-layout.html
+============================================================
+
+ Forms: qlpop, flayout
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=flayout
+🔷 Input Fields: uname, pword, sub, codechanged, twidth, theight, fheight, fhauto, flines, fontop, falt, sub
+🔷 Select Fields: lang, mpp, sortdir
+ Buttons:  Log in ,  Save 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, inorm, resizetbl, chk_flayout, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20Layout%20optins_files/js, Control%20Panel%20%C2%B7%20Cbox%20Layout%20optins_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 lookfeel.html
+============================================================
+
+ Forms: qlpop, styleadv
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=styleadv&amp;srv=4&amp;boxid=4257987
+🔷 Input Fields: uname, pword, sub, sub
+🔷 Select Fields: style
+🔷 Textarea Fields: advancedcss
+ Buttons:  Log in ,  Save 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20Theme%20editor_files/js, Control%20Panel%20%C2%B7%20Cbox%20Theme%20editor_files/analytics.js, Control%20Panel%20%C2%B7%20Cbox%20Theme%20editor_files/theme_editor.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 messages-archive.html
+============================================================
+
+ Forms: qlpop, fpostsarc
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=fpostsarc
+🔷 Input Fields: uname, pword, sub, yy1, mm1, dd1, yy2, mm2, dd2, sub
+ Buttons:  Log in ,  Go 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20Archives_files/js, Control%20Panel%20%C2%B7%20Cbox%20Archives_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 messages-channels.html
+============================================================
+
+ Forms: qlpop, fthreadadd, srchthreadsf
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=fthreadadd, /admin_l_threads
+🔷 Input Fields: uname, pword, sub, nme, sub, srch, find
+🔷 Select Fields: srchin
+ Buttons:  Log in ,  Add ,  Find 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, pf, jselall, togsrch, reload, rsziframe, chk_bulkdel, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20%20Channels_files/js, Control%20Panel%20%C2%B7%20Cbox%20%20Channels_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 messages-sticky.html
+============================================================
+
+ Forms: qlpop, fsticky
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=fsticky&amp;srv=4&amp;boxid=4257987
+🔷 Input Fields: uname, pword, sub, htmlmode, sub
+🔷 Textarea Fields: sticky
+ Buttons:  Log in ,  Save 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20Sticky%20message_files/js, Control%20Panel%20%C2%B7%20Cbox%20Sticky%20message_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 messages-weblinks.html
+============================================================
+🔷 JS Functions: loadLinks, addLink, deleteLink
+🔷 External Scripts: /assets/js/shared.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 messages.html
+============================================================
+
+ Forms: qlpop, fpostopt, fquickdel, srchpostsf
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=fpostopt, /admin_d_submit?f=fquickdel, /admin_l_posts
+🔷 Input Fields: uname, pword, sub, dummyinput, emlnotify, sub, tid, prunenum, sub, tid, srch, find
+🔷 Select Fields: prunetype, prunewhich, srchin
+ Buttons:  Log in ,  Save , Delete,  Find 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, pf, jselall, togsrch, reload, rsziframe, chk_bulkdel, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20Messages_files/js, Control%20Panel%20%C2%B7%20Cbox%20Messages_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 options-date.html
+============================================================
+
+ Forms: qlpop, dateopt
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=dateopt
+🔷 Input Fields: uname, pword, sub, tzone, sub
+🔷 Select Fields: dformat, tformat, showdate
+ Buttons:  Log in ,  Save 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, chk_dateopt, calcdate, gettime, getdaysuff, pad, gettz, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20%20%20Date%20options_files/js, Control%20Panel%20%C2%B7%20Cbox%20%20%20Date%20options_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 options-emoji.html
+============================================================
+
+ Forms: qlpop, femotreset, fsmilies
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=femotreset&amp;srv=4&amp;boxid=4257987, /admin_d_submit?f=fsmilies
+🔷 Input Fields: uname, pword, sub, sub, smcode'+tbl.rows.length+', smcodealt'+tbl.rows.length+', smurl'+tbl.rows.length+', prev, smcode1, smcodealt1, smurl1, smcode2, smcodealt2, smurl2, smcode3
+🔷 Select Fields: smiliesopt
+ Buttons:  Log in ,  Apply , New row, Upload image...,  Save changes 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, confirmload, isLimitExceeded, showLimitExceeded, addsmilie, chgcurval, updateCount, initsmilies
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20%20Emoticons_files/js, Control%20Panel%20%C2%B7%20Cbox%20%20Emoticons_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 options-filter.html
+============================================================
+
+ Forms: qlpop, ffilter
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=ffilter&amp;srv=4&amp;boxid=4257987
+🔷 Input Fields: uname, pword, sub, filter, htmlmode, sub
+🔷 Textarea Fields: wordsub
+ Buttons:  Log in ,  Save 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, rsztxtbox, updateCount, numlines, showLimitExceeded, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20Filtering_files/js, Control%20Panel%20%C2%B7%20Cbox%20Filtering_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 options.html
+============================================================
+
+ Forms: qlpop, settings
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=settings
+🔷 Input Fields: uname, pword, sub, codechanged, allowemail, avatars, boxcode, showflag, pm, moderated, mic, soundmute, soundurl, onliners_show, onliners_typing
+🔷 Select Fields: mpl, autolink, sound, ratelimit, captcha
+ Buttons:  Log in ,  Save 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, chk_settings, chksound, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20Posting%20options_files/js, Control%20Panel%20%C2%B7%20Cbox%20Posting%20options_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 publish.html
+============================================================
+
+ Forms: qlpop, fsnippet, fsnippet2
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=fsnippet, /admin/publish.html
+🔷 Input Fields: uname, pword, sub, site, private, codessl, hashtag, sub, cpy
+🔷 Select Fields: variation, sitetype
+🔷 Textarea Fields: whitelist
+ Buttons:  Log in ,  Save , Copy to clipboard
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, gentag, copytext, switchcode, toggle, updateinst, popcbox, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20%D8%A7%D9%86%D8%B4%D8%B1_files/js, Control%20Panel%20%C2%B7%20Cbox%20%D8%A7%D9%86%D8%B4%D8%B1_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 select-box.html
+============================================================
+🔷 JS Functions: loadBoxes, selectBox
+🔷 External Scripts: /assets/js/shared.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 snippet.html
+============================================================
+🔷 JS Functions: loadBoxes, populateBoxSelect, generateCode, copyCode
+🔷 External Scripts: /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 support.html
+============================================================
+🔷 Input Fields: subject
+🔷 Textarea Fields: description
+ Buttons: Submit Report
+🔷 JS Functions: logout
+🔷 External Scripts: /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 users-banned.html
+============================================================
+
+ Forms: qlpop, fcban, fban, srchbansf
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=fcban, /admin_d_submit?f=fban, /admin_l_bans
+🔷 Input Fields: uname, pword, sub, sub, ip, dur, ref, sub, srch, find
+🔷 Select Fields: policy, country, srchin
+ Buttons:  Log in , Add/update,  Add ,  Find 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, pf, jselall, togsrch, reload, rsziframe, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20Blocked%20users_files/js, Control%20Panel%20%C2%B7%20Cbox%20Blocked%20users_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 users-integration.html
+============================================================
+
+ Forms: qlpop, fuserint
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=fuserint
+🔷 Input Fields: uname, pword, sub, uoauth, uo, uoreg, sub
+🔷 Select Fields: intwith
+ Buttons:  Log in ,  Save 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, updateint, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/js, Control%20Panel%20%C2%B7%20Cbox%20%20User%20integration_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 users.html
+============================================================
+
+ Forms: qlpop, fuseropt, fuseradd, srchusersf
+🔷 Form Actions: /admin_d_login?f=qlpop, /admin_d_submit?f=fuseropt, /admin_d_submit?f=fuseradd, /admin_l_users
+🔷 Input Fields: uname, pword, sub, dummyinput, regonly, selfreg, autoprotect, autouserdel, auth_fb, autoprotect, autouserdel, lastpostdel, sub, uname, pword
+🔷 Select Fields: regonly, lvl, srchin
+ Buttons:  Log in ,  Save ,  Add ,  Find 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, pf, jselall, togsrch, reload, rsziframe, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20%20Registered%20users_files/js, Control%20Panel%20%C2%B7%20Cbox%20%20Registered%20users_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
+
+============================================================
+📄 webhook.html
+============================================================
+
+ Forms: qlpop, fpostopt
+🔷 Form Actions: /admin_d_login?f=qlpop, 
+🔷 Input Fields: uname, pword, sub, url, enabled, sub
+ Buttons:  Log in ,  Save ,  Refresh 
+🔷 JS Functions: noticetoggle, noticeclose, highlighthelp, logout
+🔷 External Scripts: Control%20Panel%20%C2%B7%20Cbox%20Webhook_files/js, Control%20Panel%20%C2%B7%20Cbox%20Webhook_files/analytics.js, /cbox-files/code.js, /cbox-files/activate.js
+✅ activate.js: Included
